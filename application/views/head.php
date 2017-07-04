@@ -20,7 +20,8 @@
 
         <!-- Le fav and touch icons -->
         <link rel="shortcut icon" href="<?= base_url() ?>assets/img/favicon.png">
-        
+
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=es"></script>
         <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js"></script>
         <script src="<?= base_url() ?>assets/js/bootstrap.min.js"></script>
         <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
@@ -31,6 +32,14 @@
         <script type="text/javascript">
             var site_url="<?= site_url() ?>";
             var base_url="<?= base_url() ?>";
+
+            var onloadCallback = function() {
+                grecaptcha.render('login_captcha', {
+                    'sitekey' : '6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH',
+                    'size' : 'normal',
+                    'opt_widget_id': '2'
+                });
+            };
         </script>
 
         <script src="<?= base_url() ?>assets/js/common.js"></script>

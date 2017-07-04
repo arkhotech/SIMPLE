@@ -68,10 +68,22 @@ class Autenticacion extends MY_Controller {
         redirect($redirectlogin);
     }
 
+    function validate_captcha() {
+        $captcha = $this->input->post('g-recaptcha-response');
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=6Le7zycUAAAAAIHDhvj6Z7yZwyCzrxddRJhpGNol&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
+        if ($response . 'success' == false) {
+            return FALSE; 
+        } else {
+            return TRUE;
+        }
+    }
+
     public function login_form() {
 
         $this->form_validation->set_rules('usuario', 'Usuario', 'required');
         $this->form_validation->set_rules('password', 'Contraseña', 'required|callback_check_password');
+        $this->form_validation->set_rules('g-recaptcha-response', 'recaptcha validation', 'required|callback_validate_captcha');
+        $this->form_validation->set_message('validate_captcha', 'Please check the the captcha form');
 
         $respuesta = new stdClass();
         if ($this->form_validation->run() == TRUE) {
