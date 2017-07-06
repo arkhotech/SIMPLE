@@ -203,7 +203,22 @@ class Etapas extends MY_Controller {
         }
     }
 
+    function validate_captcha() {
+        $CI = & get_instance();
+        log_message('debug', 'validate_captcha() : secretkey [' . $CI->config->item('secretkey') . ']');
+        $captcha = $this->input->post('g-recaptcha-response');
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $CI->config->item('secretkey') . "&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
+        if ($response . 'success' == false) {
+            return FALSE; 
+        } else {
+            return TRUE;
+        }
+    }
+
     public function ejecutar_form($etapa_id, $secuencia) {
+
+        log_message('info', 'ejecutar_form ($etapa_id [' . $etapa_id . '], $secuencia [' . $secuencia . '])');
+
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
         if ($etapa->usuario_id != UsuarioSesion::usuario()->id) {
@@ -235,7 +250,11 @@ class Etapas extends MY_Controller {
                 //Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
                 if ($c->isEditableWithCurrentPOST($etapa_id)) {
                     $c->formValidate($etapa->id);
-                    $validar_formulario = TRUE;                    
+                    $validar_formulario = TRUE;
+                }
+                if ($c->tipo =='recaptcha') {
+                    $this->form_validation->set_rules('g-recaptcha-response', 'Captcha', 'required|callback_validate_captcha');
+                    $this->form_validation->set_message('validate_captcha', 'Please check the the captcha form');
                 }
             }
             if (!$validar_formulario || $this->form_validation->run() == TRUE) {

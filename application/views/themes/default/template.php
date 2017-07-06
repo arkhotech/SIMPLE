@@ -31,7 +31,7 @@
                                         <li id="loginView">
                                             <div class="simple">
                                                 <div class="wrapper">
-                                            <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
+                                            <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>"> 
                                                 <fieldset>
                                                     <div class="validacion"></div>
                                                     <input type="hidden" name="redirect" value="<?= current_url() ?>" />
