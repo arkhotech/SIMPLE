@@ -82,7 +82,8 @@ class Acciones extends MY_BackendController {
             $accion=new AccionWebservice();
         else if($tipo=='variable')
             $accion=new AccionVariable();
-        
+        else if($tipo=='rest')
+            $accion=new AccionRest();
         $data['edit']=FALSE;
         $data['proceso']=$proceso;
         $data['tipo']=$tipo;
@@ -122,6 +123,9 @@ class Acciones extends MY_BackendController {
                 $accion=new AccionWebservice();
             else if($this->input->post('tipo')=='variable')
                 $accion=new AccionVariable();
+            else if($this->input->post('tipo')=='rest')
+                $accion=new AccionRest();
+            
             $accion->proceso_id=$this->input->post('proceso_id');
             $accion->tipo=$this->input->post('tipo');
         }
@@ -137,6 +141,8 @@ class Acciones extends MY_BackendController {
             $this->form_validation->set_rules('proceso_id','Proceso','required');
             $this->form_validation->set_rules('tipo','Tipo de Campo','required');
         }
+        
+        
 
         $respuesta=new stdClass();
         if($this->form_validation->run()==TRUE){
