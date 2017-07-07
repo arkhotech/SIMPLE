@@ -13,26 +13,11 @@ class AccionRest extends Accion {
             </p>
         ';
 
+        $display.='<script src="'.base_url().'assets/js/CrearDivHeader.js" type="text/javascript"></script>'; 
+        
         $display.='
-            <script type="text/javascript">
-                function CambioSelect(value) {
-                    switch(value){                
-                        case "POST": case "PUT":
-                            $("#divObject").show();
-                            break;
-                        case "GET": case "DELETE":
-                            $("#divObject").hide();
-                            break;
-                        default:
-                        break;
-                    }
-                }
-            </script>
-        '; 
-
-            $display.='
                 <label>Método</label>
-                <select name="extra[tipoMetodo]" onchange="CambioSelect(value)">
+                <select id="tipoMetodo" name="extra[tipoMetodo]">
                     <option value="">Seleccione...</option>
                     <option value="POST">POST</option>
                     <option value="GET">GET</option>
@@ -46,19 +31,24 @@ class AccionRest extends Accion {
         $display.='
             <div id="divObject" style="display:none;">
                 <label>Request</label>
-                <textarea name="extra[object]" rows="7" cols="70" placeholder="{ Object }" class="input-xxlarge">' . ($this->extra ? $this->extra->object : '123456') . '</textarea>
+                <textarea name="extra[object]" rows="7" cols="70" placeholder="{ Object }" class="input-xxlarge">' . ($this->extra ? $this->extra->object : '') . '</textarea>
             </div>';
 
 
         $display.='
             <div class="col-md-12">
-                <input type="text" placeholder="Nombre" name="extra[nombre]" value="' . ($this->extra ? $this->extra->nombre : '') . '" />
+                <label>Header</label>
+                <div id="divDinamico" class="col-md-12">
+                    <div class="col-md-12">
+                        <input type="text" placeholder="Nombre" name="extra[nombre]" value="' . ($this->extra ? $this->extra->nombre : '') . '" />
 
-                <input type="text" placeholder="Valor" name="extra[valor]" value="' . ($this->extra ? $this->extra->valor : '') . '" />
+                        <input type="text" placeholder="Valor" name="extra[valor]" value="' . ($this->extra ? $this->extra->valor : '') . '" />
 
-                <button type="button" class="btn btn-default">
-                    <span class="icon-plus"></span>
-                </button>
+                        <button type="button"  id="btn-add" class="btn btn-default">
+                            <span class="icon-plus"></span>
+                        </button>
+                    </div>
+                </div>
             </div>';
 
         $display.= '<label>URL</label>';
