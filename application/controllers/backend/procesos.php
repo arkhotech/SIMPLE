@@ -20,7 +20,7 @@ class Procesos extends MY_BackendController {
     public function index() {
         $data['procesos'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=1 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
                 ->orderBy('p.nombre asc')
                 ->execute();
 
@@ -39,23 +39,25 @@ class Procesos extends MY_BackendController {
         redirect('backend/procesos/editar/'.$proceso->id);
     }
     
-    public function eliminar($proceso_id){
-    	
-    	$this->form_validation->set_rules ( 'descripcion', 'Razón', 'required' );
+    public function eliminar($proceso_id) {
+
+        log_message('info', 'eliminar ($proceso_id [' . $proceso_id . '])');
+
+    	$this->form_validation->set_rules('descripcion', 'Razón', 'required');
+
     	$respuesta = new stdClass ();
     	if ($this->form_validation->run () == TRUE) {
-    			
-    	
-	        $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
-	        
-	        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+
+	        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+	        if ($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
 	            echo 'Usuario no tiene permisos para eliminar este proceso';
 	            exit;
 	        }
 	        $fecha = new DateTime ();
-	         
+
 	        // Auditar
-	        $registro_auditoria = new AuditoriaOperaciones ();
+	        $registro_auditoria = new AuditoriaOperaciones();
 	        $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
 	        $registro_auditoria->operacion = 'Eliminación de Proceso';
 	        $registro_auditoria->motivo = $this->input->post('descripcion');
@@ -63,31 +65,33 @@ class Procesos extends MY_BackendController {
 	        $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
 	        $registro_auditoria->proceso = $proceso->nombre;
             $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
-	         
-	        	
+
 	        // Detalles
 	        $proceso_array['proceso'] = $proceso->toArray(false);
-	        
+
 	        $registro_auditoria->detalles = json_encode($proceso_array);
 	        $registro_auditoria->save();
-        	$proceso->delete();
-        
+        	$proceso->delete($proceso_id);
+
         	$respuesta->validacion = TRUE;
         	$respuesta->redirect = site_url('backend/procesos/index/');
     	} else {
-    		
     		$respuesta->validacion = FALSE;
     		$respuesta->errores = validation_errors();
-    		
     	}
-    	
+
     	echo json_encode($respuesta);
     }
 
     public function editar($proceso_id) {
-        $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
-        
-        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+
+        log_message('info', 'editar ($proceso_id [' . $proceso_id . '])');
+
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
+
+        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id || $proceso->activo != true) {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }

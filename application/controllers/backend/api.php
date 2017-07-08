@@ -200,7 +200,7 @@ class API extends MY_BackendController {
 
                 $query = Doctrine_Query::create()
                         ->from('Tramite t, t.Proceso p')
-                        ->where('p.id = ?', array($proceso->id))
+                        ->where('p.activo=1 AND p.id = ?', array($proceso->id))
                         ->orderBy('id desc');
                 if ($offset)
                     $query->andWhere('id < ?', $offset);

@@ -75,7 +75,7 @@ class Estadisticas extends CI_Controller {
             
             $tramites = Doctrine_Query::create()
                     ->from('Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d')
-                    ->where('p.id = ?',$proceso_id)
+                    ->where('p.activo=1 AND p.id = ?',$proceso_id)
                     ->andWhere('t.updated_at > DATE_SUB(NOW(),INTERVAL 30 DAY)')
                     ->orderBy('t.updated_at DESC')
                     ->having('COUNT(d.id) > 0 OR COUNT(e.id) > 1')  //Mostramos solo los que se han avanzado o tienen datos
