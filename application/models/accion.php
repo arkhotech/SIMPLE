@@ -7,13 +7,14 @@ class Accion extends Doctrine_Record {
         $this->hasColumn('nombre');
         $this->hasColumn('tipo');
         $this->hasColumn('extra');
-        $this->hasColumn('proceso_id');
+        $this->hasColumn('proceso_id'); 
 
-        
+
         $this->setSubclasses(array(
                 'AccionEnviarCorreo'  => array('tipo' => 'enviar_correo'),
                 'AccionWebservice'  => array('tipo' => 'webservice'),
-                'AccionVariable'  => array('tipo' => 'variable')
+                'AccionVariable'  => array('tipo' => 'variable'),
+                'AccionRest'  => array('tipo' => 'rest')
             )
         );
     }

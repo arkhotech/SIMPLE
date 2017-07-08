@@ -15,7 +15,12 @@
 
 <form class="ajaxForm" method="POST" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>
-        <legend>Crear Acción</legend>
+        <?php if(!$edit):?>
+            <legend> Crear Acción</legend>
+        <?php endif; ?>
+        <?php if($edit):?>
+            <legend> Editar Acción</legend>
+        <?php endif; ?>
         <div class="validacion"></div>
         <?php if(!$edit):?>
         <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" />
