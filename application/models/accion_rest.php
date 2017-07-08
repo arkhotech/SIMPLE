@@ -31,7 +31,7 @@ class AccionRest extends Accion {
         $display.='
             <div id="divObject" style="display:none;">
                 <label>Request</label>
-                <textarea name="extra[object]" rows="7" cols="70" placeholder="{ Object }" class="input-xxlarge">' . ($this->extra ? $this->extra->object : '') . '</textarea>
+                <textarea name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
             </div>';
 
 
@@ -64,9 +64,14 @@ class AccionRest extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
+
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
-        
+
+        log_message('info', 'Ejecutar rest url: '.$this->extra->url, FALSE);
+        log_message('info', 'Ejecutar rest tipoMetodo: '.$this->extra->tipoMetodo, FALSE);
+        log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
+
         //Hacemos encoding a la url
         $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
             $key=$matches[1];
@@ -74,13 +79,37 @@ class AccionRest extends Accion {
             return $key.urlencode($value);
         },
         $url);
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result = curl_exec($ch);
-        
+
+        log_message('info', 'Inicializando rest client', FALSE);
+        //$rest_client = new GenericRest();
+        log_message('info', 'Lllamando potr metodo', FALSE);
+        //$result = $rest_client->call($url, $this->extra->tipoMetodo, $this->extra->request);
+        $this->load->spark('restclient/2.2.1');
+        // Load the library
+        $this->load->library('rest');
+
+        // Set config options (only 'server' is required to work)
+        //$config = array('server'=> 'https://example.com/',
+        //'api_key'			=> 'Setec_Astronomy'
+        //'api_name'		=> 'X-API-KEY'
+        //'http_user' 		=> 'username',
+        //'http_pass' 		=> 'password',
+        //'http_auth' 		=> 'basic',
+        //'ssl_verify_peer' => TRUE,
+        //'ssl_cainfo' 		=> '/certs/cert.pem'
+        //);
+
+        // Run some setup
+        //$this->rest->initialize($config);
+
+        $restCliente = new REST();
+
+        // Pull the response
+        log_message('info', 'Lllamando post', FALSE);
+        $result = $restCliente->post($url, json_decode($this->extra->request));
+
+        log_message('info', 'Result: '.$result, FALSE);
+
         $json=json_decode($result);
         
         foreach($json as $key=>$value){

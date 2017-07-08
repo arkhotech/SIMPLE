@@ -1,13 +1,18 @@
 <?php
 
-class GenericRest extends CI_Controller {
+class GenericRest{
+
+    function __construct(){
+
+    }
 
     public function call($URL, $metodo, $data=null) {
 
+        log_message('info', 'LLamando a servicio por: '.$metodo, FALSE);
         // Load the rest client spark
-        $this->load->spark('restclient/2.2.1');
+        //$this->load->spark('restclient/2.2.1');
         // Load the library
-        $this->load->library('rest');
+        //$this->load->library('rest');
 
         // Set config options (only 'server' is required to work)
         //$config = array('server'=> 'https://example.com/',
@@ -23,9 +28,14 @@ class GenericRest extends CI_Controller {
         // Run some setup
         //$this->rest->initialize($config);
 
+        $restCliente = new REST();
+
         // Pull the response
         if($metodo == "GET"){
-            $result = $this->rest->get($URL);
+            $result = $restCliente->get($URL);
+            log_message('info', 'Ejecutar webservice GET: '.$result, FALSE);
+        }else if($metodo == "POST"){
+            $result = $restCliente->post($URL, $data);
             log_message('info', 'Ejecutar webservice GET: '.$result, FALSE);
         }
 
