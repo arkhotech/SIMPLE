@@ -142,6 +142,9 @@ class Tramites extends MY_Controller {
     }
 
     public function iniciar($proceso_id) {
+
+        log_message('Info', 'Iniciando proceso '.$proceso_id, FALSE);
+
         $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
         //echo UsuarioSesion::usuario()->id;
         //exit;
