@@ -31,7 +31,7 @@
                                         <li id="loginView">
                                             <div class="simple">
                                                 <div class="wrapper">
-                                            <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
+                                            <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>"> 
                                                 <fieldset>
                                                     <div class="validacion"></div>
                                                     <input type="hidden" name="redirect" value="<?= current_url() ?>" />
@@ -39,7 +39,10 @@
                                                     <input name="usuario" id="usuario" type="text" class="input-xlarge">
                                                     <label for="password">Contraseña</label>
                                                     <input name="password" id="password" type="password" class="input-xlarge">
-                                                    <p class="olvido"><a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a> - <a href="<?= site_url('autenticacion/registrar') ?>">Registrate aquí</a></p>
+                                                    <div id="login_captcha"></div>
+                                                    <p class="olvido">
+                                                        <a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a> - <a href="<?= site_url('autenticacion/registrar') ?>">Registrate aquí</a>
+                                                    </p>
                                                     <button class="btn btn-primary pull-right" type="submit">Ingresar</button>
                                                 </fieldset>
                                             </form>

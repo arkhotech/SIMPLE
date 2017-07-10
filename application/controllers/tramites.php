@@ -157,7 +157,7 @@ class Tramites extends MY_Controller {
         //Si es asi, hacemos que lo continue. Si no, creamos uno nuevo
         $tramite=Doctrine_Query::create()
                 ->from('Tramite t, t.Proceso p, t.Etapas e, e.Tramite.Etapas hermanas')
-                ->where('t.pendiente=1 AND p.id = ? AND e.usuario_id = ?',array($proceso_id, UsuarioSesion::usuario()->id))
+                ->where('t.pendiente=1 AND p.activo=1 AND p.id = ? AND e.usuario_id = ?',array($proceso_id, UsuarioSesion::usuario()->id))
                 ->groupBy('t.id')
                 ->having('COUNT(hermanas.id) = 1')
                 ->fetchOne();

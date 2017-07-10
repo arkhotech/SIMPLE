@@ -20,7 +20,7 @@
 
         <!-- Le fav and touch icons -->
         <link rel="shortcut icon" href="<?= base_url() ?>assets/img/favicon.png">
-        
+
         <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js"></script>
         <script src="<?= base_url() ?>assets/js/bootstrap.min.js"></script>
         <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
@@ -31,6 +31,21 @@
         <script type="text/javascript">
             var site_url="<?= site_url() ?>";
             var base_url="<?= base_url() ?>";
+
+            var onloadCallback = function() {
+                if ($('#login_captcha').length) {
+                    grecaptcha.render('login_captcha', {
+                        'sitekey' : '<?= sitekey() ?>'
+                   });
+                }
+
+                if ($('#form_captcha').length) {
+                    grecaptcha.render("form_captcha", {
+                        sitekey : '<?= sitekey() ?>'
+                    });
+                }
+            };
+
         </script>
 
         <script src="<?= base_url() ?>assets/js/common.js"></script>

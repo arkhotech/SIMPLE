@@ -161,7 +161,7 @@ class Tarea extends Doctrine_Record {
     public function getUltimoUsuarioAsignado($proceso_id) {
         return Doctrine_Query::create()
                         ->from('Usuario u, u.Etapas e, e.Tarea t, e.Tramite.Proceso p')
-                        ->where('t.id = ? AND p.id = ?', array($this->id, $proceso_id))
+                        ->where('t.id = ? AND p.activo=1 AND p.id = ?', array($this->id, $proceso_id))
                         ->orderBy('e.created_at DESC')
                         ->fetchOne();
     }

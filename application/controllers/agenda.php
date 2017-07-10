@@ -843,7 +843,7 @@ class Agenda extends MY_Controller {
                     $proceso=Doctrine_Query::create()
                     ->select('p.nombre')
                     ->from("Proceso p,Tramite t")
-                    ->where('p.id=t.proceso_id AND t.id=?',$class->idtramite)
+                    ->where('p.id=t.proceso_id AND p.activo=1 AND t.id=?',$class->idtramite)
                     ->execute();
                     $nombre ='';
                     foreach($proceso as $ob){
@@ -899,7 +899,7 @@ class Agenda extends MY_Controller {
                     $proceso=Doctrine_Query::create()
                     ->select('p.nombre')
                     ->from("Proceso p,Tramite t")
-                    ->where('p.id=t.proceso_id AND t.id=?',$class->idtramite)
+                    ->where('p.id=t.proceso_id AND p.activo=1 AND t.id=?', $class->idtramite)
                     ->execute();
                     $nombre ='';
                     foreach($proceso as $ob){

@@ -15,7 +15,7 @@ class Seguimiento extends MY_BackendController {
 	}
 	public function index() {
 		// $data['procesos'] = Doctrine::getTable('Proceso')->findByCuentaId(UsuarioBackendSesion::usuario()->cuenta_id);
-		$data ['procesos'] = Doctrine_Query::create ()->from ( 'Proceso p, p.Cuenta c' )->where ( 'c.id = ?', UsuarioBackendSesion::usuario ()->cuenta_id )->orderBy ( 'p.nombre asc' )->execute ();
+		$data ['procesos'] = Doctrine_Query::create ()->from ( 'Proceso p, p.Cuenta c' )->where ('p.activo=1 AND c.id = ?', UsuarioBackendSesion::usuario ()->cuenta_id )->orderBy ( 'p.nombre asc' )->execute ();
 		
 		$data ['title'] = 'Listado de Procesos';
 		$data ['content'] = 'backend/seguimiento/index';
@@ -46,7 +46,7 @@ class Seguimiento extends MY_BackendController {
 		$per_page = 50;
 		$busqueda_avanzada = $this->input->get ( 'busqueda_avanzada' );
 		
-		$doctrine_query = Doctrine_Query::create ()->from ( 'Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d' )->where ( 'p.id = ?', $proceso_id )->having ( 'COUNT(d.id) > 0 OR COUNT(e.id) > 1' )-> // Mostramos solo los que se han avanzado o tienen datos
+		$doctrine_query = Doctrine_Query::create ()->from ( 'Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d' )->where ('p.activo=1 AND p.id = ?', $proceso_id )->having ( 'COUNT(d.id) > 0 OR COUNT(e.id) > 1' )-> // Mostramos solo los que se han avanzado o tienen datos
 groupBy ( 't.id' )->orderBy ( $order . ' ' . $direction )->limit ( $per_page )->offset ( $offset );
 		
 		if ($created_at_desde)
