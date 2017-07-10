@@ -38,16 +38,9 @@ class AccionRest extends Accion {
         $display.='
             <div class="col-md-12">
                 <label>Header</label>
-                <div id="divDinamico" class="col-md-12">
-                    <div class="col-md-12">
-                        <input type="text" placeholder="Nombre" name="extra[nombre]" value="' . ($this->extra ? $this->extra->nombre : '') . '" />
-
-                        <input type="text" placeholder="Valor" name="extra[valor]" value="' . ($this->extra ? $this->extra->valor : '') . '" />
-
-                        <button type="button"  id="btn-add" class="btn btn-default">
-                            <span class="icon-plus"></span>
-                        </button>
-                    </div>
+                <div class="col-md-12">
+                    <label>Request</label>
+                    <textarea name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
                 </div>
             </div>';
 
