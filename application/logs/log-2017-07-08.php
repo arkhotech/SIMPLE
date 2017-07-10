@@ -4129,3 +4129,367 @@ INFO  - 2017-07-08 18:52:21 --> Ejecutar rest request: {
 }
 INFO  - 2017-07-08 18:52:21 --> Inicializando rest client
 INFO  - 2017-07-08 18:52:21 --> Lllamando potr metodo
+DEBUG - 2017-07-08 19:08:14 --> Config Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:08:14 --> URI Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Router Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Output Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Security Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Input Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:08:14 --> Language Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:08:14 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:08:14 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:08:15 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Session Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Session routines successfully run
+DEBUG - 2017-07-08 19:08:15 --> Email Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Controller Class Initialized
+INFO  - 2017-07-08 19:08:15 --> Iniciando proceso 2
+DEBUG - 2017-07-08 19:08:15 --> Config Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:08:15 --> URI Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Router Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Output Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Security Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Input Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:08:15 --> Language Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:08:15 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:08:15 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Session Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Session routines successfully run
+DEBUG - 2017-07-08 19:08:15 --> Email Class Initialized
+DEBUG - 2017-07-08 19:08:15 --> Controller Class Initialized
+INFO  - 2017-07-08 19:08:15 --> Ejecutar rest url: http://httpbin.org/post
+INFO  - 2017-07-08 19:08:15 --> Ejecutar rest tipoMetodo: POST
+INFO  - 2017-07-08 19:08:15 --> Ejecutar rest request: {
+	"test":"jp"
+}
+INFO  - 2017-07-08 19:08:15 --> Inicializando rest client
+INFO  - 2017-07-08 19:08:15 --> Lllamando potr metodo
+DEBUG - 2017-07-08 19:09:21 --> Config Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:09:21 --> URI Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Router Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Output Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Security Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Input Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:09:21 --> Language Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:09:21 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:09:21 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:09:22 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:09:22 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:09:22 --> Session Class Initialized
+DEBUG - 2017-07-08 19:09:22 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:09:22 --> Session routines successfully run
+DEBUG - 2017-07-08 19:09:22 --> Email Class Initialized
+DEBUG - 2017-07-08 19:09:22 --> Controller Class Initialized
+DEBUG - 2017-07-08 19:09:22 --> File loaded: application/views/head.php
+DEBUG - 2017-07-08 19:09:22 --> File loaded: application/views/messages.php
+DEBUG - 2017-07-08 19:09:22 --> File loaded: application/views/tramites/disponibles.php
+DEBUG - 2017-07-08 19:09:22 --> File loaded: application/views/foot.php
+DEBUG - 2017-07-08 19:09:22 --> File loaded: application/views/themes/default/template.php
+DEBUG - 2017-07-08 19:09:22 --> Final output sent to browser
+DEBUG - 2017-07-08 19:09:22 --> Total execution time: 0.6660
+DEBUG - 2017-07-08 19:09:30 --> Config Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:09:30 --> URI Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Router Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Output Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Security Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Input Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:09:30 --> Language Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:09:30 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:09:30 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:09:31 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Session Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Session routines successfully run
+DEBUG - 2017-07-08 19:09:31 --> Email Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Controller Class Initialized
+INFO  - 2017-07-08 19:09:31 --> Iniciando proceso 2
+DEBUG - 2017-07-08 19:09:31 --> Config Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:09:31 --> URI Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Router Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Output Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Security Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Input Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:09:31 --> Language Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:09:31 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:09:31 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Session Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Session routines successfully run
+DEBUG - 2017-07-08 19:09:31 --> Email Class Initialized
+DEBUG - 2017-07-08 19:09:31 --> Controller Class Initialized
+INFO  - 2017-07-08 19:09:31 --> Ejecutar rest url: http://httpbin.org/post
+INFO  - 2017-07-08 19:09:31 --> Ejecutar rest tipoMetodo: POST
+INFO  - 2017-07-08 19:09:31 --> Ejecutar rest request: {
+	"test":"jp"
+}
+INFO  - 2017-07-08 19:09:31 --> Inicializando rest client
+INFO  - 2017-07-08 19:09:31 --> Lllamando potr metodo
+DEBUG - 2017-07-08 19:10:29 --> Config Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:10:29 --> URI Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Router Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Output Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Security Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Input Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:10:29 --> Language Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:10:29 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:10:29 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:10:30 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Session Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Session routines successfully run
+DEBUG - 2017-07-08 19:10:30 --> Email Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Controller Class Initialized
+INFO  - 2017-07-08 19:10:30 --> Iniciando proceso 2
+DEBUG - 2017-07-08 19:10:30 --> Config Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:10:30 --> URI Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Router Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Output Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Security Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Input Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:10:30 --> Language Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:10:30 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:10:30 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Session Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Session routines successfully run
+DEBUG - 2017-07-08 19:10:30 --> Email Class Initialized
+DEBUG - 2017-07-08 19:10:30 --> Controller Class Initialized
+INFO  - 2017-07-08 19:10:30 --> Ejecutar rest url: http://httpbin.org/post
+INFO  - 2017-07-08 19:10:30 --> Ejecutar rest tipoMetodo: POST
+INFO  - 2017-07-08 19:10:30 --> Ejecutar rest request: {
+	"test":"jp"
+}
+INFO  - 2017-07-08 19:10:30 --> Inicializando rest client
+DEBUG - 2017-07-08 19:47:22 --> Config Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:47:22 --> URI Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Router Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Output Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Security Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Input Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:47:22 --> Language Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:47:22 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:47:22 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:47:23 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Session Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> A session cookie was not found.
+DEBUG - 2017-07-08 19:47:23 --> Session routines successfully run
+DEBUG - 2017-07-08 19:47:23 --> Email Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Controller Class Initialized
+INFO  - 2017-07-08 19:47:23 --> Iniciando proceso 2
+DEBUG - 2017-07-08 19:47:23 --> Config Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:47:23 --> URI Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Router Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Output Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Security Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Input Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:47:23 --> Language Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:47:23 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:47:23 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:47:24 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:47:24 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:47:24 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:47:24 --> Session Class Initialized
+DEBUG - 2017-07-08 19:47:24 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:47:24 --> Session routines successfully run
+DEBUG - 2017-07-08 19:47:24 --> Email Class Initialized
+DEBUG - 2017-07-08 19:47:24 --> Controller Class Initialized
+INFO  - 2017-07-08 19:47:24 --> Ejecutar rest url: http://httpbin.org/post
+INFO  - 2017-07-08 19:47:24 --> Ejecutar rest tipoMetodo: POST
+INFO  - 2017-07-08 19:47:24 --> Ejecutar rest request: {
+	"test":"jp"
+}
+INFO  - 2017-07-08 19:47:24 --> Inicializando rest client
+DEBUG - 2017-07-08 19:49:52 --> Config Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:49:52 --> URI Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Router Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Output Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Security Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Input Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:49:52 --> Language Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:49:52 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Session Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Session routines successfully run
+DEBUG - 2017-07-08 19:49:52 --> Email Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Controller Class Initialized
+INFO  - 2017-07-08 19:49:52 --> Iniciando proceso 2
+DEBUG - 2017-07-08 19:49:52 --> Config Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Hooks Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Utf8 Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> UTF-8 Support Enabled
+DEBUG - 2017-07-08 19:49:52 --> URI Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Router Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Output Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Security Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Input Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Global POST and COOKIE data sanitized
+DEBUG - 2017-07-08 19:49:52 --> Language Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Loader Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Config file loaded: application/config/email.php
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: url_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: doctrine_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: date_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: string_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: html_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: json_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: file_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: text_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: money_helper
+DEBUG - 2017-07-08 19:49:52 --> Helper loaded: form_helper
+DEBUG - 2017-07-08 19:49:52 --> Form Validation Class Initialized
+DEBUG - 2017-07-08 19:49:52 --> Session Class Initialized
+DEBUG - 2017-07-08 19:49:53 --> Encrypt Class Initialized
+DEBUG - 2017-07-08 19:49:53 --> Session routines successfully run
+DEBUG - 2017-07-08 19:49:53 --> Email Class Initialized
+DEBUG - 2017-07-08 19:49:53 --> Controller Class Initialized
+INFO  - 2017-07-08 19:49:53 --> Ejecutar rest url: http://httpbin.org/post
+INFO  - 2017-07-08 19:49:53 --> Ejecutar rest tipoMetodo: POST
+INFO  - 2017-07-08 19:49:53 --> Ejecutar rest request: {
+	"test":"jp"
+}
+INFO  - 2017-07-08 19:49:53 --> Inicializando rest client

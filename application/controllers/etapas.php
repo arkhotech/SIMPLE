@@ -164,14 +164,18 @@ class Etapas extends MY_Controller {
 
         $qs = $this->input->server('QUERY_STRING');
         $paso = $etapa->getPasoEjecutable($secuencia);
+        log_message("info","Ejecutando paso: ".$paso, FALSE);
         if (!$paso) {
+            log_message("info","Entra en no paso: ", FALSE);
             redirect('etapas/ejecutar_fin/' . $etapa->id . ($qs ? '?' . $qs : ''));
         } else if (($etapa->Tarea->final || !$etapa->Tarea->paso_confirmacion) && $paso->getReadonly() && end($etapa->getPasosEjecutables()) == $paso) { //No se requiere mas input
+            log_message("info","NO se necesita mas input: ", FALSE);
             $etapa->iniciarPaso($paso);
             $etapa->finalizarPaso($paso);
             $etapa->avanzar();
             redirect('etapas/ver/' . $etapa->id . '/' . (count($etapa->getPasosEjecutables())-1));
         }else{
+            log_message("info","Flujo pra mostrar form: ", FALSE);
             $etapa->iniciarPaso($paso);
 
             $data['secuencia'] = $secuencia;

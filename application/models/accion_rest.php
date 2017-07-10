@@ -81,36 +81,29 @@ class AccionRest extends Accion {
         $url);
 
         log_message('info', 'Inicializando rest client', FALSE);
-        //$rest_client = new GenericRest();
-        log_message('info', 'Lllamando potr metodo', FALSE);
-        //$result = $rest_client->call($url, $this->extra->tipoMetodo, $this->extra->request);
-        $this->load->spark('restclient/2.2.1');
-        // Load the library
-        $this->load->library('rest');
+        $CI = & get_instance();
 
-        // Set config options (only 'server' is required to work)
-        //$config = array('server'=> 'https://example.com/',
-        //'api_key'			=> 'Setec_Astronomy'
-        //'api_name'		=> 'X-API-KEY'
-        //'http_user' 		=> 'username',
-        //'http_pass' 		=> 'password',
-        //'http_auth' 		=> 'basic',
-        //'ssl_verify_peer' => TRUE,
-        //'ssl_cainfo' 		=> '/certs/cert.pem'
-        //);
+        if($this->extra->tipoMetodo == "GET"){
+            log_message('info', 'Lllamando GET', FALSE);
+            $result = $CI->rest->get($url, array(), 'json');
+        }else if($this->extra->tipoMetodo == "POST"){
+            log_message('info', 'Lllamando POST', FALSE);
+            $result = $CI->rest->post($url, $this->extra->request, 'json');
+        }else if($this->extra->tipoMetodo == "PUT"){
+            log_message('info', 'Lllamando PUT', FALSE);
+            $result = $CI->rest->put($url, $this->extra->request, 'json');
+        }else if($this->extra->tipoMetodo == "DELETE"){
+            log_message('info', 'Lllamando DELETE', FALSE);
+            $result = $CI->rest->delete($url, array(), 'json');
+        }
 
-        // Run some setup
-        //$this->rest->initialize($config);
-
-        $restCliente = new REST();
-
-        // Pull the response
-        log_message('info', 'Lllamando post', FALSE);
-        $result = $restCliente->post($url, json_decode($this->extra->request));
-
+        $result = json_encode($result);
+        $result = "{\"metodo".$this->extra->tipoMetodo."\":".$result."}";
         log_message('info', 'Result: '.$result, FALSE);
+        //$result = json_decode("metodo".$this->extra->tipoMetodo.":".$result);
 
         $json=json_decode($result);
+        //$json=$result;
         
         foreach($json as $key=>$value){
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
