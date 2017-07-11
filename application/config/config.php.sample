@@ -427,5 +427,17 @@ $config['records']=10;// numero de registros por pagina
  */
 $config['tiempoconfimacioncita']=30; 
 
+/*
+ * recaptcha sitekey
+ *
+ */
+$config['sitekey']='6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH';
+
+/*
+ * recaptcha Secret Key
+ *
+ */
+$config['secretkey']='6Le7zycUAAAAAIHDhvj6Z7yZwyCzrxddRJhpGNol';
+
 /* End of file config.php */
 /* Location: ./application/config/config.php */

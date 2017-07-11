@@ -1,27 +1,25 @@
 <script>
+    function eliminarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_auditar_eliminar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 
-function eliminarProceso(procesoId) {
-    $("#modal").load(site_url + "backend/procesos/ajax_auditar_eliminar_proceso/" + procesoId);
-    $("#modal").modal();
-    return false;
-}
+    function activarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_auditar_activar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 
-function activarProceso(procesoId) {
-    $("#modal").load(site_url + "backend/procesos/ajax_auditar_activar_proceso/" + procesoId);
-    $("#modal").modal();
-    return false;
-}
+    function mostrarEliminados() {
+        $(".procesos_eliminados").slideToggle('slow', callbackEliminadosFn);
+        return false;
+    }
 
-function mostrarEliminados() {
-    $(".procesos_eliminados").slideToggle('slow', callbackEliminadosFn);
-    return false;
-}
-
-function callbackEliminadosFn() {
-    var $link = $("#link_eliminados");
-    $(this).is(":visible") ? $link.text("Ocultar Eliminados «") : $link.text("Mostrar Eliminados »");
-}
-
+    function callbackEliminadosFn() {
+        var $link = $("#link_eliminados");
+        $(this).is(":visible") ? $link.text("Ocultar Eliminados «") : $link.text("Mostrar Eliminados »");
+    }
 </script>
 
 <ul class="breadcrumb">
@@ -68,7 +66,7 @@ function callbackEliminadosFn() {
             <tr>
                 <td><?=$pe->nombre?></td>
                 <td>
-                    <a class="btn btn-primary" href="#" onclick="return activarProceso(<?=$pe->id?>);"><i class="icon-white icon-edit"></i> Activar</a>
+                    <a class="btn btn-primary" href="#" onclick="return activarProceso(<?=$pe->id?>);"><i class="icon-white icon-share"></i> Activar</a>
                 </td>
             </tr>
             <?php endforeach; ?>
