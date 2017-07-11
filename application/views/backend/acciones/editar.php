@@ -11,9 +11,9 @@
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
 </ul>
+ 
 
-
-<form class="ajaxForm" method="POST" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
+<form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>
         <?php if(!$edit):?>
             <legend> Crear Acción</legend>
@@ -35,12 +35,10 @@
         
         <div class="form-actions">
             <a class="btn" href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Cancelar</a>
-            <input class="btn btn-primary" type="submit" value="Guardar" />
+            <!-- <input class="btn btn-primary" type="submit" value="Guardar" /> -->
+            <button class="btn btn-primary" value="Guardar" type="button" onclick="validateForm();">Guardar</button>
         </div>
     </fieldset>
 </form>
-
-
-
-
 </div>
+<script src="<?= base_url() ?>assets/js/CrearDivHeader.js"></script>

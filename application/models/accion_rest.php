@@ -13,7 +13,7 @@ class AccionRest extends Accion {
             </p>
         ';
 
-        $display.='<script src="'.base_url().'assets/js/CrearDivHeader.js" type="text/javascript"></script>'; 
+        // $display.='<script src="'.base_url().'assets/js/CrearDivHeader.js" type="text/javascript"></script>'; 
         
         $display.='
                 <label>Método</label>
@@ -29,19 +29,22 @@ class AccionRest extends Accion {
                     $display.='</select>';
                     
         $display.='
-            <div id="divObject" style="display:none;">
+            <div class="col-md-12" id="divObject" style="display:none;">
                 <label>Request</label>
-                <textarea name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <br />
+                <span id="resultRequest" class="spanError"></span>
+                <br /><br />
             </div>';
 
 
         $display.='
             <div class="col-md-12">
                 <label>Header</label>
-                <div class="col-md-12">
-                    <label>Request</label>
-                    <textarea name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
-                </div>
+                <textarea id="header" name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
+                <br />
+                <span id="resultHeader" class="spanError"></span>
+                <br /><br />
             </div>';
 
         $display.= '<label>URL</label>';
@@ -54,6 +57,7 @@ class AccionRest extends Accion {
     public function validateForm() {
         $CI = & get_instance();
         $CI->form_validation->set_rules('extra[url]', 'URL', 'required');
+        $CI->form_validation->set_rules('extra[header]', 'Header', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {

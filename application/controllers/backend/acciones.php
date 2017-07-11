@@ -141,8 +141,6 @@ class Acciones extends MY_BackendController {
             $this->form_validation->set_rules('proceso_id','Proceso','required');
             $this->form_validation->set_rules('tipo','Tipo de Campo','required');
         }
-        
-        
 
         $respuesta=new stdClass();
         if($this->form_validation->run()==TRUE){

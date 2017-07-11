@@ -1,9 +1,26 @@
- var nextinput = 0;
+ var nextinput=validJsonR=validJsonH=0;
 
+ function validateForm(){
+ 	if(validJsonR==0 && validJsonH==0){
+ 		javascript:$('#plantillaForm').submit();
+ 		return false;
+ 	}else{
+ 		if(validJsonR==1){
+ 			$("#request").addClass('invalido');
+	    	$("#resultRequest").text("Formato requerido / json");
+ 		}
+ 		if(validJsonH==1){
+		    $("#header").addClass('invalido');
+		    $("#resultHeader").text("Formato requerido / json");
+ 		}
+ 		return false;
+ 	} 
+ }
  function CambioSelect(value){
  	switch ($("#tipoMetodo").val()) {                
  		case "POST": case "PUT":
  			$("#divObject").show();
+ 			validJsonR=1;
  		break;
  		case "GET": case "DELETE":
  			$("#divObject").hide();
@@ -14,24 +31,54 @@
  	}
  }
 
- function CrearHeaders(){   
- 	nextinput++;	
- 	var section = "<div id="+nextinput+" clas='col-md-12'><input name='extra[nombre"+nextinput+"]' type='text'/><input name='extra[valor"+nextinput+"]' type='text' /><button onclick=(DeleteInputs(this)) value="+nextinput+" type='button' class='btn-danger'><span class='icon-minus'></span></button></div>";
- 	$("#divDinamico").append(section);
- }
+ function isJsonH(object,value,id_span){
+    try {
+        JSON.parse(value);
+    }catch (e){
+	    object.addClass('invalido');
+	    id_span.text("Formato requerido / json");
+	    validJsonH=1;
+        return false;
+    }
+	object.removeClass('invalido');
+	id_span.text("");
+	validJsonH=0;
+    return true;
+}
 
- function DeleteInputs(id){
- 	$("#"+id.value).remove();
- }
+function isJsonR(object,value,id_span){
+    try {
+        JSON.parse(value);
+    }catch (e){
+	    object.addClass('invalido');
+	    id_span.text("Formato requerido / json");
+	    validJsonR=1;
+        return false;
+    }
+	object.removeClass('invalido');
+	id_span.text("");
+	validJsonR=0;
+    return true;
+}
 
  $(document).ready(function(){
+ 	$('#resultRequest').text("Formato requerido / json")
+ 	$('#resultHeader').text("Formato requerido / json")
     if($("#tipoMetodo").val()=="POST" || $("#tipoMetodo").val()=="POST"){
         $("#divObject").show();
     }else{
         $("#divObject").hide();
     }
+
     $("#tipoMetodo").change(function(){
         CambioSelect();
     });
-    $(document).on("click","#btn-add",CrearHeaders);
+
+    $("#request").focusout(function(){
+    	isJsonR($("#request"),$("#request").val(),$("#resultRequest"));
+	});
+
+    $("#header").focusout(function(){
+    	isJsonH($("#header"),$("#header").val(),$("#resultHeader"));
+	});
 });
