@@ -24,6 +24,12 @@ class Procesos extends MY_BackendController {
                 ->orderBy('p.nombre asc')
                 ->execute();
 
+        $data['procesos_eliminados'] = Doctrine_Query::create()
+                ->from('Proceso p, p.Cuenta c')
+                ->where('p.activo=0 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->orderBy('p.nombre asc')
+                ->execute();
+
         $data['title'] = 'Listado de Procesos';
         $data['content'] = 'backend/procesos/index';
         $this->load->view('backend/template', $data);
@@ -102,7 +108,57 @@ class Procesos extends MY_BackendController {
         $data['content'] = 'backend/procesos/editar';
         $this->load->view('backend/template', $data);
     }
-    
+
+    public function activar($proceso_id) {
+
+        log_message('info', 'activar ($proceso_id [' . $proceso_id . '])');
+        $this->form_validation->set_rules('descripcion', 'Razón', 'required');
+
+        $respuesta = new stdClass();
+        if ($this->form_validation->run() == TRUE) {
+
+            $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+            if ($proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
+                log_message('debug', 'Usuario no tiene permisos para activar este proceso');
+                echo 'Usuario no tiene permisos para activar este proceso';
+                exit;
+            }
+            $fecha = new DateTime();
+
+            // Auditar
+            $registro_auditoria = new AuditoriaOperaciones();
+            $registro_auditoria->fecha = $fecha->format ("Y-m-d H:i:s");
+            $registro_auditoria->operacion = 'Activación de Proceso';
+            $registro_auditoria->motivo = $this->input->post('descripcion');
+            $usuario = UsuarioBackendSesion::usuario();
+            $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
+            $registro_auditoria->proceso = $proceso->nombre;
+            $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
+
+            // Detalles
+            $proceso_array['proceso'] = $proceso->toArray(false);
+
+            $registro_auditoria->detalles = json_encode($proceso_array);
+            $registro_auditoria->save();
+            log_message('debug', '$registro_auditoria->usuario: ' . $registro_auditoria->usuario);
+
+            $q = Doctrine_Query::create()
+            ->update('Proceso')
+            ->set('activo', 1)
+            ->where("id = ?", $proceso_id);
+            $q->execute();
+
+            $respuesta->validacion = TRUE;
+            $respuesta->redirect = site_url('backend/procesos/index/');
+        } else {
+            $respuesta->validacion = FALSE;
+            $respuesta->errores = validation_errors();
+        }
+
+        echo json_encode($respuesta);
+    }
+
     public function ajax_editar($proceso_id){
         $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
         
@@ -405,15 +461,22 @@ class Procesos extends MY_BackendController {
 
     }
     
-    public function ajax_auditar_eliminar_proceso($proceso_id){
+    public function ajax_auditar_eliminar_proceso($proceso_id) {
     	if (! in_array ( 'super', explode ( ",", UsuarioBackendSesion::usuario ()->rol ) ))
     		show_error ( 'No tiene permisos', 401 );
     	
     	$proceso = Doctrine::getTable("Proceso")->find($proceso_id);
     	$data['proceso'] = $proceso;
     	$this->load->view ( 'backend/procesos/ajax_auditar_eliminar_proceso', $data );
-    	
-    	
+    }
+
+    public function ajax_auditar_activar_proceso($proceso_id) {
+        if (! in_array('super', explode (",", UsuarioBackendSesion::usuario ()->rol)))
+            show_error('No tiene permisos', 401);
+
+        $proceso = Doctrine::getTable("Proceso")->find($proceso_id);
+        $data['proceso'] = $proceso;
+        $this->load->view('backend/procesos/ajax_auditar_activar_proceso', $data);
     }
 
     public function getJSONFromModelDraw($proceso_id){

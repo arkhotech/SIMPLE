@@ -1,11 +1,25 @@
 <script>
+    function eliminarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_auditar_eliminar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 
-function eliminarProceso(procesoId) {
-    $("#modal").load(site_url + "backend/procesos/ajax_auditar_eliminar_proceso/" + procesoId);
-    $("#modal").modal();
-    return false;
-}
+    function activarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_auditar_activar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 
+    function mostrarEliminados() {
+        $(".procesos_eliminados").slideToggle('slow', callbackEliminadosFn);
+        return false;
+    }
+
+    function callbackEliminadosFn() {
+        var $link = $("#link_eliminados");
+        $(this).is(":visible") ? $link.text("Ocultar Eliminados «") : $link.text("Mostrar Eliminados »");
+    }
 </script>
 
 <ul class="breadcrumb">
@@ -16,7 +30,6 @@ function eliminarProceso(procesoId) {
 
 <a class="btn btn-success" href="<?=site_url('backend/procesos/crear/')?>"><i class="icon-file icon-white"></i> Nuevo</a>
 <a class="btn btn-default" href="#modalImportar" data-toggle="modal" ><i class="icon-upload icon"></i> Importar</a>
-
 
 <table class="table">
     <thead>
@@ -38,6 +51,29 @@ function eliminarProceso(procesoId) {
         <?php endforeach; ?>
     </tbody>
 </table>
+<?php if (sizeof($procesos_eliminados) > 0) { ?>
+<a href="#" id="link_eliminados" onclick="return mostrarEliminados();">Mostrar Eliminados »</a>
+<div class="procesos_eliminados">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Procesos Eliminados</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($procesos_eliminados as $pe): ?>
+            <tr>
+                <td><?=$pe->nombre?></td>
+                <td>
+                    <a class="btn btn-primary" href="#" onclick="return activarProceso(<?=$pe->id?>);"><i class="icon-white icon-share"></i> Activar</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php } ?>
 
 <div id="modalImportar" class="modal hide fade">
     <form method="POST" enctype="multipart/form-data" action="<?=site_url('backend/procesos/importar')?>">
