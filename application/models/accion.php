@@ -14,7 +14,8 @@ class Accion extends Doctrine_Record {
                 'AccionEnviarCorreo'  => array('tipo' => 'enviar_correo'),
                 'AccionWebservice'  => array('tipo' => 'webservice'),
                 'AccionVariable'  => array('tipo' => 'variable'),
-                'AccionRest'  => array('tipo' => 'rest')
+                'AccionRest'  => array('tipo' => 'rest'),
+                'AccionSoap'  => array('tipo' => 'soap')
             )
         );
     }

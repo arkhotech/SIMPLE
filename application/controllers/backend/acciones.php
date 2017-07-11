@@ -84,6 +84,8 @@ class Acciones extends MY_BackendController {
             $accion=new AccionVariable();
         else if($tipo=='rest')
             $accion=new AccionRest();
+        else if($tipo=='soap')
+            $accion=new AccionSoap();
         $data['edit']=FALSE;
         $data['proceso']=$proceso;
         $data['tipo']=$tipo;
@@ -125,7 +127,8 @@ class Acciones extends MY_BackendController {
                 $accion=new AccionVariable();
             else if($this->input->post('tipo')=='rest')
                 $accion=new AccionRest();
-            
+            else if($this->input->post('tipo')=='soap')
+                $accion=new AccionSoap();
             $accion->proceso_id=$this->input->post('proceso_id');
             $accion->tipo=$this->input->post('tipo');
         }
@@ -230,4 +233,14 @@ class Acciones extends MY_BackendController {
         
         redirect($_SERVER['HTTP_REFERER']);
     }
+
+    public function functions_soap($urlsoap){
+        $url=$this->input->post('urlsoap');
+        $client = new SoapClient($url);
+        $result['functions']=$client->__getFunctions();
+        $result['types']=$client->__getTypes();
+        $result=json_encode($result);
+        print_r($result);
+        exit;
+    }    
 }

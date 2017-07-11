@@ -11,6 +11,7 @@
             <option value="webservice">Consultar Webservice</option>
             <option value="variable">Generar Variable</option>
             <option value="rest">Consultar Rest</option>
+            <option value="soap">Consultar Soap</option>
         </select>
     </form>
 </div>
