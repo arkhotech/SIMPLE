@@ -68,9 +68,46 @@ class Autenticacion extends MY_Controller {
         redirect($redirectlogin);
     }
 
+    public function login_form() {
+
+        log_message('info', '{"method" : "login_form", "location" : "START"}');
+
+        $this->form_validation->set_rules('usuario', 'Usuario', 'required');
+        $this->form_validation->set_rules('password', 'Contraseña', 'required|callback_check_password');
+
+        $mostrar_captcha = self::mostrar_captcha($this->input->post('usuario'));
+
+        if ($mostrar_captcha == TRUE) {
+            log_message('debug', '{"method" : "login_form", "message" : "mostrar_captcha OK"}');
+            $this->form_validation->set_rules('g-recaptcha-response', 'reCAPTCHA', 'required|callback_validate_captcha');
+            $this->form_validation->set_message('validate_captcha', 'Please check the the captcha form');
+        }
+
+        $respuesta = new stdClass();
+
+        if ($this->form_validation->run() == TRUE) {
+            self::login_correcto($this->input->post('usuario'));
+            $this->session->set_flashdata('login_erroneo', 'FALSE');
+            $respuestaLogin = UsuarioSesion::login($this->input->post('usuario'), $this->input->post('password'));
+
+            $respuesta->validacion = TRUE;
+            $respuesta->redirect = $this->input->post('redirect') ? $this->input->post('redirect') : site_url();
+
+        } else {
+            $this->session->set_flashdata('login_erroneo', 'TRUE');
+            self::login_incorrecto($this->input->post('usuario'));
+
+            $respuesta->validacion = FALSE;
+            $respuesta->errores = validation_errors();
+        }
+
+        echo json_encode($respuesta);
+
+        log_message('info', '{"method" : "login_form", "location" : "END", "json_encode" : "' . json_encode($respuesta) . '"}');
+    }
+
     function validate_captcha() {
         $CI = & get_instance();
-        log_message('debug', 'validate_captcha() : secretkey [' . $CI->config->item('secretkey') . ']');
         $captcha = $this->input->post('g-recaptcha-response');
         $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $CI->config->item('secretkey') . "&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
         if ($response . 'success' == false) {
@@ -80,27 +117,75 @@ class Autenticacion extends MY_Controller {
         }
     }
 
-    public function login_form() {
+    private function login_correcto($usuario_o_email) {
 
-        $this->form_validation->set_rules('usuario', 'Usuario', 'required');
-        $this->form_validation->set_rules('password', 'Contraseña', 'required|callback_check_password');
-        $this->form_validation->set_rules('g-recaptcha-response', 'reCAPTCHA', 'required|callback_validate_captcha');
-        $this->form_validation->set_message('validate_captcha', 'Please check the the captcha form');
+        log_message('info', '{"method" : "login_correcto", "location" : "START", "parameters" : [{"usuario_o_email": "' . $usuario_o_email . '"}]}');
 
-        $respuesta = new stdClass();
-        if ($this->form_validation->run() == TRUE) {
-            UsuarioSesion::login($this->input->post('usuario'), $this->input->post('password'));
-            $respuesta->validacion = TRUE;
-            $respuesta->redirect = $this->input->post('redirect') ? $this->input->post('redirect') : site_url();
-        } else {
-            $respuesta->validacion = FALSE;
-            $respuesta->errores = validation_errors();
+        try {
+            // Limpia en BBDD login erroneo.
+            $usuario = Doctrine::getTable('LoginErroneo')->findByUsuario($usuario_o_email);
+            $usuario->delete();
+
+            log_message('info', '{"method" : "login_correcto", "location" : "END", "status" : "OK"}');
+
+        } catch (Exception $err) {
+            log_message('error', '{"method" : "login_correcto", "location" : "END", "status" : "ERROR", "exception" : "' . $err .'"}');
         }
+    }
 
-        echo json_encode($respuesta);
+    private function login_incorrecto($usuario_o_email) {
+
+        log_message('info', '{"method" : "loginErroneo", "location" : "START", "parameters" : [{"usuario_o_email": "' . $usuario_o_email . '"}]}');
+
+        try {
+
+            $horario = new DateTime();
+
+            // Guarda en BBDD login erroneo.
+            $loginErroneo = new LoginErroneo();
+            $loginErroneo->usuario = $usuario_o_email;
+            $loginErroneo->horario = $horario->format("Y-m-d H:i:s");
+            $loginErroneo->save();
+
+            log_message('info', '{"method" : "loginErroneo", "location" : "END", "status" : "OK"}');
+
+        } catch (Exception $err) {
+            log_message('error', '{"method" : "loginErroneo", "location" : "END", "status" : "ERROR", "exception" : "' . $err .'"}');
+        }
+    }
+
+    private function mostrar_captcha($usuario) {
+
+        log_message('info', '{"method" : "mostrar_captcha", "location" : "START", "parameters" : [{"usuario": "' . $usuario . '"}]}');
+
+        try {
+
+            $horario = new DateTime();
+            $horario->modify('-3 hour');
+
+            $result = Doctrine_Query::create()
+            ->select('COUNT(*) AS intentos')
+            ->from('LoginErroneo')
+            ->where("usuario = ? AND horario > ?", array($usuario, $horario->format("Y-m-d H:i:s")))
+            ->execute();
+
+            if ($result[0]->intentos >= 1) {
+                log_message('info', '{"method" : "mostrar_captcha", "location" : "END", "status" : "OK", "return" : "TRUE"}');
+                return TRUE;
+            } else {
+                log_message('info', '{"method" : "mostrar_captcha", "location" : "END", "status" : "OK", "return" : "FALSE"}');
+                return FALSE;
+            }
+
+        } catch (Exception $err) {
+            log_message('error', '{"method" : "mostrar_captcha", "location" : "END", "status" : "ERROR", "exception" : "' . $err . '"}');
+        }
     }
 
     public function login() {
+
+        log_message('debug', 'login() inicio');
+
         if($this->input->get('redirect'))
             $data['redirect'] = $this->input->get('redirect');
         else
