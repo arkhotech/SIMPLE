@@ -67,7 +67,10 @@ class AccionRest extends Accion {
 
         log_message('info', 'Ejecutar rest url: '.$this->extra->url, FALSE);
         log_message('info', 'Ejecutar rest tipoMetodo: '.$this->extra->tipoMetodo, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
+        if(isset($this->extra->request)){
+            log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
+        }
+
 
         //Hacemos encoding a la url
         $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
@@ -79,6 +82,14 @@ class AccionRest extends Accion {
 
         log_message('info', 'Inicializando rest client', FALSE);
         $CI = & get_instance();
+
+        if(isset($this->extra->header)){
+            log_message('info', 'Ejecutar rest headers: '.$this->extra->header, FALSE);
+            $headers = json_decode($this->extra->header);
+            foreach ($headers as $name => $value) {
+                $CI->rest->header($name.": ".$value);
+            }
+        }
 
         if($this->extra->tipoMetodo == "GET"){
             log_message('info', 'Lllamando GET', FALSE);
@@ -97,11 +108,9 @@ class AccionRest extends Accion {
         $result = json_encode($result);
         $result = "{\"metodo".$this->extra->tipoMetodo."\":".$result."}";
         log_message('info', 'Result: '.$result, FALSE);
-        //$result = json_decode("metodo".$this->extra->tipoMetodo.":".$result);
 
         $json=json_decode($result);
-        //$json=$result;
-        
+
         foreach($json as $key=>$value){
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
             if(!$dato)
