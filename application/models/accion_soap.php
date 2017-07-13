@@ -59,62 +59,62 @@ class AccionSoap extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[url]', 'URL', 'required');
-        $CI->form_validation->set_rules('extra[header]', 'Header', 'required');
+        $CI->form_validation->set_rules('extra[wsdl]', 'WSDL', 'required');
+        $CI->form_validation->set_rules('extra[operacion]', 'Operación', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
 
-        $r=new Regla($this->extra->url);
-        $url=$r->getExpresionParaOutput($etapa->id);
-
-        log_message('info', 'Ejecutar rest url: '.$this->extra->url, FALSE);
-        log_message('info', 'Ejecutar rest tipoMetodo: '.$this->extra->tipoMetodo, FALSE);
+        log_message('info', 'Ejecutar rest url: '.$this->extra->wsdl, FALSE);
+        log_message('info', 'Ejecutar rest request: '.$this->extra->operacion, FALSE);
         log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
+        log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
+        log_message('info', 'Ejecutar rest request: '.$this->extra->header, FALSE);
 
-        //Hacemos encoding a la url
-        $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
-            $key=$matches[1];
-            $value=$matches[2];
-            return $key.urlencode($value);
-        },
-        $url);
+        try{
 
-        log_message('info', 'Inicializando rest client', FALSE);
-        $CI = & get_instance();
+            $CI = & get_instance();
 
-        if($this->extra->tipoMetodo == "GET"){
-            log_message('info', 'Lllamando GET', FALSE);
-            $result = $CI->rest->get($url, array(), 'json');
-        }else if($this->extra->tipoMetodo == "POST"){
-            log_message('info', 'Lllamando POST', FALSE);
-            $result = $CI->rest->post($url, $this->extra->request, 'json');
-        }else if($this->extra->tipoMetodo == "PUT"){
-            log_message('info', 'Lllamando PUT', FALSE);
-            $result = $CI->rest->put($url, $this->extra->request, 'json');
-        }else if($this->extra->tipoMetodo == "DELETE"){
-            log_message('info', 'Lllamando DELETE', FALSE);
-            $result = $CI->rest->delete($url, array(), 'json');
-        }
+            $r=new Regla($this->extra->wsdl);
+            $wsdl=$r->getExpresionParaOutput($etapa->id);
 
-        $result = json_encode($result);
-        $result = "{\"metodo".$this->extra->tipoMetodo."\":".$result."}";
-        log_message('info', 'Result: '.$result, FALSE);
-        //$result = json_decode("metodo".$this->extra->tipoMetodo.":".$result);
+            if(isset($this->extra->request)){
+                log_message('info', 'Reemplazando soap request: '.$this->extra->request, FALSE);
+                $r=new Regla($this->extra->request);
+                $request=$r->getExpresionParaOutput($etapa->id);
+                log_message('info', 'Request: '.$request, FALSE);
+            }
 
-        $json=json_decode($result);
-        //$json=$result;
-        
-        foreach($json as $key=>$value){
-            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+            $request = json_decode($this->extra->request);
+
+            $result = $CI->nusoap->soaprequest($wsdl, $this->extra->operacion, $request);
+
+            $result = json_encode($result);
+
+            $result = "{\"response_soap\":".$result."}";
+            log_message('info', 'Result: '.$result, FALSE);
+
+            $json=json_decode($result);
+
+            foreach($json as $key=>$value){
+                $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+                if(!$dato)
+                    $dato=new DatoSeguimiento();
+                $dato->nombre=$key;
+                $dato->valor=$value;
+                $dato->etapa_id=$etapa->id;
+                $dato->save();
+            }
+        }catch (Exception $e){
+            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
-            $dato->nombre=$key;
-            $dato->valor=$value;
+            $dato->nombre="error_soap";
+            $dato->valor=$e;
             $dato->etapa_id=$etapa->id;
             $dato->save();
-        }        
-        
+        }
+
     }
 
 }

@@ -69,6 +69,9 @@ class AccionRest extends Accion {
         log_message('info', 'Ejecutar rest tipoMetodo: '.$this->extra->tipoMetodo, FALSE);
         if(isset($this->extra->request)){
             log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
+            $r=new Regla($this->extra->request);
+            $request=$r->getExpresionParaOutput($etapa->id);
+            log_message('info', 'Request: '.$request, FALSE);
         }
 
 
@@ -85,42 +88,55 @@ class AccionRest extends Accion {
 
         if(isset($this->extra->header)){
             log_message('info', 'Ejecutar rest headers: '.$this->extra->header, FALSE);
-            $headers = json_decode($this->extra->header);
+            $r=new Regla($this->extra->header);
+            $header=$r->getExpresionParaOutput($etapa->id);
+            log_message('info', 'headers: '.$header, FALSE);
+            $headers = json_decode($header);
             foreach ($headers as $name => $value) {
                 $CI->rest->header($name.": ".$value);
             }
         }
 
-        if($this->extra->tipoMetodo == "GET"){
-            log_message('info', 'Lllamando GET', FALSE);
-            $result = $CI->rest->get($url, array(), 'json');
-        }else if($this->extra->tipoMetodo == "POST"){
-            log_message('info', 'Lllamando POST', FALSE);
-            $result = $CI->rest->post($url, $this->extra->request, 'json');
-        }else if($this->extra->tipoMetodo == "PUT"){
-            log_message('info', 'Lllamando PUT', FALSE);
-            $result = $CI->rest->put($url, $this->extra->request, 'json');
-        }else if($this->extra->tipoMetodo == "DELETE"){
-            log_message('info', 'Lllamando DELETE', FALSE);
-            $result = $CI->rest->delete($url, array(), 'json');
-        }
+        try{
+            if($this->extra->tipoMetodo == "GET"){
+                log_message('info', 'Lllamando GET', FALSE);
+                $result = $CI->rest->get($url, array(), 'json');
+            }else if($this->extra->tipoMetodo == "POST"){
+                log_message('info', 'Lllamando POST', FALSE);
+                $result = $CI->rest->post($url, $request, 'json');
+            }else if($this->extra->tipoMetodo == "PUT"){
+                log_message('info', 'Lllamando PUT', FALSE);
+                $result = $CI->rest->put($url, $request, 'json');
+            }else if($this->extra->tipoMetodo == "DELETE"){
+                log_message('info', 'Lllamando DELETE', FALSE);
+                $result = $CI->rest->delete($url, array(), 'json');
+            }
 
-        $result = json_encode($result);
-        $result = "{\"metodo".$this->extra->tipoMetodo."\":".$result."}";
-        log_message('info', 'Result: '.$result, FALSE);
+            $result = json_encode($result);
+            $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
+            log_message('info', 'Result: '.$result, FALSE);
 
-        $json=json_decode($result);
+            $json=json_decode($result);
 
-        foreach($json as $key=>$value){
-            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+            foreach($json as $key=>$value){
+                $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+                if(!$dato)
+                    $dato=new DatoSeguimiento();
+                $dato->nombre=$key;
+                $dato->valor=$value;
+                $dato->etapa_id=$etapa->id;
+                $dato->save();
+            }
+        }catch (Exception $e){
+            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
-            $dato->nombre=$key;
-            $dato->valor=$value;
+            $dato->nombre="error_rest";
+            $dato->valor=$e;
             $dato->etapa_id=$etapa->id;
             $dato->save();
-        }        
-        
+        }
+
     }
 
 }
