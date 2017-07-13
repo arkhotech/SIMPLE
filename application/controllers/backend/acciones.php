@@ -240,7 +240,22 @@ class Acciones extends MY_BackendController {
         $result['functions']=$client->__getFunctions();
         $result['types']=$client->__getTypes();
         $result=json_encode($result);
+        $result = str_replace("\\n", " ", $result);
+        $result = str_replace("\\r", " ", $result);
         print_r($result);
         exit;
-    }    
+    }  
+
+    public function converter_json(){
+        $array=$this->input->post('myArrClean');
+        $json = Array();
+        $strlen=count($array);
+        for ($i = 1; $i <= $strlen; $i+=2){
+            $json[$array[$i-1]]=$array[$i];
+        }
+        $json2=json_encode($json);
+        print_r($json2);
+        exit;
+    }
+
 }
