@@ -1,6 +1,6 @@
  var nextinput=validJsonR=validJsonH=0;
  var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap=result='';
- var DataTypesSoap=["anyURI","float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","cadena de caracteres","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","normalizedString"];
+ var DataTypesSoap=["anyURI","float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","string","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","normalizedString"];
 
 var rhtmlspecialchars = function (str) {
     if (typeof(str) == "string") {
@@ -30,9 +30,12 @@ var rhtmlspecialchars2 = function (str) {
 	var urlsoap = $("#urlsoap").val();
     $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d,e){
     	if (d){
+			$("#operacion").empty(); 	
  			$('#divMetodosE').hide();
  			result = JSON.parse(d);
 	    	tiposMetodos=result.types;
+    		console.log(tiposMetodos);
+			$("#operacion").append("<option value=''>Seleccione...</option>"); 	
 	    	jQuery.each(result.functions, function(i,val){
 			    var res = val.split(" ");
 				var subtit = res[1].replace("(", " ");
@@ -67,7 +70,6 @@ var rhtmlspecialchars2 = function (str) {
 function getCleanedString(cadena){
    // Definimos los caracteres que queremos eliminar
    var specialChars = "/\n/!@#$^&%*()+=-[]{}|:<>?,.;";
-
    // Los eliminamos todos
    for (var i = 0; i < specialChars.length; i++) {
        cadena= cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
@@ -75,19 +77,65 @@ function getCleanedString(cadena){
    return cadena;
 }
 
-// Convert array to object
-var convArrToObj = function(array){
-	console.log("entre a la funcion");
-    var thisEleObj = new Object();
-    if(typeof array == "object"){
-        for(var i in array){
-            var thisEle = convArrToObj(array[i]);
-            thisEleObj[i] = "thisEle";
-        }
-    }else {
-        thisEleObj = array;
-    }
-    return thisEleObj;
+function getCleanedString2(cadena){
+   // Definimos los caracteres que queremos eliminar
+   var specialChars = "!@#$^&%*()+=-[]{}|:<>?.;";
+   // Los eliminamos todos
+   for (var i = 0; i < specialChars.length; i++) {
+       cadena= cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
+   }   
+   return cadena;
+}
+
+function CovertJson(myArrClean){
+	var json='';
+	    $.ajax({
+            url:'/backend/acciones/converter_json',
+            type:'POST',
+            async:false,
+            dataType: 'JSON',
+            data: {myArrClean: myArrClean}
+        })
+        .done(function(d){ 
+        	json=d;
+        })
+        .fail(function(){
+        	json=0;
+        });
+     	return json;
+}
+function BuscarVariables(json){
+	var array6='';
+	var array7='';
+	jQuery.each(json, function(i,value){
+		var bool = DataTypesSoap.indexOf(value);
+		if (bool==-1){
+			array7=value;
+			jQuery.each(tiposMetodos, function(i,val){
+				var bool2 = val.indexOf(value);
+				if (bool2==-1){
+					return;
+				}else{
+					var array= val.split(" ");
+					if(array[1]==value){
+						console.log("este es");
+						var cadena= array.toString();
+						var array2= cadena.split("{");
+		    			var ultimo = array2.pop();
+		    			var cadena2=getCleanedString2(ultimo);
+						var array3= cadena2.split(",");
+		    			var array4 = array3.filter(Boolean);
+		    			var array5= array4.reverse();
+		    			array6 = CovertJson(array5);
+					} 
+				}
+	    	});
+		} 	
+	});
+	var obj = {};
+	obj[0] = json;
+	obj[1] = array6;
+	return obj;
 }
 
  function CambioRadio(){
@@ -102,33 +150,28 @@ var convArrToObj = function(array){
 	    FuncResponse=res[0];
 		FunMetodo=subtit[0];
 		FuncResquest=subtit[1];
-		console.log(FuncResponse);
-		console.log(FunMetodo);
-		console.log(FuncResquest);
-		console.log(tiposMetodos);
     	jQuery.each(tiposMetodos, function(i,val){
     		var sep = val.split(" ");
     		if (sep[1]==FuncResquest){
     			// Caso Request
     			console.log("entre al request");
-    			console.log(DataTypesSoap);
     			var cadena= val.split("{");
     			var ultimo = cadena.pop();
     			var res= getCleanedString(ultimo);
     			var res= res.split(" ");
     			var myArrClean = res.filter(Boolean);
     			myArrClean= myArrClean.reverse();
-		    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-			    	if (d){
-	    				$("#request").val(d);
-			    	}else{
-			    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-			    	}
-		    	});
+    			var json = CovertJson(myArrClean);
+    			if(json==0){
+			    	$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+    			}else{
+    				var result= JSON.stringify(BuscarVariables(json),null,2);
+	    			$("#request").val(result);
+    			}
     		}
-    		 if (sep[1]==FuncResponse){
+    		if (sep[1]==FuncResponse){
     			// Caso Response
-    			console.log("entre al response");
+    			// console.log("entre al response");
     			var cadena= val.split("{");
     			var ultimo = cadena.pop();
     			var res= getCleanedString(ultimo);
@@ -137,9 +180,8 @@ var convArrToObj = function(array){
     			myArrClean= myArrClean.reverse();
 		    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
 			    	if (d){
-			    		console.log(d);
-
-	    				$("#response").val(d);
+	    				var result = JSON.stringify(JSON.parse(d),null,2);  
+	    				$("#response").val(result);
 			    	}else{
 			    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
 			    	}
@@ -219,5 +261,4 @@ function isJsonR(object,value,id_span){
 	});
 
     $(document).on('click','#btn-consultar',ConsultarFunciones);
-
 });

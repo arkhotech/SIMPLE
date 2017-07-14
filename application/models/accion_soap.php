@@ -13,15 +13,14 @@ class AccionSoap extends Accion {
          $display.='
                 <div class="col-md-12">
                         <label>WSDL</label>
-                        <input type="text" class="input-xxlarge AlignText" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl') . '" />
+                        <input type="text" class="input-xxlarge AlignText" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : '') . '" />
                         <button id="btn-consultar" type="button" class="btn btn-default AlignButton">Consultar</button>
                 </div>'; 
         
         $display.='
                 <div id="divMetodos" class="col-md-12">
                     <label>Métodos</label>
-                    <select id="operacion" name="extra[operacion]">
-                    <option value="">Seleccione...</option>';
+                    <select id="operacion" name="extra[operacion]">';
                     if ($this->extra->operacion){
                         $display.='<option value="'.($this->extra->operacion).'" selected>'.($this->extra->operacion).'</option>';
                     } 
