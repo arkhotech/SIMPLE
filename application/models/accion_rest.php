@@ -13,8 +13,9 @@ class AccionRest extends Accion {
             </p>
         ';
 
-        // $display.='<script src="'.base_url().'assets/js/CrearDivHeader.js" type="text/javascript"></script>'; 
-        
+        $display.= '<label>URL</label>';
+        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />'; 
+       
         $display.='
                 <label>Método</label>
                 <select id="tipoMetodo" name="extra[tipoMetodo]">
@@ -46,11 +47,6 @@ class AccionRest extends Accion {
                 <span id="resultHeader" class="spanError"></span>
                 <br /><br />
             </div>';
-
-        $display.= '<label>URL</label>';
-        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
-
-
         return $display;
     }
 

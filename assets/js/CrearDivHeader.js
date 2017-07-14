@@ -31,19 +31,16 @@ var rhtmlspecialchars2 = function (str) {
     $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d,e){
     	if (d){
  			$('#divMetodosE').hide();
- 			$('#divMetodos').show();
  			result = JSON.parse(d);
- 			console.log(result);
 	    	tiposMetodos=result.types;
 	    	jQuery.each(result.functions, function(i,val){
 			    var res = val.split(" ");
 				var subtit = res[1].replace("(", " ");
 			    var subtit = subtit.split(" ");
-			    $("#divOptions").append("<input class='rButton' type='radio' id='operacion' name='extra[operacion]' value='"+subtit[0]+"'> "+subtit[0]+"&nbsp;&nbsp;"); 	
+			    $("#operacion").append("<option value='"+subtit[0]+"'>"+subtit[0]+"</option>"); 	
 			});
 			CambioRadio();
     	}else{
- 			$('#divMetodos').hide();
  			$('#divMetodosE').show();
     		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
     	}
@@ -200,7 +197,6 @@ function isJsonR(object,value,id_span){
 }
 
  $(document).ready(function(){
- 	$('#divMetodos').hide();
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")
