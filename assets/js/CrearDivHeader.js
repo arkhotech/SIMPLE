@@ -1,5 +1,5 @@
  var nextinput=validJsonR=validJsonH=0;
- var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap='';
+ var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap=result='';
  var DataTypesSoap=["anyURI","float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","cadena de caracteres","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","normalizedString"];
 
 var rhtmlspecialchars = function (str) {
@@ -32,14 +32,14 @@ var rhtmlspecialchars2 = function (str) {
     	if (d){
  			$('#divMetodosE').hide();
  			$('#divMetodos').show();
- 			var result = JSON.parse(d);
+ 			result = JSON.parse(d);
  			console.log(result);
 	    	tiposMetodos=result.types;
 	    	jQuery.each(result.functions, function(i,val){
 			    var res = val.split(" ");
 				var subtit = res[1].replace("(", " ");
 			    var subtit = subtit.split(" ");
-			    $("#divOptions").append("<input class='rButton' type='radio' id='operacion' name='extra[operacion]' value='"+val+"'> "+subtit[0]+"&nbsp;&nbsp;"); 	
+			    $("#divOptions").append("<input class='rButton' type='radio' id='operacion' name='extra[operacion]' value='"+subtit[0]+"'> "+subtit[0]+"&nbsp;&nbsp;"); 	
 			});
 			CambioRadio();
     	}else{
@@ -96,13 +96,18 @@ var convArrToObj = function(array){
  function CambioRadio(){
     $("[id='operacion']").on("change", function (e) {
     	ObjectSoap=this.value;
-    	console.log(ObjectSoap);
-		var res = ObjectSoap.split(" ");
+    	jQuery.each(result.functions, function(i,val){
+    	var bool = val.indexOf(ObjectSoap);
+    	if (bool>=0){    	
+		var res = val.split(" ");
 		var subtit = res[1].replace("(", " ");
 	    var subtit = subtit.split(" ");
 	    FuncResponse=res[0];
 		FunMetodo=subtit[0];
 		FuncResquest=subtit[1];
+		console.log(FuncResponse);
+		console.log(FunMetodo);
+		console.log(FuncResquest);
 		console.log(tiposMetodos);
     	jQuery.each(tiposMetodos, function(i,val){
     		var sep = val.split(" ");
@@ -143,61 +148,9 @@ var convArrToObj = function(array){
 			    	}
 		    	});
     		}
-    		// var res= val.indexOf(FuncResponse)
-    		// if (res>0){
-    		// 	// Caso Response
-    		// 	console.log("entre al response");
-
-    		// 	var cadena= val.split("{");
-    		// 	var ultimo = cadena.pop();
-    		// 	var res= getCleanedString(ultimo);
-    		// 	var res= res.split(" ");
-    		// 	var myArrClean = res.filter(Boolean);
-    		// 	myArrClean= myArrClean.reverse();
-		    // 	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-			   //  	if (d){
-			   //  		console.log(d);
-			   //  		$("#SpanResponse").text(d);
-			   //  	}else{
-			   //  		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-			   //  	}
-		    // 	});	
-    		// }
-  //   		if (bool>0){
-  //   			var bool2= val.indexOf("Response")
-	 //    		if (bool2>0){
-	 //    			// Caso Response
-	 //    			var cadena= val.split("{");
-	 //    			var ultimo = cadena.pop();
-	 //    			var res= getCleanedString(ultimo);
-	 //    			var res= res.split(" ");
-	 //    			var myArrClean = res.filter(Boolean);
-	 //    			myArrClean= myArrClean.reverse();
-		// 	    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-		// 		    	if (d){
-		// 		    		$("#SpanResponse").text(d);
-		// 		    	}else{
-		// 		    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-		// 		    	}
-		// 	    	});	    			
-	 //    		}else{
-	 //    			// Caso Request
-	 //    			var cadena= val.split("{");
-	 //    			var ultimo = cadena.pop();
-	 //    			var res= getCleanedString(ultimo);
-	 //    			var res= res.split(" ");
-	 //    			var myArrClean = res.filter(Boolean);
-	 //    			myArrClean= myArrClean.reverse();
-	 //    			$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-		// 		    	if (d){
-	 //    					$("#request").val(d);
-		// 		    	}else{
-		// 		    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-		// 		    	}
-		// 	    	});
-	 //    		}
-  //   		}
 		});
+	}
+	});
 	});
  }
  
