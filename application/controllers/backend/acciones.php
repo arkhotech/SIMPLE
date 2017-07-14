@@ -239,10 +239,14 @@ class Acciones extends MY_BackendController {
         $client = new SoapClient($url);
         $result['functions']=$client->__getFunctions();
         $result['types']=$client->__getTypes();
-        $result=json_encode($result);
+        $result['functions'] = str_replace("\\n", " ", $result['functions']);
+        $result['functions'] = str_replace("\\r", " ", $result['functions']);
+        $result['types'] = str_replace("\\n", " ", $result['types']);
+        $result['types'] = str_replace("\\r", " ", $result['types']);
         $result = str_replace("\\n", " ", $result);
         $result = str_replace("\\r", " ", $result);
-        print_r($result);
+        $array = json_encode($result);
+        print_r($array);
         exit;
     }  
 

@@ -13,7 +13,7 @@ class AccionSoap extends Accion {
          $display.='
             <div class="col-md-12">
                 <label>WSDL</label>
-               <input type="text" class="input-xxlarge" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : '') . '" />
+               <input type="text" class="input-xxlarge" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl') . '" />
                 <button id="btn-consultar" type="button" class="btn btn-default">Consultar</button>
 
             </div>'; 
@@ -22,6 +22,7 @@ class AccionSoap extends Accion {
                 <div id="divMetodos" style="display:none;" class="col-md-12">
                     <label>Métodos</label>
                     <div id="divOptions" class="col-md-12"></div>
+                    <br /><br />
                     <span id="SpanResponse"></span>
                     <br /><br />
                 </div>                
@@ -30,14 +31,21 @@ class AccionSoap extends Accion {
                     <br /><br />
                 </div>';
                     
-        $display.='
+        $display.='            
             <div class="col-md-12">
                 <label>Request</label>
                 <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
                 <br />
                 <span id="resultRequest" class="spanError"></span>
                 <br /><br />
-            </div>';
+            </div>
+           <div class="col-md-12">
+                <label>Response</label>
+                <textarea id="response" name="extra[response]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge" readonly>' . ($this->extra ? $this->extra->response : '') . '</textarea>
+                <br /><br />
+            </div>
+
+            ';
 
 
         // $display.='
