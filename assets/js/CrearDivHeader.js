@@ -1,5 +1,6 @@
  var nextinput=validJsonR=validJsonH=0;
- var tiposMetodos='';
+ var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap='';
+ var DataTypesSoap=["anyURI","float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","cadena de caracteres","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","normalizedString"];
 
 var rhtmlspecialchars = function (str) {
     if (typeof(str) == "string") {
@@ -27,17 +28,18 @@ var rhtmlspecialchars2 = function (str) {
     $("#divOptions").empty();
     $("#warningSpan").text("");
 	var urlsoap = $("#urlsoap").val();
-    $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d){
+    $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d,e){
     	if (d){
  			$('#divMetodosE').hide();
  			$('#divMetodos').show();
-	    	var result = JSON.parse(d);
+ 			var result = JSON.parse(d);
+ 			console.log(result);
 	    	tiposMetodos=result.types;
 	    	jQuery.each(result.functions, function(i,val){
 			    var res = val.split(" ");
 				var subtit = res[1].replace("(", " ");
-				var titulo = subtit.split(" ");
-			    $("#divOptions").append("<input class='rButton' type='radio' id='operacion' name='extra[operacion]' value='"+titulo[0]+"'> "+titulo[0]+"&nbsp;&nbsp;"); 	
+			    var subtit = subtit.split(" ");
+			    $("#divOptions").append("<input class='rButton' type='radio' id='operacion' name='extra[operacion]' value='"+val+"'> "+subtit[0]+"&nbsp;&nbsp;"); 	
 			});
 			CambioRadio();
     	}else{
@@ -91,61 +93,110 @@ var convArrToObj = function(array){
     return thisEleObj;
 }
 
- function CambioRadio(value){
+ function CambioRadio(){
     $("[id='operacion']").on("change", function (e) {
-    	var metodo=this.value;
+    	ObjectSoap=this.value;
+    	console.log(ObjectSoap);
+		var res = ObjectSoap.split(" ");
+		var subtit = res[1].replace("(", " ");
+	    var subtit = subtit.split(" ");
+	    FuncResponse=res[0];
+		FunMetodo=subtit[0];
+		FuncResquest=subtit[1];
+		console.log(tiposMetodos);
     	jQuery.each(tiposMetodos, function(i,val){
-    		var bool= val.indexOf(metodo)
-    		if (bool>0){
-    			var bool2= val.indexOf("Response")
-	    		if (bool2>0){
-	    			// Caso Response
-	    			var cadena= val.split("{");
-	    			var ultimo = cadena.pop();
-	    			var res= getCleanedString(ultimo);
-	    			var res= res.split(" ");
-	    			var myArrClean = res.filter(Boolean);
-	    			myArrClean= myArrClean.reverse();
-			    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-				    	if (d){
-				    		$("#SpanResponse").text(d);
-				    	}else{
-				    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-				    	}
-			    	});	    			
-	    		}else{
-	    			// Caso Request
-	    			var cadena= val.split("{");
-	    			var ultimo = cadena.pop();
-	    			var res= getCleanedString(ultimo);
-	    			var res= res.split(" ");
-	    			var myArrClean = res.filter(Boolean);
-	    			myArrClean= myArrClean.reverse();
-	    			$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-				    	if (d){
-	    					$("#request").val(d);
-				    	}else{
-				    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-				    	}
-			    	});
-	    		}
-
-
-
-    			
-    			// var res= rhtmlspecialchars(val);
-    			// var res2= rhtmlspecialchars(res);
-    			// console.log(res);
-
-    			// var res4= rhtmlspecialchars(res3);
-    			// var res5= rhtmlspecialchars(res4);
-    			// var res6= rhtmlspecialchars(res5);
-    			// var res7= rhtmlspecialchars(res6);
-    			// var res8= rhtmlspecialchars(res7);
-    			// var res9= rhtmlspecialchars(res8);
-    			// var res10= rhtmlspecialchars2(res9);
-    			// var res11= rhtmlspecialchars2(res10);
+    		var sep = val.split(" ");
+    		if (sep[1]==FuncResquest){
+    			// Caso Request
+    			console.log("entre al request");
+    			console.log(DataTypesSoap);
+    			var cadena= val.split("{");
+    			var ultimo = cadena.pop();
+    			var res= getCleanedString(ultimo);
+    			var res= res.split(" ");
+    			var myArrClean = res.filter(Boolean);
+    			myArrClean= myArrClean.reverse();
+		    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
+			    	if (d){
+	    				$("#request").val(d);
+			    	}else{
+			    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+			    	}
+		    	});
     		}
+    		 if (sep[1]==FuncResponse){
+    			// Caso Response
+    			console.log("entre al response");
+    			var cadena= val.split("{");
+    			var ultimo = cadena.pop();
+    			var res= getCleanedString(ultimo);
+    			var res= res.split(" ");
+    			var myArrClean = res.filter(Boolean);
+    			myArrClean= myArrClean.reverse();
+		    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
+			    	if (d){
+			    		console.log(d);
+
+	    				$("#response").val(d);
+			    	}else{
+			    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+			    	}
+		    	});
+    		}
+    		// var res= val.indexOf(FuncResponse)
+    		// if (res>0){
+    		// 	// Caso Response
+    		// 	console.log("entre al response");
+
+    		// 	var cadena= val.split("{");
+    		// 	var ultimo = cadena.pop();
+    		// 	var res= getCleanedString(ultimo);
+    		// 	var res= res.split(" ");
+    		// 	var myArrClean = res.filter(Boolean);
+    		// 	myArrClean= myArrClean.reverse();
+		    // 	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
+			   //  	if (d){
+			   //  		console.log(d);
+			   //  		$("#SpanResponse").text(d);
+			   //  	}else{
+			   //  		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+			   //  	}
+		    // 	});	
+    		// }
+  //   		if (bool>0){
+  //   			var bool2= val.indexOf("Response")
+	 //    		if (bool2>0){
+	 //    			// Caso Response
+	 //    			var cadena= val.split("{");
+	 //    			var ultimo = cadena.pop();
+	 //    			var res= getCleanedString(ultimo);
+	 //    			var res= res.split(" ");
+	 //    			var myArrClean = res.filter(Boolean);
+	 //    			myArrClean= myArrClean.reverse();
+		// 	    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
+		// 		    	if (d){
+		// 		    		$("#SpanResponse").text(d);
+		// 		    	}else{
+		// 		    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+		// 		    	}
+		// 	    	});	    			
+	 //    		}else{
+	 //    			// Caso Request
+	 //    			var cadena= val.split("{");
+	 //    			var ultimo = cadena.pop();
+	 //    			var res= getCleanedString(ultimo);
+	 //    			var res= res.split(" ");
+	 //    			var myArrClean = res.filter(Boolean);
+	 //    			myArrClean= myArrClean.reverse();
+	 //    			$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
+		// 		    	if (d){
+	 //    					$("#request").val(d);
+		// 		    	}else{
+		// 		    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+		// 		    	}
+		// 	    	});
+	 //    		}
+  //   		}
 		});
 	});
  }
