@@ -62,8 +62,8 @@ class AccionSoap extends Accion {
         log_message('info', 'Ejecutar rest url: '.$this->extra->wsdl, FALSE);
         log_message('info', 'Ejecutar rest request: '.$this->extra->operacion, FALSE);
         log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->header, FALSE);
+        //log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
+        //log_message('info', 'Ejecutar rest request: '.$this->extra->header, FALSE);
 
         try{
 
@@ -79,11 +79,21 @@ class AccionSoap extends Accion {
                 log_message('info', 'Request: '.$request, FALSE);
             }
 
-            $request = json_decode($this->extra->request);
+            $request = json_decode($request, true);
+            //var_dump($request);
+
+            //print_r($request);
+            //dd($request);
 
             $result = $CI->nusoap->soaprequest($wsdl, $this->extra->operacion, $request);
 
-            $result = json_encode($result);
+            log_message('info', 'Se obtiene respuesta', FALSE);
+            $response_xml = $result["GetCitiesByCountryResult"];
+
+            log_message('info', 'Cargando xml', FALSE);
+            $response = simplexml_load_string($response_xml);
+            log_message('info', 'Transformando a json', FALSE);
+            $result = json_encode($response);
 
             $result = "{\"response_soap\":".$result."}";
             log_message('info', 'Result: '.$result, FALSE);
