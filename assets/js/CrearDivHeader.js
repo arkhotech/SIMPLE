@@ -165,8 +165,10 @@ function BuscarVariables(json){
     			if(json==0){
 			    	$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
     			}else{
-    				var result= JSON.stringify(BuscarVariables(json),null,2);
-	    			$("#request").val(result);
+    		
+    				// var result= JSON.stringify(BuscarVariables(json),null,2);
+    				// var result= JSON.stringify(BuscarVariables(json),null,2);
+	    			$("#request").val(JSON.stringify(json));
     			}
     		}
     		if (sep[1]==FuncResponse){
@@ -178,14 +180,14 @@ function BuscarVariables(json){
     			var res= res.split(" ");
     			var myArrClean = res.filter(Boolean);
     			myArrClean= myArrClean.reverse();
-		    	$.post("/backend/acciones/converter_json", {myArrClean: myArrClean}, function(d){
-			    	if (d){
-	    				var result = JSON.stringify(JSON.parse(d),null,2);  
-	    				$("#response").val(result);
-			    	}else{
-			    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-			    	}
-		    	});
+    			var json = CovertJson(myArrClean);
+    			if(json==0){
+			    	$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+    			}else{
+    				// var result= JSON.stringify(BuscarVariables(json),null,2);
+    				// var result= JSON.stringify(BuscarVariables(json),null,2);
+	    			$("#response").val(JSON.stringify(json));
+    			}
     		}
 		});
 	}
