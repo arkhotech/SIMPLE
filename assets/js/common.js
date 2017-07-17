@@ -75,6 +75,8 @@ $(document).ready(function(){
                             grecaptcha.render('login_captcha', {
                                 'sitekey' : site_key
                             });
+                        } else {
+                            grecaptcha.reset();
                         }
 
                         form.submitting = false;
