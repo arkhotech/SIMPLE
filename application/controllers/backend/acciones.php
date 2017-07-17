@@ -252,6 +252,8 @@ class Acciones extends MY_BackendController {
 
     public function converter_json(){
         $array=$this->input->post('myArrClean');
+        $array = str_replace("\\n", " ", $array);
+        $array = str_replace("\\r", " ", $array);
         $json = Array();
         $strlen=count($array);
         for ($i = 1; $i <= $strlen; $i+=2){
