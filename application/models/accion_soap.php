@@ -68,7 +68,7 @@ class AccionSoap extends Accion {
         log_message('info', 'Ejecutar rest url: '.$this->extra->wsdl, FALSE);
         log_message('info', 'Ejecutar rest request: '.$this->extra->operacion, FALSE);
         log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
-        //log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
+        log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
         //log_message('info', 'Ejecutar rest request: '.$this->extra->header, FALSE);
 
         try{
@@ -94,7 +94,21 @@ class AccionSoap extends Accion {
             $result = $CI->nusoap->soaprequest($wsdl, $this->extra->operacion, $request);
 
             log_message('info', 'Se obtiene respuesta', FALSE);
-            $response_xml = $result["GetCitiesByCountryResult"];
+
+            $response_name = "";
+            if(isset($this->extra->response)){
+                $response = json_decode($this->extra->response, true);
+                foreach($response as $key=>$value){
+                    $response_name = $key;
+                    break;
+                }
+            }
+
+            log_message('info', 'response name: '.$response_name, FALSE);
+
+            $response_xml = $result[$response_name];
+
+            log_message('info', '$response_xml: '.$response_xml, FALSE);
 
             log_message('info', 'Cargando xml', FALSE);
             $response = simplexml_load_string($response_xml);
