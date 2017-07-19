@@ -12,7 +12,7 @@
     <li><a href="<?=site_url('backend/formularios/listar/'.$proceso->id)?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Acciones</a></li>
-    <li><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    <!-- <li><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li> -->
 </ul>
 
 <a class="btn btn-success" href="#" onclick="return seleccionarAccion(<?=$proceso->id?>);"><i class="icon-white icon-file"></i> Nuevo</a>
