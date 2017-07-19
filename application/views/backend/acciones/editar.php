@@ -11,7 +11,7 @@
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
 </ul>
- 
+  
 
 <form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>

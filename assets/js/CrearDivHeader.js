@@ -1,52 +1,13 @@
- var nextinput=validJsonR=validJsonH=0;
- var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap=result='';
- var DataTypesSoap=["anyURI","float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","string","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","normalizedString"];
+var nextinput=validJsonR=validJsonH=0;
+var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap=result='';
+var operaciones = [];
 
-var rhtmlspecialchars = function (str) {
-    if (typeof(str) == "string") {
-	    str = str.replace(/&gt;/ig, "");
-	    str = str.replace(/&lt;/ig, "");
-	    str = str.replace(/&#039;/g, "");
-	    str = str.replace(/&quot;/ig, '');
-	    str = str.replace(/\n/ig, '');
-	    str = str.replace(" ", '');
-	    str = str.replace(/&amp;/ig, ''); 
-    }
-    return str;
-}
-
-var rhtmlspecialchars2 = function (str) {
-    if (typeof(str) == "string") {
-    str = str.replace(/___/ig, " ");
-    str = str.replace(/__/ig, " ");
-    str = str.replace(/_/ig, " ");
-    }
-    return str;
-}
-
- function ConsultarFunciones(){
+function ConsultarFunciones(){
     $("#divOptions").empty();
     $("#warningSpan").text("");
 	var urlsoap = $("#urlsoap").val();
     $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d,e){
-    	if (d){
-			$("#operacion").empty(); 	
- 			$('#divMetodosE').hide();
- 			result = JSON.parse(d);
-	    	tiposMetodos=result.types;
-    		console.log(tiposMetodos);
-			$("#operacion").append("<option value=''>Seleccione...</option>"); 	
-	    	jQuery.each(result.functions, function(i,val){
-			    var res = val.split(" ");
-				var subtit = res[1].replace("(", " ");
-			    var subtit = subtit.split(" ");
-			    $("#operacion").append("<option value='"+subtit[0]+"'>"+subtit[0]+"</option>"); 	
-			});
-			CambioRadio();
-    	}else{
- 			$('#divMetodosE').show();
-    		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
-    	}
+    	manejorespuesta(d);
     });
  }
 
@@ -77,24 +38,14 @@ function getCleanedString(cadena){
    return cadena;
 }
 
-function getCleanedString2(cadena){
-   // Definimos los caracteres que queremos eliminar
-   var specialChars = "!@#$^&%*()+=-[]{}|:<>?.;";
-   // Los eliminamos todos
-   for (var i = 0; i < specialChars.length; i++) {
-       cadena= cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
-   }   
-   return cadena;
-}
-
-function CovertJson(myArrClean){
+function CovertJson(myArrClean,operaciones){
 	var json='';
-	    $.ajax({
+	    $.ajax({  
             url:'/backend/acciones/converter_json',
             type:'POST',
             async:false,
             dataType: 'JSON',
-            data: {myArrClean: myArrClean}
+            data: {myArrClean: myArrClean, operaciones:operaciones}
         })
         .done(function(d){ 
         	json=d;
@@ -104,42 +55,11 @@ function CovertJson(myArrClean){
         });
      	return json;
 }
-function BuscarVariables(json){
-	var array6='';
-	var array7='';
-	jQuery.each(json, function(i,value){
-		var bool = DataTypesSoap.indexOf(value);
-		if (bool==-1){
-			array7=value;
-			jQuery.each(tiposMetodos, function(i,val){
-				var bool2 = val.indexOf(value);
-				if (bool2==-1){
-					return;
-				}else{
-					var array= val.split(" ");
-					if(array[1]==value){
-						console.log("este es");
-						var cadena= array.toString();
-						var array2= cadena.split("{");
-		    			var ultimo = array2.pop();
-		    			var cadena2=getCleanedString2(ultimo);
-						var array3= cadena2.split(",");
-		    			var array4 = array3.filter(Boolean);
-		    			var array5= array4.reverse();
-		    			array6 = CovertJson(array5);
-					} 
-				}
-	    	});
-		} 	
-	});
-	var obj = {};
-	obj[0] = json;
-	obj[1] = array6;
-	return obj;
-}
 
  function CambioRadio(){
     $("[id='operacion']").on("change", function (e) {
+    	$("#request").val("");
+    	$("#response").val("");
     	ObjectSoap=this.value;
     	jQuery.each(result.functions, function(i,val){
     	var bool = val.indexOf(ObjectSoap);
@@ -154,39 +74,34 @@ function BuscarVariables(json){
     		var sep = val.split(" ");
     		if (sep[1]==FuncResquest){
     			// Caso Request
-    			console.log("entre al request");
     			var cadena= val.split("{");
     			var ultimo = cadena.pop();
     			var res= getCleanedString(ultimo);
     			var res= res.split(" ");
     			var myArrClean = res.filter(Boolean);
     			myArrClean= myArrClean.reverse();
-    			var json = CovertJson(myArrClean);
+    			var json = CovertJson(myArrClean,operaciones); 
     			if(json==0){
 			    	$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
     			}else{
-    		
-    				// var result= JSON.stringify(BuscarVariables(json),null,2);
-    				// var result= JSON.stringify(BuscarVariables(json),null,2);
-	    			$("#request").val(JSON.stringify(json));
+    				var result= JSON.stringify(json,null,2);
+	    			$("#request").val(result);
     			}
     		}
     		if (sep[1]==FuncResponse){
     			// Caso Response
-    			// console.log("entre al response");
     			var cadena= val.split("{");
     			var ultimo = cadena.pop();
     			var res= getCleanedString(ultimo);
     			var res= res.split(" ");
     			var myArrClean = res.filter(Boolean);
     			myArrClean= myArrClean.reverse();
-    			var json = CovertJson(myArrClean);
+				var json = CovertJson(myArrClean,operaciones); 
     			if(json==0){
 			    	$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
     			}else{
-    				// var result= JSON.stringify(BuscarVariables(json),null,2);
-    				// var result= JSON.stringify(BuscarVariables(json),null,2);
-	    			$("#response").val(JSON.stringify(json));
+    				var result= JSON.stringify(json,null,2);
+	    			$("#response").val(result);
     			}
     		}
 		});
@@ -194,8 +109,8 @@ function BuscarVariables(json){
 	});
 	});
  }
- 
- function CambioSelect(value){
+
+function CambioSelect(value){
  	switch ($("#tipoMetodo").val()) {                
  		case "POST": case "PUT":
  			$("#divObject").show();
@@ -240,6 +155,58 @@ function isJsonR(object,value,id_span){
     return true;
 }
 
+
+function manejorespuesta(data){
+    if (data){
+		$("#operacion").empty(); 	
+			$('#divMetodosE').hide();
+			result = JSON.parse(data);
+			jQuery.each(result.types, function(i,val){	
+			val = getCleanedString(val);
+			val = val.replace("{", ""); 
+			val = val.replace("}", ""); 
+			val = val.replace(";", ""); 
+			val = val.split(" ");
+	    	val = val.filter(Boolean);
+	    	operaciones[i] = val;
+		});
+    	tiposMetodos=result.types;
+		$("#operacion").append("<option value=''>Seleccione...</option>"); 	
+    	jQuery.each(result.functions, function(i,val){
+		    var res = val.split(" ");
+			var subtit = res[1].replace("(", " ");
+		    var subtit = subtit.split(" ");
+		    $("#operacion").append("<option value='"+subtit[0]+"'>"+subtit[0]+"</option>"); 	
+		});
+		CambioRadio();
+	}else{
+		$('#divMetodosE').show();
+		$("#warningSpan").text("La consulta al servicio SOAP no trajo resultados, verifique.");
+	}
+}
+
+var CargarWsdl = function(){ 
+    var formu=$(this);
+    var nombreform=$(this).attr("id");
+    var form = $('#plantillaForm').get(0); 
+    var formData = new FormData(form);
+    $.ajax({
+        url: "/backend/acciones/upload_file", 
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(data){
+        	$("#modalImportarWsdl").modal('hide');
+        	manejorespuesta(data);
+        },
+        error: function(data){
+          	alert("ha ocurrido un error al cargar su archivo");
+        },
+    });
+};
+
  $(document).ready(function(){
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
@@ -263,4 +230,6 @@ function isJsonR(object,value,id_span){
 	});
 
     $(document).on('click','#btn-consultar',ConsultarFunciones);
+    $(document).on('click','#btn-load',CargarWsdl);
+
 });
