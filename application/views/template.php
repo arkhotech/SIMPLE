@@ -52,7 +52,7 @@
                                                 <div class="wrapper">
                                                 <?php //if(!$claveunicaOnly):?><p>O utilice ClaveÚnica</p><?php //endif ?> <a href="<?= site_url('autenticacion/login_openid?redirect=' . current_url()) ?>"><img src="<?= base_url() ?>assets/img/claveunica-medium.png" alt="OpenID"/></a>
                                                 </div>
-                                                </div>
+                                            </div>
                                         </li>
                                     </ul>
                                 </li>

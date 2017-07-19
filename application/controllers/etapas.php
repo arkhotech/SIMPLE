@@ -209,7 +209,6 @@ class Etapas extends MY_Controller {
 
     function validate_captcha() {
         $CI = & get_instance();
-        log_message('debug', 'validate_captcha() : secretkey [' . $CI->config->item('secretkey') . ']');
         $captcha = $this->input->post('g-recaptcha-response');
         $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $CI->config->item('secretkey') . "&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
         if ($response . 'success' == false) {

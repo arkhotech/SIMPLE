@@ -29,19 +29,20 @@
         <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js"></script> <?php //Soporte para selects con multiple choices    ?>
         <script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js"></script> <?php //Soporte para subir archivos con ajax    ?>
         <script type="text/javascript">
-            var site_url="<?= site_url() ?>";
-            var base_url="<?= base_url() ?>";
+            var site_url = "<?= site_url() ?>";
+            var base_url = "<?= base_url() ?>";
+            var site_key = "<?= sitekey() ?>";
 
             var onloadCallback = function() {
-                if ($('#login_captcha').length) {
+                if ($('#login_captcha').length && '<?=$this->session->flashdata('login_erroneo')?>' == 'TRUE') {
                     grecaptcha.render('login_captcha', {
-                        'sitekey' : '<?= sitekey() ?>'
+                        'sitekey' : site_key
                    });
                 }
 
                 if ($('#form_captcha').length) {
                     grecaptcha.render("form_captcha", {
-                        sitekey : '<?= sitekey() ?>'
+                        sitekey : site_key
                     });
                 }
             };
