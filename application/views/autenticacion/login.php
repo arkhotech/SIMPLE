@@ -2,6 +2,25 @@
 <html lang="es">
     <head>
         <?php $this->load->view('head')?>
+        <script type="text/javascript">
+            var site_url = "<?= site_url() ?>";
+            var base_url = "<?= base_url() ?>";
+            var site_key = "<?= sitekey() ?>";
+
+            var onloadCallback = function() {
+                if ($('#login_captcha').length && '<?=$this->session->flashdata('login_erroneo')?>' == 'TRUE') {
+                    grecaptcha.render('login_captcha', {
+                        'sitekey' : site_key
+                   });
+                }
+
+                if ($('#form_captcha').length) {
+                    grecaptcha.render("form_captcha", {
+                        sitekey : site_key
+                    });
+                }
+            };
+        </script>
     </head>
     <body>
         <div class="container">

@@ -86,16 +86,22 @@ class Autenticacion extends MY_Controller {
         $respuesta = new stdClass();
 
         if ($this->form_validation->run() == TRUE) {
+
             self::login_correcto($this->input->post('usuario'));
             $this->session->set_flashdata('login_erroneo', 'FALSE');
+
             $respuestaLogin = UsuarioSesion::login($this->input->post('usuario'), $this->input->post('password'));
 
             $respuesta->validacion = TRUE;
             $respuesta->redirect = $this->input->post('redirect') ? $this->input->post('redirect') : site_url();
+            $login_status = 'LOGIN_OK';
 
         } else {
+
             $this->session->set_flashdata('login_erroneo', 'TRUE');
             self::login_incorrecto($this->input->post('usuario'));
+
+            $login_status = 'LOGIN_NOK';
 
             $respuesta->validacion = FALSE;
             $respuesta->errores = validation_errors();
@@ -103,7 +109,7 @@ class Autenticacion extends MY_Controller {
 
         echo json_encode($respuesta);
 
-        log_message('info', '{"method" : "login_form", "location" : "END", "json_encode" : "' . json_encode($respuesta) . '"}');
+        log_message('info', '{"method" : "login_form", "location" : "END", "status" : "' . $login_status . '"}');
     }
 
     function validate_captcha() {
