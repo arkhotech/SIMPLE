@@ -38,7 +38,7 @@
         </tr>
         <?php endforeach; ?>
     </tbody>
-</table>
+</table> 
 
 <div id="modalImportarAccion" class="modal hide fade">
     <form method="POST" enctype="multipart/form-data" action="<?=site_url('backend/acciones/importar')?>">

@@ -234,7 +234,7 @@ class Acciones extends MY_BackendController {
         redirect($_SERVER['HTTP_REFERER']);
     }
 
-    public function functions_soap($urlsoap){
+    public function functions_soap(){
         $url=$this->input->post('urlsoap');
         $client = new SoapClient($url);
         $result['functions']=$client->__getFunctions();
@@ -248,20 +248,128 @@ class Acciones extends MY_BackendController {
         $array = json_encode($result);
         print_r($array);
         exit;
-    }  
-
-    public function converter_json(){
-        $array=$this->input->post('myArrClean');
-        $array = str_replace("\\n", " ", $array);
-        $array = str_replace("\\r", " ", $array);
-        $json = Array();
-        $strlen=count($array);
-        for ($i = 1; $i <= $strlen; $i+=2){
-            $json[$array[$i-1]]=$array[$i];
-        }
-        $json2=json_encode($json);
-        print_r($json2);
-        exit;
     }
 
+    public function upload_file(){
+        try {
+            $file_path = $_FILES['archivo']['tmp_name'];
+            $name = $_FILES['tmp_name'];
+            if ($file_path) {
+                $wsdl = file_get_contents($_FILES['archivo']['tmp_name']);
+                $config['upload_path'] = "uploads/wsdl/";
+                $config['file_name'] = $file_path;
+                $config['allowed_types'] = "*";
+                $config['max_size'] = "50000";
+                $config['max_width'] = "2000";
+                $config['max_height'] = "2000";
+                $this->load->library('upload', $config);
+                if (!$this->upload->do_upload('archivo')) {
+                    $data['uploadError'] = $this->upload->display_errors();
+                    echo $this->upload->display_errors();
+                    return;
+                }
+                $data['uploadSuccess'] = $this->upload->data();
+                $file_path = str_replace("/", "", $file_path);
+                $wsdl_url="uploads/wsdl/".$file_path.".wsdl";
+                $client = new SoapClient($wsdl_url);
+                $result['functions']=$client->__getFunctions();
+                $result['types']=$client->__getTypes();
+                $result['functions'] = str_replace("\\n", " ", $result['functions']);
+                $result['functions'] = str_replace("\\r", " ", $result['functions']);
+                $result['types'] = str_replace("\\n", " ", $result['types']);
+                $result['types'] = str_replace("\\r", " ", $result['types']);
+                $result = str_replace("\\n", " ", $result);
+                $result = str_replace("\\r", " ", $result);
+                $array = json_encode($result);
+                print_r($array);
+                exit;
+            }else{
+                die('No hay archivo');
+            }
+        } catch (Exception $ex) {
+            die('Código: '.$ex->getCode().' Mensaje: '.$ex->getMessage());
+        }
+        exit;
+    }  
+
+   public function converter_json(){
+        $array=$this->input->post('myArrClean');
+        $operaciones=$this->input->post('operaciones');
+        $strlen1=count($array);
+
+        for ($i = 1; $i <= $strlen1; $i+=2){
+            $array2[$array[$i-1]]=$array[$i];
+        }
+
+        $DataTypesSoap=["float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","string","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","anyURI","normalizedString"];
+
+        foreach ($array2 as $d){
+            $date=$d;
+            $clave = array_search($date, $DataTypesSoap);
+            if ($clave==FALSE){
+                foreach ($operaciones as $d){
+                    $clave = array_search($date, $d);
+                    if ($clave!=FALSE){
+                        $count1=count($d)/2;
+                        if ($count1 > count($array)){
+                            $nuevo = $d;
+                            unset($nuevo[0],$nuevo[1]);
+                            $nuevo2 = array_reverse($nuevo);
+                        }
+                    }
+                }
+            }
+        }
+        for ($i = 1; $i <= count($nuevo2); $i+=2){
+            $array3[$nuevo2[$i-1]]=$nuevo2[$i];
+        }
+        foreach ($array3 as $d){
+            $date2=$d;
+                $clave2 = array_search($date2, $DataTypesSoap);
+            if ($clave2==FALSE){
+                foreach ($operaciones as $d){
+                    $clave2 = array_search($date2, $d);
+                    if ($clave2!=FALSE){
+                            if ($d[1]==$date2){
+                                if ($d[0]=='struct'){
+                                        $nuevo3 = $d;
+                                        unset($nuevo3[0],$nuevo3[1]);
+                                        $nuevo4 = array_reverse($nuevo3);
+                                        $array4="";
+                                        for ($i = 1; $i <= count($nuevo4); $i+=2){
+                                            $array4[$nuevo4[$i-1]]=$nuevo4[$i];
+                                        }
+
+                                        foreach ($array3 as $key => $val){
+                                            if ($val == $date2) {
+                                                $array3[$key]=$array4;
+                                            }
+                                        }
+                                }else{
+                                    $nuevo4 = array_reverse($d);
+                                    $i=0;
+                                    $array4="";
+                                    for ($i = 1; $i <= count($nuevo4); $i+=2){
+                                        $array4[$nuevo4[$i-1]]=$nuevo4[$i];
+                                    }
+                                    foreach ($array3 as $key => $val){
+                                        if ($val == $date2) {
+                                            $array3[$key]=$array4;
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+        }
+        $array3 = str_replace("\\n", " ", $array3);
+        $array3 = str_replace("\\n", " ", $array3);
+        $array2[$date]=$array3;
+        $array2 = str_replace("\\n", " ", $array2);
+        $array2 = str_replace("\\r", " ", $array2);
+        $json=json_encode($array2);
+        print_r($json);
+        exit;
+    }
 }

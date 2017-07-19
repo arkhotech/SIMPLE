@@ -14,7 +14,8 @@ class AccionSoap extends Accion {
                 <div class="col-md-12">
                         <label>WSDL</label>
                         <input type="text" class="input-xxlarge AlignText" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : '') . '" />
-                        <button id="btn-consultar" type="button" class="btn btn-default AlignButton">Consultar</button>
+                        <a class="btn btn-default" id="btn-consultar" ><i class="icon-search icon"></i> Consultar</a>
+                        <a class="btn btn-default" href="#modalImportarWsdl" data-toggle="modal" ><i class="icon-upload icon"></i> Importar</a>
                 </div>'; 
         
         $display.='
@@ -46,6 +47,24 @@ class AccionSoap extends Accion {
             </div>
 
             ';
+
+        $display.='<div id="modalImportarWsdl" class="modal hide fade">
+            <form method="POST" enctype="multipart/form-data" action="backend/acciones/upload_file">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Importar Archivo Soap</h3>
+            </div>
+            <div class="modal-body">
+                <p>Cargue a continuación el archivo .wsdl del Servio Soap.</p>
+                <input type="file" name="archivo" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+                <button type="button" id="btn-load" class="btn btn-primary">Importar</button>
+            </div>
+            </form>
+        </div>
+        <div id="modal" class="modal hide fade"></div>';    
         // $display.='
         //     <div class="col-md-12">
         //         <label>Header</label>
@@ -59,8 +78,8 @@ class AccionSoap extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[wsdl]', 'WSDL', 'required');
-        $CI->form_validation->set_rules('extra[operacion]', 'Operación', 'required');
+        $CI->form_validation->set_rules('extra[request]', 'Request', 'required');
+        $CI->form_validation->set_rules('extra[operacion]', 'Métodos', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
