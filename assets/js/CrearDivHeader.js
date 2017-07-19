@@ -158,6 +158,8 @@ function isJsonR(object,value,id_span){
 
 function manejorespuesta(data){
     if (data){
+    	$("#request").val("");
+    	$("#response").val("");
 		$("#operacion").empty(); 	
 			$('#divMetodosE').hide();
 			result = JSON.parse(data);

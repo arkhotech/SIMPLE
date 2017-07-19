@@ -1,4 +1,4 @@
-<script src="<?= base_url() ?>assets/js/modelador-acciones.js" type="text/javascript"></script>
+<script src="<?= base_url() ?>assets/js/modelador-seguridad.js" type="text/javascript"></script>
 
 <ul class="breadcrumb">
     <li>
@@ -11,8 +11,8 @@
     <li><a href="<?=site_url('backend/procesos/editar/'.$proceso->id)?>">Diseñador</a></li>
     <li><a href="<?=site_url('backend/formularios/listar/'.$proceso->id)?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
-    <li class="active"><a href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Acciones</a></li>
-    <li><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    <li><a href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Acciones</a></li>
+    <li class="active"><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
 
 <a class="btn btn-success" href="#" onclick="return seleccionarAccion(<?=$proceso->id?>);"><i class="icon-white icon-file"></i> Nuevo</a>
@@ -21,7 +21,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Accion</th>
+            <th>Institución</th>
             <th>Tipo</th>
             <th></th>
         </tr>

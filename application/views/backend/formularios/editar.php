@@ -16,6 +16,7 @@
     <li class="active"><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
 
 <div id="areaFormulario">
