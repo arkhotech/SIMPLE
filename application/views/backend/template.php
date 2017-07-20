@@ -129,7 +129,7 @@
 
         <div id="main">
             <div class="container-fluid">
-        <?php $this->load->view($content) ?>
+        <?php $this->load->view($content) ?> 
             </div>
         </div>
 

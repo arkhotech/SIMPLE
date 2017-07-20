@@ -42,10 +42,10 @@ class Proceso extends Doctrine_Record {
             'orderBy'=>'nombre asc'
         ));
 
-        $this->hasMany('Seguridad as Admin_seguridad',array(
+        $this->hasMany('Seguridad as Admseguridad',array(
             'local'=>'id',
             'foreign'=>'proceso_id',
-            'orderBy'=>'nombre asc'
+            'orderBy'=>'institucion asc'
         ));
 
         $this->hasMany('Documento as Documentos',array(

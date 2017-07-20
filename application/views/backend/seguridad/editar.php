@@ -10,36 +10,33 @@
     <li><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
-    <li class="active"><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    <li class="active"><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
   
 
-<form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
+<form id="plantillaForm" class="ajaxForm" method="POST" action="<?=site_url('backend/Admseguridad/editar_form/'.($edit?$seguridad->id:''))?>">
     <fieldset>
         <?php if(!$edit):?>
-            <legend> Crear Acción</legend>
+            <legend> Regitrar métodos de seguridad</legend>
         <?php endif; ?>
         <?php if($edit):?>
-            <legend> Editar Acción</legend>
+            <legend> Editar métodos de seguridad</legend>
         <?php endif; ?>
         <div class="validacion"></div>
         <?php if(!$edit):?>
-        <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" />
-        <input type="hidden" name="tipo" value="<?=$tipo?>" />
+        <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" /> 
         <?php endif; ?>
-        <label>Nombre de la acción</label>
-        <input type="text" name="nombre" value="<?=$edit?$accion->nombre:''?>" />
-        <label>Tipo</label>
-        <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
-        
-        <?=$accion->displayForm()?>
-        
+        <label>Nombre de la Institución</label>
+        <input type="text" name="institucion" value="<?=$edit?$seguridad->institucion:''?>" />
+        <label>Nombre del Servicio</label>
+        <input type="text" name="servicio" value="<?=$edit?$seguridad->servicio:''?>" />
+        <?=$seguridad->displayForm()?>
         <div class="form-actions">
-            <a class="btn" href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Cancelar</a>
-            <!-- <input class="btn btn-primary" type="submit" value="Guardar" /> -->
-            <button class="btn btn-primary" value="Guardar" type="button" onclick="validateForm();">Guardar</button>
+            <a class="btn" href="<?=site_url('backend/Admseguridad/listar/'.$proceso->id)?>">Cancelar</a>
+            <input class="btn btn-primary" type="submit" value="Guardar" />
+            <!-- <button class="btn btn-primary" value="Guardar" type="button">Guardar</button> -->
         </div>
     </fieldset>
 </form>
 </div>
-<script src="<?= base_url() ?>assets/js/CrearDivHeader.js"></script>
+<script src="<?= base_url() ?>assets/js/AdmSeguridad.js"></script>

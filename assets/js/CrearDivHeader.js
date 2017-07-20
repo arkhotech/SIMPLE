@@ -12,7 +12,7 @@ function ConsultarFunciones(){
  }
 
  function validateForm(){
- 	if(validJsonR==0 && validJsonH==0){
+    if(validJsonR==0 && validJsonH==0){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{

@@ -4,11 +4,10 @@ class Seguridad extends Doctrine_Record {
 
     function setTableDefinition() {        
         $this->hasColumn('id');
-        $this->hasColumn('nombre');
-        $this->hasColumn('tipo');
+        $this->hasColumn('institucion');
+        $this->hasColumn('servicio');
         $this->hasColumn('extra');
         $this->hasColumn('proceso_id'); 
-
 
         // $this->setSubclasses(array(
         //         'seguridadEnviarCorreo'  => array('tipo' => 'enviar_correo'),
