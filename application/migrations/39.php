@@ -31,7 +31,7 @@ class Migration_38 extends Doctrine_Migration_Base {
         $this->createForeignKey( 'evento_externo', 'eetarea_foreign_key', array(
                 'local'        => 'proceso_id',
                 'foreign'      => 'id',
-                'foreignTable' => 'tarea',
+                'foreignTable' => 'proceso',
                 'onUpdate'     => 'CASCADE',
                 'onDelete'     => 'CASCADE',
             )
@@ -44,17 +44,3 @@ class Migration_38 extends Doctrine_Migration_Base {
 
 }
 ?>
-
-
-
-CREATE TABLE `seguridad` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `institucion` varchar(128) NOT NULL,
-  `servicio` varchar(128) NOT NULL,
-  `extra` text,
-  `proceso_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_trigger_proceso1_idx` (`proceso_id`),
-  CONSTRAINT `fk_trigger_proceso2` FOREIGN KEY (`proceso_id`) REFERENCES `proceso` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
-
