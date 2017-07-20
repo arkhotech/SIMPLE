@@ -1,13 +1,13 @@
 <?php
 
-class Seguridad extends Doctrine_Record { 
+class Seguridad2 extends Doctrine_Record {
 
-    function setTableDefinition() {
+    function setTableDefinition() {        
         $this->hasColumn('id');
         $this->hasColumn('institucion');
         $this->hasColumn('servicio');
         $this->hasColumn('extra');
-        $this->hasColumn('proceso_id');
+        $this->hasColumn('proceso_id'); 
     }
 
     function setUp() {
@@ -17,8 +17,13 @@ class Seguridad extends Doctrine_Record {
             'local' => 'proceso_id',
             'foreign' => 'id'
         ));
+        
+        // $this->hasMany('Evento as Eventos', array(
+        //     'local' => 'id',
+        //     'foreign' => 'seguridad_id'
+        // ));
     }
-
+    
     public function displayForm(){
         return NULL;
     }
@@ -53,16 +58,16 @@ class Seguridad extends Doctrine_Record {
     
     /**
      * @param $input
-     * @return Seguridad
+     * @return seguridad
      */
     public static function importComplete($input)
     {
         $json = json_decode($input);
-        $seguridad = new Seguridad();
+        $seguridad = new seguridad();
         
         try {
             
-            //Asignamos los valores a las propiedades de la Seguridad
+            //Asignamos los valores a las propiedades de la seguridad
             foreach ($json as $keyp => $p_attr) {
                 if ($keyp != 'id' && $keyp != 'proceso_id')
                     $seguridad->{$keyp} = $p_attr;

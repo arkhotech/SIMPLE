@@ -1,5 +1,5 @@
 <?php
-class Migration_38 extends Doctrine_Migration_Base {
+class Migration_39 extends Doctrine_Migration_Base {
 
     public function up() {
 
@@ -16,11 +16,11 @@ class Migration_38 extends Doctrine_Migration_Base {
             'servicio' => array(
                 'type' => 'varchar(128)',
                 'notnull' => 1
-            )
+            ),
             'extra' => array(
                 'type' => 'text',
                 'notnull' => 1
-            )
+            ),
             'proceso_id' => array(
                 'type' => 'int',
                 'notnull' => 1
@@ -28,7 +28,7 @@ class Migration_38 extends Doctrine_Migration_Base {
         );
 
         $this->createTable('seguridad', $columns, array('primary' => array('id'))); 
-        $this->createForeignKey( 'evento_externo', 'eetarea_foreign_key', array(
+        $this->createForeignKey( 'fk_trigger_proceso1_idx', 'fk_trigger_proceso2', array(
                 'local'        => 'proceso_id',
                 'foreign'      => 'id',
                 'foreignTable' => 'proceso',
@@ -36,7 +36,7 @@ class Migration_38 extends Doctrine_Migration_Base {
                 'onDelete'     => 'CASCADE',
             )
         );
-    }
+    }  
 
     public function down() {
         $this->dropTable('seguridad');
