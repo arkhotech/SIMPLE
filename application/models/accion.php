@@ -37,6 +37,10 @@ class Accion extends Doctrine_Record {
     public function displayForm(){
         return NULL;
     }
+
+    public function displaySecurityForm($id_proceso){
+        return NULL;
+    }
     
     public function validateForm(){
         return;

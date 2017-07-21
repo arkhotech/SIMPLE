@@ -16,11 +16,11 @@ class Migration_38 extends Doctrine_Migration_Base {
             'servicio' => array(
                 'type' => 'varchar(128)',
                 'notnull' => 1
-            )
+            ),
             'extra' => array(
                 'type' => 'text',
                 'notnull' => 1
-            )
+            ),
             'proceso_id' => array(
                 'type' => 'int',
                 'notnull' => 1

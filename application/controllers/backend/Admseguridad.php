@@ -35,7 +35,7 @@ class Admseguridad extends MY_BackendController {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
-        
+
         $data['edit'] = FALSE;
         $data['proceso'] = $proceso;
         $data['seguridad'] = new SeguridadForm();

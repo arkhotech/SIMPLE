@@ -4,10 +4,10 @@ require_once('seguridad.php');
 class SeguridadForm extends Seguridad {
 
     public function displayForm() {
-        $display.=' <label>Tipo de Seguridad</label>
+        $display =' <label>Tipo de Seguridad</label>
                     <select id="tipoSeguridad" name="extra[tipoSeguridad]">
                         <option value="">Seleccione...</option>
-                        <option value="HTTP_BASIC">HTTP_BASIC</option>
+                        <option value="HTTP_BASIC">BASIC</option>
                         <option value="API_KEY">API_KEY</option>
                         <option value="OAUTH2">OAUTH2</option>';
                        

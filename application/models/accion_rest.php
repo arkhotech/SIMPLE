@@ -4,6 +4,10 @@ require_once('accion.php');
 class AccionRest extends Accion {
 
     public function displayForm() {
+
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+        $data['seguridad'] = $proceso['proceso']->Admseguridad;
+
         $display = '
             <p>
                 Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados como variables.
@@ -29,6 +33,59 @@ class AccionRest extends Accion {
                     } 
                     $display.='</select>';
                     
+        $display.='
+            <div class="col-md-12" id="divObject" style="display:none;">
+                <label>Request</label>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <br />
+                <span id="resultRequest" class="spanError"></span>
+                <br /><br />
+            </div>';
+
+
+        $display.='
+            <div class="col-md-12">
+                <label>Header</label>
+                <textarea id="header" name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
+                <br />
+                <span id="resultHeader" class="spanError"></span>
+                <br /><br />
+            </div>';
+        return $display;
+    }
+
+    public function displaySecurityForm($proceso_id) {
+
+        log_message('info', 'displaySecurityForm id proceso: '.$proceso_id, FALSE);
+
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        log_message('info', 'Obtiene proceso: '.$proceso, FALSE);
+
+        $data['seguridad'] = $proceso['proceso']->Admseguridad;
+
+        print_r($data['seguridad']);
+
+        var_dump($data['seguridad']);
+
+        log_message('info', 'seguridad: '.print_r($data['seguridad']), FALSE);
+
+        $display = '<label>URL</label>';
+        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
+
+        $display.='
+                <label>Método</label>
+                <select id="tipoMetodo" name="extra[tipoMetodo]">
+                    <option value="">Seleccione...</option>
+                    <option value="POST">POST</option>
+                    <option value="GET">GET</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>';
+        if ($this->extra->tipoMetodo){
+            $display.='<option value="'.($this->extra->tipoMetodo).'" selected>'.($this->extra->tipoMetodo).'</option>';
+        }
+        $display.='</select>';
+
         $display.='
             <div class="col-md-12" id="divObject" style="display:none;">
                 <label>Request</label>

@@ -9,14 +9,6 @@ class Seguridad extends Doctrine_Record {
         $this->hasColumn('extra');
         $this->hasColumn('proceso_id'); 
 
-        // $this->setSubclasses(array(
-        //         'seguridadEnviarCorreo'  => array('tipo' => 'enviar_correo'),
-        //         'seguridadWebservice'  => array('tipo' => 'webservice'),
-        //         'seguridadVariable'  => array('tipo' => 'variable'),
-        //         'seguridadRest'  => array('tipo' => 'rest'),
-        //         'seguridadSoap'  => array('tipo' => 'soap')
-        //     )
-        // );
     }
 
     function setUp() {

@@ -8,7 +8,6 @@
         <label>Tipo de acción</label>
         <select name="tipo">
             <option value="enviar_correo">Enviar correo</option>
-            <option value="webservice">Consultar Webservice</option>
             <option value="variable">Generar Variable</option>
             <option value="rest">Consultar Rest</option>
             <option value="soap">Consultar Soap</option>

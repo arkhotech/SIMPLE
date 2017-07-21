@@ -31,9 +31,14 @@
         <input type="text" name="nombre" value="<?=$edit?$accion->nombre:''?>" />
         <label>Tipo</label>
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
-        
-        <?=$accion->displayForm()?>
-        
+        <?php
+            if($tipo == "rest" || $tipo == "soap") {
+                echo $accion->displaySecurityForm($proceso->id);
+            }else{
+                echo $accion->displayForm();
+            }
+        ?>
+
         <div class="form-actions">
             <a class="btn" href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Cancelar</a>
             <!-- <input class="btn btn-primary" type="submit" value="Guardar" /> -->
