@@ -90,13 +90,16 @@ class Acciones extends MY_BackendController {
         $data['proceso']=$proceso;
         $data['tipo']=$tipo;
         $data['accion']=$accion;
-        
+         
         $data['content']='backend/acciones/editar';
         $data['title']='Crear Acción';
         $this->load->view('backend/template',$data);
     }
     
     public function editar($accion_id){
+
+        log_message('info', 'Acciones.editar [' . $accion_id . ']');
+
         $accion = Doctrine::getTable('Accion')->find($accion_id);
         if ($accion->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
@@ -239,6 +242,7 @@ class Acciones extends MY_BackendController {
         $result['functions'] = str_replace("\\r", " ", $result['functions']);
         $result['types'] = str_replace("\\n", " ", $result['types']);
         $result['types'] = str_replace("\\r", " ", $result['types']);
+        $result['caso']=1;
         $result = str_replace("\\n", " ", $result);
         $result = str_replace("\\r", " ", $result);
         $array = json_encode($result);
@@ -252,6 +256,7 @@ class Acciones extends MY_BackendController {
             $name = $_FILES['tmp_name'];
             if ($file_path) {
                 $wsdl = file_get_contents($_FILES['archivo']['tmp_name']);
+                $xml = new SimpleXMLElement($wsdl);
                 $config['upload_path'] = "uploads/wsdl/";
                 $config['file_name'] = $file_path;
                 $config['allowed_types'] = "*";
@@ -268,6 +273,8 @@ class Acciones extends MY_BackendController {
                 $file_path = str_replace("/", "", $file_path);
                 $wsdl_url="uploads/wsdl/".$file_path.".wsdl";
                 $client = new SoapClient($wsdl_url);
+                $result['caso']=2;
+                $result['targetNamespace'] = $xml['targetNamespace'];
                 $result['functions']=$client->__getFunctions();
                 $result['types']=$client->__getTypes();
                 $result['functions'] = str_replace("\\n", " ", $result['functions']);

@@ -49,17 +49,13 @@ class Doctrine_Connection_UnitOfWork extends Doctrine_Connection_Module
     public function saveGraph(Doctrine_Record $record, $replace = false)
     {
         $record->assignInheritanceValues();
-
         $conn = $this->getConnection();
         $conn->connect();
-
         $state = $record->state();
         if ($state === Doctrine_Record::STATE_LOCKED || $state === Doctrine_Record::STATE_TLOCKED) {
             return false;
         }
-
         $record->state($record->exists() ? Doctrine_Record::STATE_LOCKED : Doctrine_Record::STATE_TLOCKED);
-
         try {
             $conn->beginInternalTransaction();
             $record->state($state);
@@ -149,6 +145,8 @@ class Doctrine_Connection_UnitOfWork extends Doctrine_Connection_Module
         } catch (Exception $e) {
             // Make sure we roll back our internal transaction
             //$record->state($state);
+            log_message('info','ANTONIO_MORA dentro del try');
+            log_message('info',$e);
             $conn->rollback();
             throw $e;
         }

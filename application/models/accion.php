@@ -1,6 +1,6 @@
 <?php
 
-class Accion extends Doctrine_Record {
+class Accion extends Doctrine_Record     {
 
     function setTableDefinition() {        
         $this->hasColumn('id');
@@ -52,10 +52,13 @@ class Accion extends Doctrine_Record {
     }
     
     public function setExtra($datos_array) {
-        if ($datos_array) 
+        if ($datos_array) {
+            log_message('info','Accion.setExtra, $datos_array: ' . json_encode($datos_array));
             $this->_set('extra' , json_encode($datos_array));
-        else 
+        } else {
+            log_message('info','Accion.setExtra, $datos_array: NULL');
             $this->_set('extra' , NULL);
+        }
     }
     
     public function getExtra(){

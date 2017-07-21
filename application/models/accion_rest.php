@@ -5,6 +5,7 @@ class AccionRest extends Accion {
 
     public function displayForm() {
 
+        log_message('info', 'AccionRest.displayForm');
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
         $data['seguridad'] = $proceso['proceso']->Admseguridad;
 

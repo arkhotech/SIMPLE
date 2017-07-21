@@ -30,7 +30,7 @@
         <input type="text" name="institucion" value="<?=$edit?$seguridad->institucion:''?>" />
         <label>Nombre del Servicio</label>
         <input type="text" name="servicio" value="<?=$edit?$seguridad->servicio:''?>" />
-        <?=$seguridad->displayForm()?>
+        <?= $seguridad->displayForm() ?>
         <div class="form-actions">
             <a class="btn" href="<?=site_url('backend/Admseguridad/listar/'.$proceso->id)?>">Cancelar</a>
             <input class="btn btn-primary" type="submit" value="Guardar" />

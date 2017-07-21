@@ -3,44 +3,42 @@ require_once('seguridad.php');
 
 class SeguridadForm extends Seguridad {
 
-    public function displayForm() {
-
-        $display='<label>Tipo de Seguridad</label>
-                    <select id="tipoSeguridad" name="extra[tipoSeguridad]">
-                        <option value="">Seleccione...</option>
-                        <option value="HTTP_BASIC">BASIC</option>
-                        <option value="API_KEY">API_KEY</option>
-                        <option value="OAUTH2">OAUTH2</option> 
-                    </select>';
+    // public function displayForm() {
+    //     $display='<label>Tipo de Seguridad</label>
+    //                 <select id="tipoSeguridad" name="extra[tipoSeguridad]">
+    //                     <option value="">Seleccione...</option>
+    //                     <option value="HTTP_BASIC">HTTP_BASIC</option>
+    //                     <option value="API_KEY">API_KEY</option>
+    //                     <option value="OAUTH2">OAUTH2</option> 
+    //                 </select>';
          
-        $display.='
-            <div class="col-md-12" id="DivUser" style="display:none;">
-                <label>Usuario</label>
-                <input type="text" id="user" name="extra[user]" value="'.(isset($this->extra->user) ? $this->extra->user : '').'">
-            </div>';
+    //     $display.='
+    //         <div class="col-md-12" id="DivUser" style="display:none;">
+    //             <label>Usuario</label>
+    //             <input type="text" id="user" name="extra[user]" value="'.(isset($this->extra->user) ? $this->extra->user : 'jhgjhgghjhghj').'">
+    //         </div>';
 
-        $display.='
-            <div class="col-md-12" id="DivPass" style="display:none;">
-                <label>Contraseña</label>
-                <input type="text" id="pass" name="extra[pass] value="'.(isset($this->extra->pass) ? $this->extra->pass : '').'">
-            </div>';
+    //     $display.='
+    //         <div class="col-md-12" id="DivPass" style="display:none;">
+    //             <label>Contraseña</label>
+    //             <input type="text" id="pass" name="extra[pass] value="'.(isset($this->extra->pass) ? $this->extra->pass : 'jhgjhghjg').'">
+    //         </div>';
 
-        $display.='
-            <div class="col-md-12" id="DivKey" style="display:none;">
-                <label>Llave de aplicacion</label>
-                <input type="text" id="key" name="extra[key]" value="'.(isset($this->extra->key) ? $this->extra->key : '').'">
-            </div>';
-        return $display;
-    }
+    //     $display.='
+    //         <div class="col-md-12" id="DivKey" style="display:none;">
+    //             <label>Llave de aplicacion</label>
+    //             <input type="text" id="key" name="extra[key]" value="'.(isset($this->extra->key) ? $this->extra->key : 'jhgjbcbcbvchggh').'">
+    //         </div>';
+    //     return $display;
+    // }
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[tipoSeguridad]', 'Tipo de Seguridad', 'required');
-        // $CI->form_validation->set_rules('extra[tema]', 'Tema', 'required');
-        // $CI->form_validation->set_rules('extra[contenido]', 'Contenido', 'required');
+        $CI->form_validation->set_rules('extra[tipoSeguridad]', 'Tipo de seguridad', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
+
         $regla=new Regla($this->extra->para);
         $to=$regla->getExpresionParaOutput($etapa->id);
         if(isset($this->extra->cc)){
