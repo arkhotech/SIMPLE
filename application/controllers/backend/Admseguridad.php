@@ -41,7 +41,7 @@ class Admseguridad extends MY_BackendController {
         $data['seguridad'] = new SeguridadForm();
         
         $data['content']='backend/seguridad/editar';
-        $data['title']='Crear Acción';
+        $data['title']='Registrar metodo';
         $this->load->view('backend/template',$data);
     }
     
@@ -51,11 +51,11 @@ class Admseguridad extends MY_BackendController {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
-        $data['edit']=TRUE;
-        $data['proceso']=$seguridad->Proceso;
-        $data['seguridad']=$seguridad;
-        $data['content']='backend/seguridad/editar';
-        $data['title']='Editar Seguridad';
+        $data['edit'] = TRUE;
+        $data['proceso'] = $seguridad->Proceso;
+        $data['seguridad'] = $seguridad;
+        $data['content'] = 'backend/seguridad/editar';
+        $data['title'] = 'Editar Seguridad';
         $this->load->view('backend/template',$data);
     }
 

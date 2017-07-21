@@ -32,7 +32,7 @@
  * @version     $Revision: 7673 $
  */
 abstract class Doctrine_Record extends Doctrine_Record_Abstract implements Countable, IteratorAggregate, Serializable
-{
+{ 
     /**
      * STATE CONSTANTS
      */
