@@ -161,9 +161,12 @@ function manejorespuesta(data){
     	$("#request").val("");
     	$("#response").val("");
 		$("#operacion").empty(); 	
-			$('#divMetodosE').hide();
-			result = JSON.parse(data);
-			jQuery.each(result.types, function(i,val){	
+		$('#divMetodosE').hide();
+		result = JSON.parse(data);
+        if(result.caso==2){
+            $("#urlsoap").val(result.targetNamespace[0]);
+        }
+		jQuery.each(result.types, function(i,val){	
 			val = getCleanedString(val);
 			val = val.replace("{", ""); 
 			val = val.replace("}", ""); 
@@ -188,6 +191,7 @@ function manejorespuesta(data){
 }
 
 var CargarWsdl = function(){ 
+    $("#urlsoap").val("");
     var formu=$(this);
     var nombreform=$(this).attr("id");
     var form = $('#plantillaForm').get(0); 
@@ -233,5 +237,11 @@ var CargarWsdl = function(){
 
     $(document).on('click','#btn-consultar',ConsultarFunciones);
     $(document).on('click','#btn-load',CargarWsdl);
+    $("#urlsoap").keyup(function(){
+        $("#request").val("");
+        $("#response").val("");
+        // $("#operacion").empty();    
+        $('#divMetodosE').hide();
+    });
 
 });

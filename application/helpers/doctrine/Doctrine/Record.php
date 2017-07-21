@@ -664,6 +664,8 @@ abstract class Doctrine_Record extends Doctrine_Record_Abstract implements Count
     {
         $map = $this->_table->inheritanceMap;
         foreach ($map as $k => $v) {
+            log_message('info',$k);
+            log_message('info',$v);
             $k = $this->_table->getFieldName($k);
             $old = $this->get($k, false);
 

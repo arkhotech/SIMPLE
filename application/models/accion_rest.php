@@ -4,6 +4,8 @@ require_once('accion.php');
 class AccionRest extends Accion {
 
     public function displayForm() {
+
+        log_message('info', 'AccionRest.displayForm');
         $display = '
             <p>
                 Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados como variables.

@@ -10,20 +10,16 @@ class Migration_39 extends Doctrine_Migration_Base {
                 'primary' => 1
             ),
             'institucion' => array(
-                'type' => 'varchar(128)',
-                'notnull' => 1
+                'type' => 'varchar(128)'
             ),
             'servicio' => array(
-                'type' => 'varchar(128)',
-                'notnull' => 1
+                'type' => 'varchar(128)'
             ),
             'extra' => array(
-                'type' => 'text',
-                'notnull' => 1
+                'type' => 'text'
             ),
             'proceso_id' => array(
-                'type' => 'int',
-                'notnull' => 1
+                'type' => 'int'
             )
         );
 

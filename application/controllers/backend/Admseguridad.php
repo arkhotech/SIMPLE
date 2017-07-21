@@ -30,22 +30,22 @@ class Admseguridad extends MY_BackendController {
     
     public function crear($proceso_id){
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
-
         if ($proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
-        
         $data['edit'] = FALSE;
         $data['proceso'] = $proceso;
-        $data['seguridad'] = new SeguridadForm();
-        
+        $data['seguridad'] = new Seguridad();
         $data['content']='backend/seguridad/editar';
         $data['title']='Registrar metodo';
         $this->load->view('backend/template',$data);
     }
     
     public function editar($seguridad_id){
+
+        log_message('info', 'AdmSeguridad.editar [' . $seguridad_id . ']');
+
         $seguridad = Doctrine::getTable('Seguridad')->find($seguridad_id);
         if ($seguridad->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
@@ -74,6 +74,7 @@ class Admseguridad extends MY_BackendController {
         }
         
         $this->form_validation->set_rules('institucion','Institucion','required');
+        $this->form_validation->set_rules('servicio','Servicio','required');
         $seguridad->validateForm();
         if(!$seguridad_id){
             $this->form_validation->set_rules('proceso_id','Proceso','required');
@@ -84,33 +85,27 @@ class Admseguridad extends MY_BackendController {
             if(!$seguridad){
                 $this->form_validation->set_rules('proceso_id','Proceso','required');
             }
-            
             $seguridad->institucion=$this->input->post('institucion');
             $seguridad->servicio=$this->input->post('servicio');
             $seguridad->extra=$this->input->post('extra',false);
             $seguridad->save();
-            
             $respuesta->validacion=TRUE;
             $respuesta->redirect=site_url('backend/Admseguridad/listar/'.$seguridad->Proceso->id);
         }else{
             $respuesta->validacion=FALSE;
             $respuesta->errores=validation_errors();
         }
-        
         echo json_encode($respuesta);
     }
     
     public function eliminar($seguridad_id){
         $seguridad=Doctrine::getTable('Seguridad')->find($seguridad_id);
-        
         if($seguridad->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para eliminar esta accion.';
             exit;
         }
-        
         $proceso=$seguridad->Proceso;
         $fecha = new DateTime ();
-         
         // Auditar
         $registro_auditoria = new AuditoriaOperaciones ();
         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
@@ -119,20 +114,14 @@ class Admseguridad extends MY_BackendController {
         $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
         $registro_auditoria->proceso = $proceso->nombre;
         $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
-        
         //Detalles
-
         $seguridad_array['proceso'] = $proceso->toArray(false);
         $seguridad_array['seguridad'] = $seguridad->toArray(false);
         unset($seguridad_array['seguridad']['proceso_id']);
-        
         $registro_auditoria->detalles=  json_encode($seguridad_array);
         $registro_auditoria->save();
-        
         $seguridad->delete();
-        
         redirect('backend/Admseguridad/listar/'.$proceso->id);
-        
     }
     
     public function exportar($seguridad_id)
