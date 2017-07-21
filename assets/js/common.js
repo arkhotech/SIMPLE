@@ -47,6 +47,7 @@ $(document).ready(function(){
 
     $(".ajaxForm :submit").attr("disabled", false);
     $(document).on("submit", ".ajaxForm", function() {
+
         var form = this;
         if (!form.submitting) {
             form.submitting = true;
@@ -56,7 +57,7 @@ $(document).ready(function(){
             $(ajaxLoader).css({
                 left: ($(form).width() / 2 - $(ajaxLoader).width() / 2) + "px",
                 top: ($(form).height() / 2 - $(ajaxLoader).height() / 2) + "px"
-                });
+            });
             $.ajax({
                 url: form.action,
                 data: $(form).serialize(),
@@ -71,12 +72,15 @@ $(document).ready(function(){
                             f(form);
                         }
                     } else {
-                        if ($('#login_captcha').is(':empty')) {
-                            grecaptcha.render('login_captcha', {
-                                'sitekey' : site_key
-                            });
-                        } else {
-                            grecaptcha.reset();
+
+                        if ($('#login_captcha').length > 0) {
+                            if ($('#login_captcha').is(':empty')) {
+                                grecaptcha.render('login_captcha', {
+                                    'sitekey' : site_key
+                                });
+                            } else {
+                                grecaptcha.reset();
+                            }
                         }
 
                         form.submitting = false;
