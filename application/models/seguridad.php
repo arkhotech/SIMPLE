@@ -46,19 +46,19 @@ class Seguridad extends Doctrine_Record {
         $display.='
             <div class="col-md-12" id="DivUser" style="display:none;">
                 <label>Usuario</label>
-                <input type="text" id="user" name="extra[user]" value="'.(isset($this->extra->user) ? $this->extra->user : '').'">
+                <input type="text" id="user" name="extra[user]" class="" value="'.(isset($this->extra->user) ? $this->extra->user : '').'">
             </div>';
 
         $display.='
             <div class="col-md-12" id="DivPass" style="display:none;">
-                <label>Usuario</label>
-                <input type="text" id="pass" name="extra[pass]" value="'.(isset($this->extra->pass) ? $this->extra->pass : '').'">
+                <label>Contraseña</label>
+                <input type="text" id="pass" name="extra[pass]" class="" value="'.(isset($this->extra->pass) ? $this->extra->pass : '').'">
             </div>';
 
         $display.='
             <div class="col-md-12" id="DivKey" style="display:none;">
                 <label>Llave de aplicacion</label>
-                <input type="text" id="key" name="extra[key]" value="'.(isset($this->extra->key) ? $this->extra->key : '').'">
+                <input type="text" id="key" name="extra[key]" class="" value="'.(isset($this->extra->key) ? $this->extra->key : '').'">
             </div>';
         return $display;
     }

@@ -33,8 +33,7 @@
         <?= $seguridad->displayForm() ?>
         <div class="form-actions">
             <a class="btn" href="<?=site_url('backend/Admseguridad/listar/'.$proceso->id)?>">Cancelar</a>
-            <input class="btn btn-primary" type="submit" value="Guardar" />
-            <!-- <button class="btn btn-primary" value="Guardar" type="button">Guardar</button> -->
+            <button class="btn btn-primary" value="Guardar" type="submit">Guardar</button>
         </div>
     </fieldset>
 </form>

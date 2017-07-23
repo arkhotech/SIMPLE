@@ -32,10 +32,12 @@ class SeguridadForm extends Seguridad {
     //     return $display;
     // }
 
-    public function validateForm() {
-        $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[tipoSeguridad]', 'Tipo de seguridad', 'required');
-    }
+    // public function validateForm() {
+    //     $CI = & get_instance();
+    //     $CI->form_validation->set_rules('institucion','Institucion2','required');
+    //     $CI->form_validation->set_rules('servicio','Servicio2','required');
+    //     $CI->form_validation->set_rules('extra[tipoSeguridad]', 'Tipo de seguridad2', 'required');
+    // }
 
     public function ejecutar(Etapa $etapa) {
 

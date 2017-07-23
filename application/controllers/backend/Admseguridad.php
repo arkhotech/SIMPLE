@@ -44,9 +44,6 @@ class Admseguridad extends MY_BackendController {
     }
     
     public function editar($seguridad_id){
-
-        log_message('info', 'AdmSeguridad.editar [' . $seguridad_id . ']');
-
         $seguridad = Doctrine::getTable('Seguridad')->find($seguridad_id);
         if ($seguridad->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
@@ -68,14 +65,24 @@ class Admseguridad extends MY_BackendController {
             $seguridad=new SeguridadForm();
             $seguridad->proceso_id=$this->input->post('proceso_id');
         }
-        
+        $extra=$this->input->post('extra');
+        $tipoSeguridad=$extra['tipoSeguridad'];
         if($seguridad->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar esta accion.';
             exit;
         }
-        
         $this->form_validation->set_rules('institucion','Institucion','required');
         $this->form_validation->set_rules('servicio','Servicio','required');
+        $this->form_validation->set_rules('extra[tipoSeguridad]','Tipo de seguridad','required');
+        switch ($tipoSeguridad){
+            case 'API_KEY':
+                $this->form_validation->set_rules('extra[key]','Key','required');
+                break;
+            case "HTTP_BASIC": case "OAUTH2":
+                $this->form_validation->set_rules('extra[user]','user','required');
+                $this->form_validation->set_rules('extra[pass]','password','required'); 
+                break;
+        }
         $seguridad->validateForm();
         if(!$seguridad_id){
             $this->form_validation->set_rules('proceso_id','Proceso','required');
