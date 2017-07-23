@@ -141,7 +141,7 @@
   z-index: 1000;
 }
 .invalido{
-  border: 1px solid #AA0909;
+  border-color: 1px solid #AA0909;
 }
 .spanError{
   font-size:10px;

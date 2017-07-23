@@ -10,7 +10,7 @@
     <li><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
-    <!-- <li><a href="<?= site_url('backend/seguridad/listar/' . $proceso->id) ?>">Seguridad</a></li> -->
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
   
 
@@ -36,7 +36,6 @@
         
         <div class="form-actions">
             <a class="btn" href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Cancelar</a>
-            <!-- <input class="btn btn-primary" type="submit" value="Guardar" /> -->
             <button class="btn btn-primary" value="Guardar" type="button" onclick="validateForm();">Guardar</button>
         </div>
     </fieldset>

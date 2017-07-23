@@ -3,8 +3,7 @@ var tiposMetodos=FunMetodo=FuncResponse=FuncResquest=ObjectSoap=result='';
 var operaciones = [];
 
 function ConsultarFunciones(){
-    $("#divOptions").empty();
-    $("#warningSpan").text("");
+    limpiar();
 	var urlsoap = $("#urlsoap").val();
     $.post("/backend/acciones/functions_soap", {urlsoap: urlsoap}, function(d,e){
     	manejorespuesta(d);
@@ -192,6 +191,7 @@ function manejorespuesta(data){
 
 var CargarWsdl = function(){ 
     $("#urlsoap").val("");
+    limpiar();
     var formu=$(this);
     var nombreform=$(this).attr("id");
     var form = $('#plantillaForm').get(0); 
@@ -212,6 +212,13 @@ var CargarWsdl = function(){
         },
     });
 };
+var limpiar = function(){
+    $("#request").val("");
+    $("#response").val("");
+    $("#operacion").empty();    
+    $('#divMetodosE').hide();
+    $("#warningSpan").text("");
+}
 
  $(document).ready(function(){
  	$('#divMetodosE').hide();
@@ -238,10 +245,7 @@ var CargarWsdl = function(){
     $(document).on('click','#btn-consultar',ConsultarFunciones);
     $(document).on('click','#btn-load',CargarWsdl);
     $("#urlsoap").keyup(function(){
-        $("#request").val("");
-        $("#response").val("");
-        // $("#operacion").empty();    
-        $('#divMetodosE').hide();
+        limpiar();
     });
 
 });

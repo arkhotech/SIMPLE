@@ -97,9 +97,6 @@ class Acciones extends MY_BackendController {
     }
     
     public function editar($accion_id){
-
-        log_message('info', 'Acciones.editar [' . $accion_id . ']');
-
         $accion = Doctrine::getTable('Accion')->find($accion_id);
         if ($accion->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
