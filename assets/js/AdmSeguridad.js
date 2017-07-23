@@ -1,5 +1,4 @@
 function CambioSelect(){
-    $("#tipoSeguridad").change(function(){
         switch ($("#tipoSeguridad").val()) {                
             case "HTTP_BASIC": case "OAUTH2":
                 $("#DivUser").show();
@@ -26,9 +25,12 @@ function CambioSelect(){
                 $("#key").val("");
             break;
         }
-    });
  }
 
  $(document).ready(function(){
     CambioSelect();
+    $("#tipoSeguridad").change(function(){
+        CambioSelect();
+    });
+
 });
