@@ -31,12 +31,13 @@
         <input type="text" name="nombre" value="<?=$edit?$accion->nombre:''?>" />
         <label>Tipo</label>
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
+
         <?php
-            if($tipo == "rest" || $tipo == "soap") {
-                echo $accion->displaySecurityForm($proceso->id);
-            }else{
-                echo $accion->displayForm();
-            }
+        if($tipo == "rest" || $tipo == "soap") {
+            echo $accion->displaySecurityForm($proceso->id);
+        }else{
+            echo $accion->displayForm();
+        }
         ?>
 
         <div class="form-actions">
