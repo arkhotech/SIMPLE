@@ -20,7 +20,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Accion</th>
+            <th>Accion
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
             <th>Tipo</th>
             <th></th>
         </tr>
