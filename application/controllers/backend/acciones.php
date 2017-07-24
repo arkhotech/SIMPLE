@@ -235,13 +235,13 @@ class Acciones extends MY_BackendController {
         $client = new SoapClient($url);
         $result['functions']=$client->__getFunctions();
         $result['types']=$client->__getTypes();
-        $result['functions'] = str_replace("\\n", " ", $result['functions']);
-        $result['functions'] = str_replace("\\r", " ", $result['functions']);
-        $result['types'] = str_replace("\\n", " ", $result['types']);
-        $result['types'] = str_replace("\\r", " ", $result['types']);
         $result['caso']=1;
-        $result = str_replace("\\n", " ", $result);
-        $result = str_replace("\\r", " ", $result);
+        // $result['functions'] = str_replace("\\n", " ", $result['functions']);
+        // $result['functions'] = str_replace("\\r", " ", $result['functions']);
+        // $result['types'] = str_replace("\\n", " ", $result['types']);
+        // $result['types'] = str_replace("\\r", " ", $result['types']);
+        // $result = str_replace("\\n", " ", $result);
+        // $result = str_replace("\\r", " ", $result);
         $array = json_encode($result);
         print_r($array);
         exit;
@@ -274,12 +274,12 @@ class Acciones extends MY_BackendController {
                 $result['targetNamespace'] = $xml['targetNamespace'];
                 $result['functions']=$client->__getFunctions();
                 $result['types']=$client->__getTypes();
-                $result['functions'] = str_replace("\\n", " ", $result['functions']);
-                $result['functions'] = str_replace("\\r", " ", $result['functions']);
-                $result['types'] = str_replace("\\n", " ", $result['types']);
-                $result['types'] = str_replace("\\r", " ", $result['types']);
-                $result = str_replace("\\n", " ", $result);
-                $result = str_replace("\\r", " ", $result);
+                // $result['functions'] = str_replace("\\n", " ", $result['functions']);
+                // $result['functions'] = str_replace("\\r", " ", $result['functions']);
+                // $result['types'] = str_replace("\\n", " ", $result['types']);
+                // $result['types'] = str_replace("\\r", " ", $result['types']);
+                // $result = str_replace("\\n", " ", $result);
+                // $result = str_replace("\\r", " ", $result);
                 $array = json_encode($result);
                 print_r($array);
                 exit;
@@ -292,44 +292,52 @@ class Acciones extends MY_BackendController {
         exit;
     }  
 
-   public function converter_json(){
+    public function converter_json(){
         $array=$this->input->post('myArrClean');
         $operaciones=$this->input->post('operaciones');
-        $strlen1=count($array);
+        // var_dump($array);
+        $DataTypesSoap=["float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","string","anyURI","normalizedString"];
 
-        for ($i = 1; $i <= $strlen1; $i+=2){
-            $array2[$array[$i-1]]=$array[$i];
-        }
-
-        $DataTypesSoap=["float","language","Qname","boolean","gDay","long","short","byte","gMonth","Name","string","date","gMonthDay","NCName","time","dateTime","gYear","negativeInteger","token","decimal","gYearMonth","NMTOKEN","unsignedByte","double","ID","NMTOKENS","unsignedInt","duration","IDREFS","nonNegativeInteger","unsignedLong","ENTITIES","int","nonPostiveInteger","unsignedShort","ENTITY","integer","anyURI","normalizedString"];
-
-        foreach ($array2 as $d){
-            $date=$d;
-            $clave = array_search($date, $DataTypesSoap);
-            if ($clave==FALSE){
-                foreach ($operaciones as $d){
-                    $clave = array_search($date, $d);
-                    if ($clave!=FALSE){
-                        $count1=count($d)/2;
-                        if ($count1 > count($array)){
-                            $nuevo = $d;
-                            unset($nuevo[0],$nuevo[1]);
-                            $nuevo2 = array_reverse($nuevo);
+        if (empty($array)) {
+            $json = '{}';
+            print_r($json);
+            exit;
+        }else{
+            for ($i = 1; $i <= count($array); $i+=2){
+                $array2[$array[$i-1]]=$array[$i];
+            }
+            foreach ($array2 as $d){
+                $date=$d;
+                $clave = in_array($date, $DataTypesSoap);
+                if ($clave==FALSE){
+                    foreach ($operaciones as $d){
+                        $clave = in_array($date, $d);
+                        if ($clave!=FALSE){
+                            if ($d[1]==$date){
+                                if ($d[0]=='struct'){
+                                    $nuevo = $d;
+                                    unset($nuevo[0],$nuevo[1]);
+                                    $nuevo2 = array_reverse($nuevo);
+                                }else{
+                                    $nuevo = $d;
+                                    $nuevo2 = array_reverse($nuevo);
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
-        for ($i = 1; $i <= count($nuevo2); $i+=2){
-            $array3[$nuevo2[$i-1]]=$nuevo2[$i];
-        }
-        foreach ($array3 as $d){
-            $date2=$d;
-                $clave2 = array_search($date2, $DataTypesSoap);
-            if ($clave2==FALSE){
-                foreach ($operaciones as $d){
-                    $clave2 = array_search($date2, $d);
-                    if ($clave2!=FALSE){
+            for ($i = 1; $i <= count($nuevo2); $i+=2){
+                $array3[$nuevo2[$i-1]]=$nuevo2[$i];
+            }
+
+            foreach ($array3 as $d){
+                $date2=$d;
+                $clave2 = in_array($date2, $DataTypesSoap);
+                if ($clave2==FALSE){
+                    foreach ($operaciones as $d){
+                        $clave2 = in_array($date2, $d);
+                        if ($clave2!=FALSE){
                             if ($d[1]==$date2){
                                 if ($d[0]=='struct'){
                                         $nuevo3 = $d;
@@ -359,15 +367,12 @@ class Acciones extends MY_BackendController {
                                     }
                                 }
                             }
+                        }
                     }
                 }
+            $array2[$date]=$array3;
             }
         }
-        $array3 = str_replace("\\n", " ", $array3);
-        $array3 = str_replace("\\n", " ", $array3);
-        $array2[$date]=$array3;
-        $array2 = str_replace("\\n", " ", $array2);
-        $array2 = str_replace("\\r", " ", $array2);
         $json=json_encode($array2);
         print_r($json);
         exit;
