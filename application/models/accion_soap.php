@@ -3,35 +3,44 @@ require_once('accion.php');
    
 class AccionSoap extends Accion {
 
-    public function displayForm() {
+    public function displaySecurityForm($proceso_id) {
+
+        log_message('info', 'displaySecurityForm id proceso: '.$proceso_id, FALSE);
+
+        $data = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        log_message('info', 'Obtiene proceso desde bd: '.$data->id, FALSE);
+
+        $conf_seguridad = $data->Admseguridad;
+
         $display = '
             <p>
                 Esta accion consultara via SOAP la siguiente URL. Los resultados, seran almacenados como variables.
             </p>
         ';
 
-         $display.='
+        $display.='
                 <div class="col-md-12">
                         <label>WSDL</label>
                         <input type="text" class="input-xxlarge AlignText" id="urlsoap" name="extra[wsdl]" value="' . ($this->extra ? $this->extra->wsdl : '') . '" />
                         <a class="btn btn-default" id="btn-consultar" ><i class="icon-search icon"></i> Consultar</a>
                         <a class="btn btn-default" href="#modalImportarWsdl" data-toggle="modal" ><i class="icon-upload icon"></i> Importar</a>
-                </div>'; 
-        
+                </div>';
+
         $display.='
                 <div id="divMetodos" class="col-md-12">
                     <label>Métodos</label>
                     <select id="operacion" name="extra[operacion]">';
-                    if ($this->extra->operacion){
-                        $display.='<option value="'.($this->extra->operacion).'" selected>'.($this->extra->operacion).'</option>';
-                    } 
-                    $display.='</select>
+        if ($this->extra->operacion){
+            $display.='<option value="'.($this->extra->operacion).'" selected>'.($this->extra->operacion).'</option>';
+        }
+        $display.='</select>
                 </div>                
                 <div id="divMetodosE" style="display:none;" class="col-md-12">
                     <span id="warningSpan" class="spanError"></span>
                     <br /><br />
                 </div>';
-                    
+
         $display.='            
             <div class="col-md-12">
                 <label>Request</label>
@@ -64,15 +73,22 @@ class AccionSoap extends Accion {
             </div>
             </form>
         </div>
-        <div id="modal" class="modal hide fade"></div>';    
-        // $display.='
-        //     <div class="col-md-12">
-        //         <label>Header</label>
-        //         <textarea id="header" name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
-        //         <br />
-        //         <span id="resultHeader" class="spanError"></span>
-        //         <br /><br />
-        //     </div>';
+        <div id="modal" class="modal hide fade"></div>';
+
+        $display.='
+                <label>Seguridad</label>
+                <select id="tipoSeguridad" name="extra[idSeguridad]">';
+        foreach($conf_seguridad as $seg){
+            $display.='
+                        <option value="">Sin seguridad</option>';
+            if ($this->extra->idSeguridad && $this->extra->idSeguridad == $seg->id){
+                $display.='<option value="'.$seg->id.'" selected>'.$seg->institucion.' - '.$seg->servicio.'</option>';
+            }else{
+                $display.='<option value="'.$seg->id.'">'.$seg->institucion.' - '.$seg->servicio.'</option>';
+            }
+        }
+        $display.='</select>';
+
         return $display;
     }
 

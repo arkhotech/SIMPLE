@@ -8,7 +8,7 @@ class Admseguridad extends MY_BackendController {
     public function __construct() {
         parent::__construct();
         UsuarioBackendSesion::force_login();
-//        if(UsuarioBackendSesion::usuario()->rol!='super' && UsuarioBackendSesion::usuario()->rol!='modelamiento'){
+
         if( !in_array('super', explode(',',UsuarioBackendSesion::usuario()->rol) ) && !in_array( 'modelamiento',explode(',',UsuarioBackendSesion::usuario()->rol))){
             echo 'No tiene permisos para acceder a esta seccion.';
             exit;

@@ -3,88 +3,49 @@ require_once('accion.php');
 
 class AccionRest extends Accion {
 
-    public function displayForm() {
+    public function displaySecurityForm($proceso_id) {
 
-        log_message('info', 'AccionRest.displayForm');
-        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
-        $data['seguridad'] = $proceso['proceso']->Admseguridad;
+        log_message('info', 'displaySecurityForm id proceso: '.$proceso_id, FALSE);
+
+        $data = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        log_message('info', 'Obtiene proceso desde bd: '.$data->id, FALSE);
+
+        $conf_seguridad = $data->Admseguridad;
 
         $display = '
             <p>
                 Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados como variables.
             </p>
-            <p>
-                Los resultados esperados deben venir en formato JSON siguiendo este formato:
-            </p>
         ';
 
         $display.= '<label>URL</label>';
-        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />'; 
-       
-        $display.='
-                <label>Método</label>
-                <select id="tipoMetodo" name="extra[tipoMetodo]">
-                    <option value="">Seleccione...</option>
-                    <option value="POST">POST</option>
-                    <option value="GET">GET</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>';
-                    if ($this->extra->tipoMetodo){
-                        $display.='<option value="'.($this->extra->tipoMetodo).'" selected>'.($this->extra->tipoMetodo).'</option>';
-                    } 
-                    $display.='</select>';
-                    
-        $display.='
-            <div class="col-md-12" id="divObject" style="display:none;">
-                <label>Request</label>
-                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
-                <br />
-                <span id="resultRequest" class="spanError"></span>
-                <br /><br />
-            </div>';
-
-
-        $display.='
-            <div class="col-md-12">
-                <label>Header</label>
-                <textarea id="header" name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
-                <br />
-                <span id="resultHeader" class="spanError"></span>
-                <br /><br />
-            </div>';
-        return $display;
-    }
-
-    public function displaySecurityForm($proceso_id) {
-
-        log_message('info', 'displaySecurityForm id proceso: '.$proceso_id, FALSE);
-
-        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
-
-        log_message('info', 'Obtiene proceso: '.$proceso, FALSE);
-
-        $data['seguridad'] = $proceso['proceso']->Admseguridad;
-
-        print_r($data['seguridad']);
-
-        var_dump($data['seguridad']);
-
-        log_message('info', 'seguridad: '.print_r($data['seguridad']), FALSE);
-
-        $display = '<label>URL</label>';
         $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
 
         $display.='
                 <label>Método</label>
                 <select id="tipoMetodo" name="extra[tipoMetodo]">
-                    <option value="">Seleccione...</option>
-                    <option value="POST">POST</option>
-                    <option value="GET">GET</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>';
-        if ($this->extra->tipoMetodo){
-            $display.='<option value="'.($this->extra->tipoMetodo).'" selected>'.($this->extra->tipoMetodo).'</option>';
-        }
+                    <option value="">Seleccione...</option>';
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "POST"){
+                        $display.='<option value="POST" selected>POST</option>';
+                    }else{
+                        $display.='<option value="POST">POST</option>';
+                    }
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "GET"){
+                        $display.='<option value="GET" selected>GET</option>';
+                    }else{
+                        $display.='<option value="GET">GET</option>';
+                    }
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "PUT"){
+                        $display.='<option value="PUT" selected>PUT</option>';
+                    }else{
+                        $display.='<option value="PUT">PUT</option>';
+                    }
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "DELETE"){
+                        $display.='<option value="DELETE" selected>DELETE</option>';
+                    }else{
+                        $display.='<option value="DELETE">DELETE</option>';
+                    }
         $display.='</select>';
 
         $display.='
@@ -105,6 +66,21 @@ class AccionRest extends Accion {
                 <span id="resultHeader" class="spanError"></span>
                 <br /><br />
             </div>';
+
+        $display.='
+                <label>Seguridad</label>
+                <select id="tipoSeguridad" name="extra[idSeguridad]">';
+                foreach($conf_seguridad as $seg){
+                    $display.='
+                        <option value="">Sin seguridad</option>';
+                        if ($this->extra->idSeguridad && $this->extra->idSeguridad == $seg->id){
+                            $display.='<option value="'.$seg->id.'" selected>'.$seg->institucion.' - '.$seg->servicio.'</option>';
+                        }else{
+                            $display.='<option value="'.$seg->id.'">'.$seg->institucion.' - '.$seg->servicio.'</option>';
+                        }
+                }
+                $display.='</select>';
+
         return $display;
     }
 
@@ -115,6 +91,12 @@ class AccionRest extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
+
+        log_message('info', 'ejecutar id idseguridad: '.$this->extra->idSeguridad, FALSE);
+
+        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
+
+        log_message('info', 'Obtiene seguridad desde bd: '.$data->id, FALSE);
 
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);

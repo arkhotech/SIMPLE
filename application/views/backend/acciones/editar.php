@@ -33,7 +33,7 @@
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
 
         <?php
-        if($tipo == "rest" || $tipo == "soap") {
+        if($tipo == "rest" || $tipo == "soap" || $accion->tipo == "rest" || $accion->tipo == "soap") {
             echo $accion->displaySecurityForm($proceso->id);
         }else{
             echo $accion->displayForm();
