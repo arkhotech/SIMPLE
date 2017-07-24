@@ -29,7 +29,7 @@ function ConsultarFunciones(){
  
 function getCleanedString(cadena){
    // Definimos los caracteres que queremos eliminar
-   var specialChars = "/\n/!@#$^&%*()+=-[]{}|:<>?,.;";
+   var specialChars = "\b\t\n\v\f\r/\n/!@#$^&%*()+=-[]{}|:<>?;,.";
    // Los eliminamos todos
    for (var i = 0; i < specialChars.length; i++) {
        cadena= cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
@@ -60,16 +60,16 @@ function CovertJson(myArrClean,operaciones){
     	$("#request").val("");
     	$("#response").val("");
     	ObjectSoap=this.value;
-    	jQuery.each(result.functions, function(i,val){
-    	var bool = val.indexOf(ObjectSoap);
-    	if (bool>=0){    	
-		var res = val.split(" ");
-		var subtit = res[1].replace("(", " ");
-	    var subtit = subtit.split(" ");
-	    FuncResponse=res[0];
-		FunMetodo=subtit[0];
-		FuncResquest=subtit[1];
-    	jQuery.each(tiposMetodos, function(i,val){
+        jQuery.each(result.functions, function(i,val){
+        var bool = val.indexOf(ObjectSoap);
+        if (bool>=0){       
+        var res = val.split(" ");
+        var subtit = res[1].replace("(", " ");
+        var subtit = subtit.split(" ");
+        FuncResponse=res[0];
+        FunMetodo=subtit[0];
+        FuncResquest=subtit[1];
+        jQuery.each(tiposMetodos, function(i,val){
     		var sep = val.split(" ");
     		if (sep[1]==FuncResquest){
     			// Caso Request
@@ -157,22 +157,23 @@ function isJsonR(object,value,id_span){
 
 function manejorespuesta(data){
     if (data){
-    	$("#request").val("");
-    	$("#response").val("");
-		$("#operacion").empty(); 	
-		$('#divMetodosE').hide();
-		result = JSON.parse(data);
+        $("#request").val("");
+        $("#response").val("");
+        $("#operacion").empty();    
+        $('#divMetodosE').hide();
+        result = JSON.parse(data);
         if(result.caso==2){
             $("#urlsoap").val(result.targetNamespace[0]);
         }
-		jQuery.each(result.types, function(i,val){	
-			val = getCleanedString(val);
-			val = val.replace("{", ""); 
-			val = val.replace("}", ""); 
-			val = val.replace(";", ""); 
-			val = val.split(" ");
-	    	val = val.filter(Boolean);
-	    	operaciones[i] = val;
+        jQuery.each(result.types, function(i,val){  
+            val =  getCleanedString(val); 
+            val = val.replace(/\n/g, "");
+            val = val.split(" ");
+            val = val.filter(Boolean);
+            for (j = 0; j < val.length; j++) { 
+                val[j] = val[j].trim();
+            }
+         operaciones[i] = val;
 		});
     	tiposMetodos=result.types;
 		$("#operacion").append("<option value=''>Seleccione...</option>"); 	
