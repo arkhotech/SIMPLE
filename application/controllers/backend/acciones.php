@@ -230,18 +230,33 @@ class Acciones extends MY_BackendController {
         redirect($_SERVER['HTTP_REFERER']);
     }
 
+    public function prueba($url){
+        //print_r("hola desde prueba");        
+        
+        $fileContents= file_get_contents($url);
+        
+        $fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
+        $fileContents = trim(str_replace('"', "'", $fileContents));
+        
+        $simpleXml = simplexml_load_string($fileContents);
+        print_r($simpleXml);
+        //$json = json_encode($simpleXml);
+        //print_r($json);
+        exit;
+    }
+
     public function functions_soap(){
-        $url=$this->input->post('urlsoap');
+        $url=$this->input->post('urlsoap'); 
         $client = new SoapClient($url);
         $result['functions']=$client->__getFunctions();
         $result['types']=$client->__getTypes();
         $result['caso']=1;
-        // $result['functions'] = str_replace("\\n", " ", $result['functions']);
-        // $result['functions'] = str_replace("\\r", " ", $result['functions']);
-        // $result['types'] = str_replace("\\n", " ", $result['types']);
-        // $result['types'] = str_replace("\\r", " ", $result['types']);
-        // $result = str_replace("\\n", " ", $result);
-        // $result = str_replace("\\r", " ", $result);
+        $result['functions'] = str_replace("\\n", " ", $result['functions']);
+        $result['functions'] = str_replace("\\r", " ", $result['functions']);
+        $result['types'] = str_replace("\\n", " ", $result['types']);
+        $result['types'] = str_replace("\\r", " ", $result['types']);
+        $result = str_replace("\\n", " ", $result);
+        $result = str_replace("\\r", " ", $result);
         $array = json_encode($result);
         print_r($array);
         exit;

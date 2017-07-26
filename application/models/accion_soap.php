@@ -98,13 +98,16 @@ class AccionSoap extends Accion {
         $CI->form_validation->set_rules('extra[operacion]', 'Métodos', 'required');
     }
 
-    public function ejecutar(Etapa $etapa) {
+    public function ejecutar(Etapa $etapa) { 
+        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
+        log_message('info', '##################################################################', FALSE);
+        log_message('info', 'tipo de seguridad: '.$data->extra->tipoSeguridad, FALSE);
+        log_message('info', 'usuario: '.$data->extra->user, FALSE);
+        log_message('info', 'password: '.$data->extra->pass, FALSE);
+        log_message('info', '##################################################################', FALSE);
+        $user = $data->extra->user;
+        $pass = $data->extra->pass;
 
-        log_message('info', 'Ejecutar rest url: '.$this->extra->wsdl, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->operacion, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
-        log_message('info', 'Ejecutar rest request: '.$this->extra->response, FALSE);
-        //log_message('info', 'Ejecutar rest request: '.$this->extra->header, FALSE);
 
         try{
 
@@ -114,19 +117,142 @@ class AccionSoap extends Accion {
             $wsdl=$r->getExpresionParaOutput($etapa->id);
 
             if(isset($this->extra->request)){
-                log_message('info', 'Reemplazando soap request: '.$this->extra->request, FALSE);
+                //log_message('info', 'Reemplazando soap request: '.$this->extra->request, FALSE);
                 $r=new Regla($this->extra->request);
                 $request=$r->getExpresionParaOutput($etapa->id);
-                log_message('info', 'Request: '.$request, FALSE);
+                //log_message('info', 'Request: '.$request, FALSE);
             }
 
+
+                /*
+                            $request='{
+                  "sobre": {
+                    "encabezado": {
+                      "idSobre": "161001000120100914100000099",
+                      "fechaHora": "2013-01-23T09:30:47Z",
+                      "proveedor": {
+                        "nombre": "ISP",
+                        "servicios": {
+                          "servicio": "LISTA DE ESPERA CORAZON",
+                          "respuestaServicio": {
+                            "estado": "SI",
+                            "glosa": "RESPUEåSTA EXITOSA"
+                          }
+                        }
+                      },
+                      "consumidor": {
+                        "nombre": "MINSAL",
+                        "tramite": "LISTA DE ESPERA",
+                        "certificado": {
+                          "X509Data": {
+                            "X509IssuerSerial": {
+                              "X509IssuerName": "IN",
+                              "X509SerialNumber": "0"
+                            }
+                          }
+                        }
+                      },
+                      "fechaHoraReq": "2013-01-23T09:30:47Z",
+                      "emisor": "ISP",
+                      "metadataOperacional": {
+                        "estadoSobre": "00",
+                        "glosaSobre": "TRANSACCION EXITOSA"
+                      }
+                    },
+                    "cuerpo": {
+                      
+                    }
+                  }
+                }';
+
+
+                $request2='{
+                    "Sobre": {
+                        "encabezado": {
+                            "idSobre": "161001000120100914100000099",
+                            "fechaHora": "2013-01-23T09:30:47Z",
+                            "proveedor": {
+                                "nombre": "ISP",
+                                "servicios": {
+                                    "respuestaServicio": {
+                                        "estado": "SI",
+                                        "glosa": "RESPUESTA EXITOSA"
+                                    },
+                                    "servicio": "LISTA DE ESPERA CORAZON"
+                                }
+                            },
+                            "consumidor": {
+                                "nombre": "MINSAL",
+                                "tramite": "LISTA DE ESPERA",
+                                "certificado": {
+                                    "x509Data": {
+                                        "X509IssuerName": "IN",
+                                        "X509SerialNumber": "0"
+                                    }
+                                }
+                            },
+                            "fechaHoraReq": "2013-01-23T09:30:47Z",
+                            "emisor": "ISP",
+                            "metadataOperacional": {
+                                "estadoSobre": "00",
+                                "glosaSobre": "TRANSACCION EXITOSA"
+                            }
+                        },
+                        "cuerpo": {
+                            "documento": {}
+                        }
+                    }
+                }';
+
+                $prueba='{
+                    "Sobre": {
+                        "encabezado": {
+                            "idSobre": "161001000120100914100000099",
+                            "fechaHora": "2013-01-23T09:30:47Z",
+                            "proveedor": {
+                                "nombre": "ISP",
+                                "servicios": {
+                                    "respuestaServicio": {
+                                        "estado": "SI",
+                                        "glosa": "RESPUESTA EXITOSA"
+                                    },
+                                    "servicio": "LISTA DE ESPERA CORAZON"
+                                }
+                            },
+                            "consumidor": {
+                                "nombre": "MINSAL",
+                                "tramite": "LISTA DE ESPERA",
+                                "certificado": {
+                                    "x509Data": {
+                                        "X509IssuerName": "IN",
+                                        "X509SerialNumber": "0"
+                                    }
+                                }
+                            },
+                            "fechaHoraReq": "2013-01-23T09:30:47Z",
+                            "emisor": "ISP",
+                            "metadataOperacional": {
+                                "estadoSobre": "00",
+                                "glosaSobre": "TRANSACCION EXITOSA"
+                            }
+                        },
+                        "cuerpo": {
+                            "documento": {}
+                        }
+                    }
+
+                }';*/
+            //$request3 = json_encode($request2, true);
             $request = json_decode($request, true);
-            //var_dump($request);
-
-            //print_r($request);
-            //dd($request);
-
-            $result = $CI->nusoap->soaprequest($wsdl, $this->extra->operacion, $request);
+            log_message('info', 'Reemplazando soap request: '.$request, FALSE);
+            print_r($request4);
+            $soapclient = new nusoap_client($wsdl,'wsdl');
+            //$soapclient = new nusoap_client('http://localhost:8088/mockListaDeEsperaSoap?wsdl','wsdl');
+            $soapclient->setCredentials($user, $pass, 'basic');
+            $result = $soapclient->call($this->extra->operacion, $request4);
+            echo '<pre>'; print_r($soapclient); echo '</pre>';
+            echo '<pre>'; print_r($result); echo '</pre>';
+            //exit;
 
             log_message('info', 'Se obtiene respuesta', FALSE);
 
@@ -138,6 +264,7 @@ class AccionSoap extends Accion {
                     break;
                 }
             }
+
 
             log_message('info', 'response name: '.$response_name, FALSE);
 
