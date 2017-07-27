@@ -1,7 +1,7 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h3 id="myModalLabel">Eliminar Agenda
-        <a href="/assets/ayuda/simple/backend/agenda-agregar.html" target="_blank">
+        <a href="/assets/ayuda/simple/backend/agenda-editar.html#eliminar" target="_blank">
             <span class="glyphicon glyphicon-info-sign" style="font-size: 16px;"></span>
         </a>
     </h3>
