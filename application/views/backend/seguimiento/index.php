@@ -28,7 +28,11 @@
 <table class="table">
 	<thead>
 		<tr>
-			<th>Proceso</th>
+			<th>Proceso
+                <a href="/assets/ayuda/simple/backend/seguimiento-de-procesos.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+			</th>
 			<th>Acciones</th>
 		</tr>
 	</thead>

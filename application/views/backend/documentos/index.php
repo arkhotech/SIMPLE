@@ -22,7 +22,12 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Documento</th>
+            <th>
+                Documento
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/generacion-de-documentos.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
             <th></th>
         </tr>
     </thead>

@@ -35,7 +35,11 @@
     <thead>
         <tr>
             <th>Proceso</th>
-            <th>Acciones</th>
+            <th>Acciones
+                <a href="/assets/ayuda/simple/backend/export-import.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
         </tr>
     </thead>
     <tbody>

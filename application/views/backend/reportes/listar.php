@@ -13,7 +13,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Reporte</th>
+            <th>Reporte
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/reportes.html" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+            </th>
             <th>Filtro</th>
             <th>Acciones</th>
         </tr>
