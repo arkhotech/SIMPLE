@@ -204,8 +204,7 @@ class AccionSoap extends Accion {
                     }
                 }';*/
 
-                /*$prueba['sobre']='{
-                    
+                $prueba='{
                         "encabezado": {
                             "idSobre": "161001000120100914100000099",
                             "fechaHora": "2013-01-23T09:30:47Z",
@@ -243,7 +242,7 @@ class AccionSoap extends Accion {
 
                 }';
 
-            $array2='{
+            /*$array2='{
               "RegistrarInicioActividadesRequest": {
                 "Username": "130497810",
                 "Password": "sag2016123A",
@@ -260,7 +259,7 @@ class AccionSoap extends Accion {
             //exit; */
 
 
-            //$request = json_decode($array, true);
+            $request = json_decode($array, true);
             //print_r($request);
             //log_message('info', 'Reemplazando soap request: '.$request, FALSE);
             //print_r($this->extra->operacion);

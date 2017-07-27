@@ -15,7 +15,7 @@ function ConsultarFunciones(){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{
- 		if(validJsonR==1){
+        if(validJsonR==1){
  			$("#request").addClass('invalido');
 	    	$("#resultRequest").text("Formato requerido / json");
  		}
