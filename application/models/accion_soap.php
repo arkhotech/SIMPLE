@@ -202,10 +202,10 @@ class AccionSoap extends Accion {
                             "documento": {}
                         }
                     }
-                }';
+                }';*/
 
-                $prueba='{
-                    "Sobre": {
+                /*$prueba['sobre']='{
+                    
                         "encabezado": {
                             "idSobre": "161001000120100914100000099",
                             "fechaHora": "2013-01-23T09:30:47Z",
@@ -239,22 +239,41 @@ class AccionSoap extends Accion {
                         "cuerpo": {
                             "documento": {}
                         }
-                    }
+                    
 
-                }';*/
-            //$request3 = json_encode($request2, true);
-            $request = json_decode($request, true);
-            log_message('info', 'Reemplazando soap request: '.$request, FALSE);
-            print_r($request4);
-            $soapclient = new nusoap_client($wsdl,'wsdl');
-            //$soapclient = new nusoap_client('http://localhost:8088/mockListaDeEsperaSoap?wsdl','wsdl');
-            $soapclient->setCredentials($user, $pass, 'basic');
-            $result = $soapclient->call($this->extra->operacion, $request4);
-            echo '<pre>'; print_r($soapclient); echo '</pre>';
-            echo '<pre>'; print_r($result); echo '</pre>';
-            //exit;
+                }';
 
-            log_message('info', 'Se obtiene respuesta', FALSE);
+            $array2='{
+              "RegistrarInicioActividadesRequest": {
+                "Username": "130497810",
+                "Password": "sag2016123A",
+                "DataXML": "test"
+              }
+            }';
+
+            $array["RegistrarInicioActividadesRequest"]=array([
+                "Username" => "130497810",
+                "Password" => "sag2016123A",
+                "DataXML" => "test"
+            ]);
+            //print_r($array);
+            //exit; */
+
+
+            //$request = json_decode($array, true);
+            //print_r($request);
+            //log_message('info', 'Reemplazando soap request: '.$request, FALSE);
+            //print_r($this->extra->operacion);
+            //$soapclient = new nusoap_client($wsdl,'wsdl');
+            //$var="http://sicexsagqa.sag.gob.cl/VyV.InicioActividades/RecepcionInicioActividades.svc?wsdl";
+            $soapclient = new nusoap_client($var,'wsdl');
+            //$soapclient->setCredentials($user, $pass, 'basic');
+            $result = $soapclient->call($this->extra->operacion, $request);
+            //$result = $soapclient->call("RecepcionInicioActividades", $array);
+            //echo '<pre>'; print_r($soapclient); echo '</pre>';
+            var_dump($result);
+            print_r($result);
+            log_message('info', 'Se obtiene respuesta de servicio'.$result, FALSE);
 
             $response_name = "";
             if(isset($this->extra->response)){

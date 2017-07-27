@@ -144,7 +144,7 @@ class AccionRest extends Accion {
                 log_message('info', 'Lllamando PUT', FALSE);
                 $result = $CI->rest->put($url, $request, 'json');
             }else if($this->extra->tipoMetodo == "DELETE"){
-                log_message('info', 'Lllamando DELETE', FALSE);
+                log_message('info', 'Llamando DELETE', FALSE);
                 $result = $CI->rest->delete($url, array(), 'json');
             }
 
@@ -153,6 +153,8 @@ class AccionRest extends Accion {
             log_message('info', 'Result: '.$result, FALSE);
 
             $json=json_decode($result);
+            log_message('info', 'Result: '.$json, FALSE);
+            print_r($json);
 
             foreach($json as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
