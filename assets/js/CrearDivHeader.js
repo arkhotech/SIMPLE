@@ -10,21 +10,24 @@ function ConsultarFunciones(){
     });
  }
 
- function validateForm(){
-    if(validJsonR==0 && validJsonH==0){
+ function validateForm(){    
+    if(validJsonR==0 && validJsonR==0){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{
         if(validJsonR==1){
+            console.log("entre a validar el request");
  			$("#request").addClass('invalido');
 	    	$("#resultRequest").text("Formato requerido / json");
  		}
+
  		if(validJsonH==1){
+            console.log("entre a validar el header");
 		    $("#header").addClass('invalido');
 		    $("#resultHeader").text("Formato requerido / json");
  		}
- 		// return false;
- 	} 
+    }
+ 		// return false; 
  }
  
 function getCleanedString(cadena){
@@ -57,7 +60,7 @@ function CovertJson(myArrClean,operaciones){
 
  function CambioRadio(){
     $("[id='operacion']").on("change", function (e) {
-    	$("#request").val("");
+        $("#request").val("");
     	$("#response").val("");
     	ObjectSoap=this.value;
         jQuery.each(result.functions, function(i,val){
@@ -110,6 +113,8 @@ function CovertJson(myArrClean,operaciones){
  }
 
 function CambioSelect(value){
+    validJsonR=0;
+    validJsonH=0;
  	switch ($("#tipoMetodo").val()) {                
  		case "POST": case "PUT":
  			$("#divObject").show();
@@ -125,13 +130,16 @@ function CambioSelect(value){
  }
 
  function isJsonH(object,value,id_span){
-    try {
-        JSON.parse(value);
-    }catch (e){
-	    object.addClass('invalido');
-	    id_span.text("Formato requerido / json");
-	    validJsonH=1;
-        return false;
+    var obj = $("#header").val();
+    if(obj.length>1){
+        try {
+            JSON.parse(value);
+        }catch (e){
+            object.addClass('invalido');
+            id_span.text("Formato requerido / json");
+            validJsonH=1;
+            return false;
+        }        
     }
 	object.removeClass('invalido');
 	id_span.text("");
@@ -222,6 +230,8 @@ var limpiar = function(){
 }
 
  $(document).ready(function(){
+    console.log("REQUEST INICIO:"+validJsonR);
+    console.log("HEADERS INICIO:"+validJsonH);
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")

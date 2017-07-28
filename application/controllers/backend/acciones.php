@@ -130,9 +130,9 @@ class Acciones extends MY_BackendController {
         }
         
         if($accion->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
-                echo 'Usuario no tiene permisos para editar esta accion.';
-                exit;
-            }
+            echo 'Usuario no tiene permisos para editar esta accion.';
+            exit;
+        }
         
         $this->form_validation->set_rules('nombre','Nombre','required');
         $accion->validateForm();

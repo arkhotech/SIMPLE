@@ -19,8 +19,11 @@ class AccionRest extends Accion {
             </p>
         ';
 
-        $display.= '<label>URL</label>';
-        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
+        $display.= '<label>Endpoint</label>';
+        $display.='<input type="text" class="input-xxlarge" placeholder="Server" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
+
+        $display.= '<label>Resource</label>';
+        $display.='<input type="text" class="input-xxlarge" placeholder="Uri" name="extra[uri]" value="' . ($this->extra ? $this->extra->uri : '') . '" />';
 
         $display.='
                 <label>Método</label>
@@ -86,7 +89,8 @@ class AccionRest extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[url]', 'URL', 'required');
+        $CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
+        $CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
         //$CI->form_validation->set_rules('extra[header]', 'Header', 'required');
     }
 
@@ -96,9 +100,46 @@ class AccionRest extends Accion {
         $user = $data->extra->user;
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
-        $NameKey = $data->extra->namekey;
+        $NameKey='';
+        
+        if(strlen($data->extra->namekey)>3){
+            $NameKey = $data->extra->namekey;
+        }
+        
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
+
+        $r=new Regla($this->extra->uri);
+        $uri=$r->getExpresionParaOutput($etapa->id);
+
+        switch ($tipoSeguridad) {
+            case "HTTP_BASIC":
+                $config = array(
+                    'server'          => $url,
+                    'http_user'       => $user,
+                    'http_pass'       => $pass,
+                    'http_auth'       => 'basic'
+                );
+                break;
+            case "API_KEY":
+                $config = array(
+                    'server'          => $url,
+                    'api_key'         => $ApiKey,
+                    'api_name'        => $NameKey
+                );
+                break;
+            case "OAUTH2":
+                //SEGURIDAD OAUTH2
+                $config="Config de asuth 2";;
+                break;
+            default:
+                //NO TIENE SEGURIDAD
+                print_r("No tiene seguridad");
+                $config = array(
+                    'server'          => $url
+                );
+            break;
+        }
         if(isset($this->extra->request)){
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
@@ -114,7 +155,7 @@ class AccionRest extends Accion {
 
         $CI = & get_instance();
 
-        /*if(isset($this->extra->header)){
+        if(isset($this->extra->header)){
             log_message('info', 'Ejecutar rest headers: '.$this->extra->header, FALSE);
             $r=new Regla($this->extra->header);
             $header=$r->getExpresionParaOutput($etapa->id);
@@ -123,153 +164,36 @@ class AccionRest extends Accion {
             foreach ($headers as $name => $value) {
                 $CI->rest->header($name.": ".$value);
             }
-            print_r($CI->rest);
-        }*/
-        log_message('info', '#######################################################################################################', FALSE);
+        }
+        print_r("<pre>");
+        print_r($config);
+        print_r("</pre>");
+        print_r("<pre>");
+        print_r($request);
+        print_r("</pre>");        
         try{
             if($this->extra->tipoMetodo == "GET"){
                 log_message('info', 'Entre a una peticion get', FALSE);
-                switch ($tipoSeguridad) {
-                    case "HTTP_BASIC":
-                        //SEGURIDAD BASIC
-                        $config = array(
-                            'server'          => $url,
-                            'http_user'       => $user,
-                            'http_pass'       => $pass,
-                            'http_auth'       => 'basic'
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->get('posts/1/comments', array(), 'json');
-                        break;
-                    case "API_KEY":
-                        // Set config options (only 'server' is required to work)
-                        log_message('info', 'Entre a una api key get', FALSE);
-                        
-                        $config = array(
-                            'server'          => $url,
-                            'api_key'         => $ApiKey,
-                            'api_name'        => $NameKey
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->get('/v3/templates/b8372ca8-aa4d-47aa-a506-85047bc201f4', array(), 'json');
-                        break;
-                    case "OAUTH2":
-                        //SEGURIDAD OAUTH2
-                        break;
-                    default:
-                        //NO TIENE SEGURIDAD
-                        $result = $CI->rest->put($url, array(), 'json');
-                    break;
-                }
-                exit;
-                echo "entre en el get";
-                // Run some setup
-                // Pull in an array of tweets
+                $CI->rest->initialize($config);
+                $result = $CI->rest->get($uri, array() , 'json');
             }else if($this->extra->tipoMetodo == "POST"){
-                log_message('info', 'Lllamando POST', FALSE);
-                switch ($tipoSeguridad) {
-                    case "HTTP_BASIC":
-                        //SEGURIDAD BASIC
-                        $config = array(
-                            'server'          => $url,
-                            'http_user'       => $user,
-                            'http_pass'       => $pass,
-                            'http_auth'       => 'basic'
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->post('posts/1/comments', array(), 'json');
-                        break;
-                    case "API_KEY":
-                        // Set config options (only 'server' is required to work)
-                        $config = array(
-                            'server'          => $url,
-                            'api_key'         => $ApiKey,
-                            'api_name'        => $NameKey
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->post('posts/1/comments', array(), 'json');
-                        break;
-                    case "OAUTH2":
-                        //SEGURIDAD OAUTH2
-                        break;
-                    default:
-                        //NO TIENE SEGURIDAD
-                        $result = $CI->rest->post($url, array(), 'json');
-                    break;
-                }
-                //$result = $CI->rest->post($url, $request, 'json');
+                log_message('info', 'Llamando POST', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->post($uri, $request, 'json');
             }else if($this->extra->tipoMetodo == "PUT"){
-                log_message('info', 'Lllamando PUT', FALSE);
-                switch ($tipoSeguridad) {
-                    case "HTTP_BASIC":
-                        //SEGURIDAD BASIC
-                        $config = array(
-                            'server'          => $url,
-                            'http_user'       => $user,
-                            'http_pass'       => $pass,
-                            'http_auth'       => 'basic'
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->put('posts/1/comments', array(), 'json');
-                        break;
-                    case "API_KEY":
-                        // Set config options (only 'server' is required to work)
-                        $config = array(
-                            'server'          => $url,
-                            'api_key'         => $ApiKey,
-                            'api_name'        => $NameKey
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->put('posts/1/comments', array(), 'json');
-                        break;
-                    case "OAUTH2":
-                        //SEGURIDAD OAUTH2
-                        break;
-                    default:
-                        //NO TIENE SEGURIDAD
-                        $result = $CI->rest->put($url, array(), 'json');
-                    break;
-                }
-                //$result = $CI->rest->put($url, $request, 'json');
+                log_message('info', 'Llamando PUT', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->put($uri, $request, 'json');
             }else if($this->extra->tipoMetodo == "DELETE"){
                 log_message('info', 'Llamando DELETE', FALSE);
-                switch ($tipoSeguridad) {
-                    case "HTTP_BASIC":
-                        //SEGURIDAD BASIC
-                        $config = array(
-                            'server'          => $url,
-                            'http_user'       => $user,
-                            'http_pass'       => $pass,
-                            'http_auth'       => 'basic'
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->delete('posts/1/comments', array(), 'json');
-                        break;
-                    case "API_KEY":
-                        // Set config options (only 'server' is required to work)
-                        $config = array(
-                            'server'          => $url,
-                            'api_key'         => $ApiKey,
-                            'api_name'        => $NameKey
-                        );
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->delete('posts/1/comments', array(), 'json');
-                        break;
-                    case "OAUTH2":
-                        //SEGURIDAD OAUTH2
-                        break;
-                    default:
-                        //NO TIENE SEGURIDAD
-                        $result = $CI->rest->delete($url, array(), 'json');
-                    break;
-                }
-                //$result = $CI->rest->delete($url, array(), 'json');
+                //Falta capturar el codigo http de la cabecera.//  
+                $CI->rest->initialize($config);
+                $result = $CI->rest->delete($uri, $request, 'json');
             }
-
-
             $result = json_encode($result);
+            print_r("<pre>");
             print_r($result);
-            echo "Ya imprimi el result";
+            print_r("</pre>");
             exit;
             $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
             log_message('info', 'IMPRIMIR Result: '.$result, FALSE);
