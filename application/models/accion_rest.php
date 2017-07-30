@@ -99,6 +99,10 @@ class AccionRest extends Accion {
         $NameKey = $data->extra->namekey;
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
+
+        var_dump(parse_url($url));
+        exit;
+
         if(isset($this->extra->request)){
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
