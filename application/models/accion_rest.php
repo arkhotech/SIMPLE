@@ -108,7 +108,7 @@ class AccionRest extends Accion {
         
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
-<<<<<<< HEAD
+
         $caracter="/";
         $f = substr($url, -1);
         if($caracter===$f){
@@ -149,12 +149,11 @@ class AccionRest extends Accion {
                 );
             break;
         }
-=======
 
-        var_dump(parse_url($url));
-        exit;
 
->>>>>>> 416aa7e7ec40701a3cbf7678a7bbc9fb0adc9333
+
+
+
         if(isset($this->extra->request)){
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
@@ -205,37 +204,16 @@ class AccionRest extends Accion {
                 $CI->rest->initialize($config);
                 $result = $CI->rest->delete($uri, $request, 'json');
             }
-
-
-
-            
-           /* print_r("<pre>");
-            print_r($_GET);
-            print_r("</pre>");
-
-            print_r("<pre>");
-            print_r($_POST);
-            print_r("</pre>");
-
-            print_r("<pre>");
-            print_r($_FILES);
-            print_r("</pre>");*/
-
-
-            //print_r("<pre>");
-            //print_r($_SERVER['SERVER_PROTOCOL']);
-            //print_r("</pre>");
-
-
-
-            /*print_r("<pre>");
-            print_r(get_headers($url, 1));
-            print_r("</pre>");
-            $result = json_encode($result);
-            print_r("<pre>");
-            print_r($result);
-            print_r("</pre>");*/
-
+            $debug = $CI->rest->debug();
+            if($debug['http_code']=='204'){
+                print_r("<pre>");
+                print_r("Respuesta 204, se ejecuto con exito pero no trajo resultado.");
+                print_r("</pre>");
+            }else{
+                print_r("<pre>");
+                print_r("No paso por la respuesta 204.");
+                print_r("</pre>");
+            }
             exit;
             $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
             log_message('info', 'IMPRIMIR Result: '.$result, FALSE);
