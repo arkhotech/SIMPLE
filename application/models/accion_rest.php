@@ -108,9 +108,17 @@ class AccionRest extends Accion {
         
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
-
+        $caracter="/";
+        $f = substr($url, -1);
+        if($caracter===$f){
+            $url = substr($url, 0, -1);
+        }
         $r=new Regla($this->extra->uri);
         $uri=$r->getExpresionParaOutput($etapa->id);
+        $l = substr($uri, 0, 1);
+        if($caracter===$l){
+            $uri = substr($uri, 1);
+        }
 
         switch ($tipoSeguridad) {
             case "HTTP_BASIC":
@@ -134,7 +142,7 @@ class AccionRest extends Accion {
                 break;
             default:
                 //NO TIENE SEGURIDAD
-                print_r("No tiene seguridad");
+                //print_r("No tiene seguridad");
                 $config = array(
                     'server'          => $url
                 );
@@ -165,12 +173,12 @@ class AccionRest extends Accion {
                 $CI->rest->header($name.": ".$value);
             }
         }
-        print_r("<pre>");
+        /*print_r("<pre>");
         print_r($config);
         print_r("</pre>");
         print_r("<pre>");
         print_r($request);
-        print_r("</pre>");        
+        print_r("</pre>");*/        
         try{
             if($this->extra->tipoMetodo == "GET"){
                 log_message('info', 'Entre a una peticion get', FALSE);
@@ -190,10 +198,37 @@ class AccionRest extends Accion {
                 $CI->rest->initialize($config);
                 $result = $CI->rest->delete($uri, $request, 'json');
             }
+
+
+
+            
+           /* print_r("<pre>");
+            print_r($_GET);
+            print_r("</pre>");
+
+            print_r("<pre>");
+            print_r($_POST);
+            print_r("</pre>");
+
+            print_r("<pre>");
+            print_r($_FILES);
+            print_r("</pre>");*/
+
+
+            //print_r("<pre>");
+            //print_r($_SERVER['SERVER_PROTOCOL']);
+            //print_r("</pre>");
+
+
+
+            /*print_r("<pre>");
+            print_r(get_headers($url, 1));
+            print_r("</pre>");
             $result = json_encode($result);
             print_r("<pre>");
             print_r($result);
-            print_r("</pre>");
+            print_r("</pre>");*/
+
             exit;
             $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
             log_message('info', 'IMPRIMIR Result: '.$result, FALSE);
