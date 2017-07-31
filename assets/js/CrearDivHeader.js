@@ -15,11 +15,11 @@ function ConsultarFunciones(){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{
-        if(validJsonR==1){
+        /*if(validJsonR==1){
             console.log("entre a validar el request");
  			$("#request").addClass('invalido');
 	    	$("#resultRequest").text("Formato requerido / json");
- 		}
+ 		}*/
 
  		if(validJsonH==1){
             console.log("entre a validar el header");
@@ -148,7 +148,7 @@ function CambioSelect(value){
 }
 
 function isJsonR(object,value,id_span){
-    try {
+   /* try {
         JSON.parse(value);
     }catch (e){
 	    object.addClass('invalido');
@@ -157,7 +157,7 @@ function isJsonR(object,value,id_span){
         return false;
     }
 	object.removeClass('invalido');
-	id_span.text("");
+	id_span.text("");*/
 	validJsonR=0;
     return true;
 }
