@@ -108,6 +108,7 @@ class AccionRest extends Accion {
         
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
+<<<<<<< HEAD
         $caracter="/";
         $f = substr($url, -1);
         if($caracter===$f){
@@ -148,6 +149,12 @@ class AccionRest extends Accion {
                 );
             break;
         }
+=======
+
+        var_dump(parse_url($url));
+        exit;
+
+>>>>>>> 416aa7e7ec40701a3cbf7678a7bbc9fb0adc9333
         if(isset($this->extra->request)){
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
