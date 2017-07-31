@@ -206,22 +206,13 @@ class AccionRest extends Accion {
             }
             $debug = $CI->rest->debug();
             if($debug['http_code']=='204'){
-                print_r("<pre>");
-                print_r("Respuesta 204, se ejecuto con exito pero no trajo resultado.");
-                print_r("</pre>");
-            }else{
-                print_r("<pre>");
-                print_r("No paso por la respuesta 204.");
-                print_r("</pre>");
+                log_message('info', 'Respuesta 204, No Content', FALSE);
             }
-            exit;
-            $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
-            log_message('info', 'IMPRIMIR Result: '.$result, FALSE);
+            $result2 = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
+            log_message('info', 'IMPRIMIR Result: '.$result2, FALSE);
 
-            $json=json_decode($result);
+            $json=json_decode($result2);
             log_message('info', 'Result: '.$json, FALSE);
-            print_r($json);
-
             foreach($json as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
                 if(!$dato)
