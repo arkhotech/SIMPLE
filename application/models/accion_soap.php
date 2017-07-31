@@ -149,9 +149,9 @@ class AccionSoap extends Accion {
                 $request=$r->getExpresionParaOutput($etapa->id);
                 //log_message('info', 'Request: '.$request, FALSE);
             }
-            print_r("<pre>");
-            print_r($request);
-            print_r("</pre>");
+            //print_r("<pre>");
+            //print_r($request);
+            //print_r("</pre>");
 
 
 /*$prueba2='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:q0="http://www.ispch.cl/" xmlns:q1="http://valida.aem.gob.cl" xmlns:q2="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -238,13 +238,13 @@ if ($err) {
 $err = $client->getError();
 $result = $client->call($this->extra->operacion, $request);
 if ($client->fault) {
-        echo '<h2>Fault</h2><pre>'; print_r($result); echo '</pre>';
+        //echo '<h2>Fault</h2><pre>'; print_r($result); echo '</pre>';
 } else {
         $err = $client->getError();
         if ($err) {
-                echo '<h2>Error</h2><pre>' . $err . '</pre>';
+                //echo '<h2>Error</h2><pre>' . $err . '</pre>';
         } else {
-                echo '<h2>Result</h2><pre>'; print_r($result); echo '</pre>';
+                //echo '<h2>Result</h2><pre>'; print_r($result); echo '</pre>';
         }
 }
 
@@ -252,7 +252,7 @@ if ($client->fault) {
 //echo '<h2>Request</h2><pre>' . htmlspecialchars($client->request, ENT_QUOTES) . '</pre>';
 //echo '<h2>Response</h2><pre>' . htmlspecialchars($client->response, ENT_QUOTES) . '</pre>';
 //echo '<h2>Debug</h2><pre>' . htmlspecialchars($client->debug_str, ENT_QUOTES) . '</pre>';
-exit;
+//exit;
        
             //$request = json_decode($array, true);
             
@@ -260,9 +260,9 @@ exit;
             //print_r($this->extra->operacion);
             //$soapclient = new nusoap_client($wsdl,'wsdl');
             //$var="http://sicexsagqa.sag.gob.cl/VyV.InicioActividades/RecepcionInicioActividades.svc?wsdl";
-            $soapclient = new nusoap_client($var,'wsdl');
-            $soapclient->setCredentials($user, $pass, 'basic');
-            $result = $soapclient->call($this->extra->operacion, $request);
+            //$soapclient = new nusoap_client($var,'wsdl');
+            //$soapclient->setCredentials($user, $pass, 'basic');
+            //$result = $soapclient->call($this->extra->operacion, $request);
             //print_r("<pre>");
             //print_r($soapclient);
             //print_r("</pre>");
