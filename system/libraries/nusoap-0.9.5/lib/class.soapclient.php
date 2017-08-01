@@ -206,6 +206,7 @@ class nusoap_client extends nusoap_base  {
 			} elseif (is_array($params)) {
 				$this->debug("serializing param array for WSDL operation $operation");
 				$payload = $this->wsdl->serializeRPCParameters($operation,'input',$params,$this->bindingType);
+				
 			} else {
 				$this->debug('params must be array or string');
 				$this->setError('params must be array or string');
