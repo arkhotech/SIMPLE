@@ -431,13 +431,13 @@ $config['tiempoconfimacioncita']=30;
  * recaptcha sitekey
  *
  */
-$config['sitekey']='6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH';
+$config['sitekey']='';
 
 /*
  * recaptcha Secret Key
  *
  */
-$config['secretkey']='6Le7zycUAAAAAIHDhvj6Z7yZwyCzrxddRJhpGNol';
+$config['secretkey']='';
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */
