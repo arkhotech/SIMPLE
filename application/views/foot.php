@@ -33,3 +33,6 @@
                 </div>
             </div>
             <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=es"></script>
+            <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDOQ2m4sss96dWd5sEs5levoURjrzMUYc&callback=initMap">
+            </script>
