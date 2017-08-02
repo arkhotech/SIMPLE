@@ -8,7 +8,11 @@
             <li>
                 <a href="<?=site_url('backend/configuracion')?>">Configuración</a> <span class="divider">/</span>
             </li>
-            <li class="active">Grupos de Usuarios</li>
+            <li class="active">Grupos de Usuarios
+                <a href="/assets/ayuda/simple/backend/configuracion/grupos.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </li>
         </ul>
         
         <p><a class="btn btn-success" href="<?=site_url('backend/configuracion/grupo_usuarios_editar')?>"><i class="icon-file icon-white"></i> Nuevo</a></p>

@@ -18,7 +18,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Formulario</th>
+            <th>Formulario
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/generacion-de-formularios.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
             <th>Acciones</th>
         </tr>
     </thead>

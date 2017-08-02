@@ -3083,13 +3083,12 @@ input[type="submit"].btn.btn-mini {
   vertical-align: middle;
   white-space: nowrap;
   *margin-left: .3em;
+  margin: 0 4px 4px 0;
 }
 .btn-group:first-child {
   *margin-left: 0;
 }
-.btn-group + .btn-group {
-  margin-left: 5px;
-}
+
 .btn-toolbar {
   font-size: 0;
   margin-top: 9px;

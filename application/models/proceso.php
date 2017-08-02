@@ -9,6 +9,7 @@ class Proceso extends Doctrine_Record {
         $this->hasColumn('height');     //alto de la grilla
         $this->hasColumn('cuenta_id');
         $this->hasColumn('proc_cont');
+        $this->hasColumn('activo');
     }
 
     function setUp() {
@@ -93,7 +94,7 @@ class Proceso extends Doctrine_Record {
         
         $conexiones=  Doctrine_Query::create()
                 ->from('Conexion c, c.TareaOrigen.Proceso p')
-                ->where('p.id = ?',$this->id)
+                ->where('p.activo=1 AND p.id = ?',$this->id)
                 ->execute();
         foreach($conexiones as $c){
             //$conexion->id=$c->identificador;
@@ -113,7 +114,7 @@ class Proceso extends Doctrine_Record {
         return Doctrine_Query::create()
             ->select('c.*')
             ->from('Conexion c, c.TareaOrigen.Proceso p1, c.TareaDestino.Proceso p2')
-            ->where('p1.id = ? OR p2.id = ?',array($this->id,$this->id))
+            ->where('(p1.activo=1 AND p2.activo=1) AND (p1.id = ? OR p2.id = ?)',array($this->id,$this->id))
             ->execute();
     }
 
@@ -261,7 +262,7 @@ class Proceso extends Doctrine_Record {
     public function getTareaInicial($usuario_id=null){
         $tareas=Doctrine_Query::create()
                 ->from('Tarea t, t.Proceso p')
-                ->where('t.inicial = 1 AND p.id = ?',$this->id)
+                ->where('t.inicial = 1 AND p.activo=1 AND p.id = ?',$this->id)
                 ->orderBy('FIELD(acceso_modo, "grupos_usuarios", "claveunica", "registrados", "publico")')
                 ->execute();
 
@@ -279,7 +280,7 @@ class Proceso extends Doctrine_Record {
     public function getCampos($tipo=null,$excluir_readonly=true){
         $query= Doctrine_Query::create()
                 ->from('Campo c, c.Formulario f, f.Proceso p')
-                ->where('p.id = ?',$this->id);
+                ->where('p.activo=1 AND p.id = ?',$this->id);
         
         if($tipo)
             $query->andWhere('c.tipo = ?',$tipo);
@@ -305,7 +306,7 @@ class Proceso extends Doctrine_Record {
     public function getVariables(){
     	return  Doctrine_Query::create()
     	->from('Accion a, a.Proceso p')
-    	->where('p.id=?', $this->id)
+    	->where('p.activo=1 AND p.id=?', $this->id)
     	->andWhere("tipo = 'variable'")
     	->execute();
     	
@@ -319,7 +320,7 @@ class Proceso extends Doctrine_Record {
     		$campos=Doctrine_Query::create()
     		->select('d.nombre')
     		->from('DatoSeguimiento d, d.Etapa.Tramite.Proceso p')
-    		->andWhere('p.id = ?',$this->id)
+    		->andWhere('p.activo=1 AND p.id = ?',$this->id)
     		->groupBy('d.nombre')
     		->execute();
     	
@@ -335,7 +336,7 @@ class Proceso extends Doctrine_Record {
 
         $tareas = Doctrine_Query::create()
                 ->from('Tarea t, t.Proceso p')
-                ->where('p.id = ? AND t.inicial = 1',$this->id)
+                ->where('p.activo=1 AND p.id = ? AND t.inicial = 1',$this->id)
                 ->execute();
 
         foreach ($tareas as $t) {
@@ -353,7 +354,7 @@ class Proceso extends Doctrine_Record {
         
         $tareas = Doctrine_Query::create()
                 ->from('Tarea t, t.Proceso p')
-                ->where('p.id = ? AND t.inicial = 1',$this->id)
+                ->where('p.activo=1 AND p.id = ? AND t.inicial = 1',$this->id)
                 ->execute();
 
         foreach ($tareas as $t) {
@@ -438,6 +439,17 @@ class Proceso extends Doctrine_Record {
     		->where("t.proceso_id = ?", $this->id)
     		->andWhere("t.ended_at IS NOT NULL")
     		->execute();
+    }
+
+    // Elimina los procesos de manera logica
+    public function delete($proceso_id) {
+
+        log_message('info', 'delete test ($proceso_id [' . $proceso_id . '])');
+
+        return Doctrine_Query::create()
+            ->update('Proceso')->set('activo', 0)
+            ->where('id = ?', $proceso_id)
+            ->execute();
     }
 
 }
