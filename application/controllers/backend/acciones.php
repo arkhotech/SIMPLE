@@ -130,9 +130,9 @@ class Acciones extends MY_BackendController {
         }
         
         if($accion->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
-                echo 'Usuario no tiene permisos para editar esta accion.';
-                exit;
-            }
+            echo 'Usuario no tiene permisos para editar esta accion.';
+            exit;
+        }
         
         $this->form_validation->set_rules('nombre','Nombre','required');
         $accion->validateForm();
@@ -182,18 +182,13 @@ class Acciones extends MY_BackendController {
         $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
         
         //Detalles
-
         $accion_array['proceso'] = $proceso->toArray(false);
         $accion_array['accion'] = $accion->toArray(false);
         unset($accion_array['accion']['proceso_id']);
-        
         $registro_auditoria->detalles=  json_encode($accion_array);
         $registro_auditoria->save();
-        
         $accion->delete();
-        
         redirect('backend/acciones/listar/'.$proceso->id);
-        
     }
     
     public function exportar($accion_id)
@@ -231,17 +226,17 @@ class Acciones extends MY_BackendController {
     }
 
     public function functions_soap(){
-        $url=$this->input->post('urlsoap');
+        $url=$this->input->post('urlsoap'); 
         $client = new SoapClient($url);
         $result['functions']=$client->__getFunctions();
         $result['types']=$client->__getTypes();
         $result['caso']=1;
-        // $result['functions'] = str_replace("\\n", " ", $result['functions']);
-        // $result['functions'] = str_replace("\\r", " ", $result['functions']);
-        // $result['types'] = str_replace("\\n", " ", $result['types']);
-        // $result['types'] = str_replace("\\r", " ", $result['types']);
-        // $result = str_replace("\\n", " ", $result);
-        // $result = str_replace("\\r", " ", $result);
+        $result['functions'] = str_replace("\\n", " ", $result['functions']);
+        $result['functions'] = str_replace("\\r", " ", $result['functions']);
+        $result['types'] = str_replace("\\n", " ", $result['types']);
+        $result['types'] = str_replace("\\r", " ", $result['types']);
+        $result = str_replace("\\n", " ", $result);
+        $result = str_replace("\\r", " ", $result);
         $array = json_encode($result);
         print_r($array);
         exit;
@@ -274,12 +269,6 @@ class Acciones extends MY_BackendController {
                 $result['targetNamespace'] = $xml['targetNamespace'];
                 $result['functions']=$client->__getFunctions();
                 $result['types']=$client->__getTypes();
-                // $result['functions'] = str_replace("\\n", " ", $result['functions']);
-                // $result['functions'] = str_replace("\\r", " ", $result['functions']);
-                // $result['types'] = str_replace("\\n", " ", $result['types']);
-                // $result['types'] = str_replace("\\r", " ", $result['types']);
-                // $result = str_replace("\\n", " ", $result);
-                // $result = str_replace("\\r", " ", $result);
                 $array = json_encode($result);
                 print_r($array);
                 exit;

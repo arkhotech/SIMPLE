@@ -5207,6 +5207,7 @@ class wsdl extends nusoap_base {
 	 */
 	function getOperationData($operation, $bindingType = 'soap')
 	{
+		//log_message('info', 'Esta es mi operacion2: '.$this->varDump($operation), FALSE);
 		if ($bindingType == 'soap') {
 			$bindingType = 'http://schemas.xmlsoap.org/wsdl/soap/';
 		} elseif ($bindingType == 'soap12') {
@@ -5222,6 +5223,7 @@ class wsdl extends nusoap_base {
 					// note that we could/should also check the namespace here
 					if ($operation == $bOperation) {
 						$opData = $this->bindings[ $portData['binding'] ]['operations'][$operation];
+					    //log_message('info', 'Esta es mi data2: '.$this->varDump($opData), FALSE);
 					    return $opData;
 					} 
 				} 
@@ -7360,9 +7362,12 @@ class nusoap_client extends nusoap_base  {
 			if (is_string($params)) {
 				$this->debug("serializing param string for WSDL operation $operation");
 				$payload = $params;
+				//log_message('info', 'Este es mi payload: '.$this->varDump($params), FALSE);
 			} elseif (is_array($params)) {
 				$this->debug("serializing param array for WSDL operation $operation");
+				log_message('info', 'payload: '. $this->varDump($payload), FALSE);
 				$payload = $this->wsdl->serializeRPCParameters($operation,'input',$params,$this->bindingType);
+				log_message('info', 'payload2: '. $this->varDump($payload), FALSE);
 			} else {
 				$this->debug('params must be array or string');
 				$this->setError('params must be array or string');

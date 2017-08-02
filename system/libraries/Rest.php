@@ -325,39 +325,39 @@ class REST
     {
         $request = $this->_ci->curl->debug_request();
 
-        echo "=============================================<br/>\n";
+        /*echo "=============================================<br/>\n";
         echo "<h2>REST Test</h2>\n";
         echo "=============================================<br/>\n";
         echo "<h3>Request</h3>\n";
         echo $request['url']."<br/>\n";
         echo "=============================================<br/>\n";
-        echo "<h3>Response</h3>\n";
+        echo "<h3>Response</h3>\n";*/
 
         if ($this->response_string)
         {
-            echo "<code>".nl2br(htmlentities($this->response_string))."</code><br/>\n\n";
+            //echo "<code>".nl2br(htmlentities($this->response_string))."</code><br/>\n\n";
         }
 
         else
         {
-            echo "No response<br/>\n\n";
+            //echo "No response<br/>\n\n";
         }
 
-        echo "=============================================<br/>\n";
+        //echo "=============================================<br/>\n";
 
         if ($this->_ci->curl->error_string)
         {
-            echo "<h3>Errors</h3>";
+            /*echo "<h3>Errors</h3>";
             echo "<strong>Code:</strong> ".$this->_ci->curl->error_code."<br/>\n";
             echo "<strong>Message:</strong> ".$this->_ci->curl->error_string."<br/>\n";
-            echo "=============================================<br/>\n";
+            echo "=============================================<br/>\n";*/
         }
 
-        echo "<h3>Call details</h3>";
+        /*echo "<h3>Call details</h3>";
         echo "<pre>";
         print_r($this->_ci->curl->info);
-        echo "</pre>";
-
+        echo "</pre>";*/
+        return $this->_ci->curl->info;
     }
 
 

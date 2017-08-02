@@ -4,24 +4,17 @@ require_once('accion.php');
 class AccionRest extends Accion {
 
     public function displaySecurityForm($proceso_id) {
-
-        log_message('info', 'displaySecurityForm id proceso: '.$proceso_id, FALSE);
-
         $data = Doctrine::getTable('Proceso')->find($proceso_id);
-
-        log_message('info', 'Obtiene proceso desde bd: '.$data->id, FALSE);
-
         $conf_seguridad = $data->Admseguridad;
-
         $display = '
             <p>
                 Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados como variables.
             </p>
         ';
-
-        $display.= '<label>URL</label>';
-        $display.='<input type="text" class="input-xxlarge" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
-
+        $display.= '<label>Endpoint</label>';
+        $display.='<input type="text" class="input-xxlarge" placeholder="Server" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
+        $display.= '<label>Resource</label>';
+        $display.='<input type="text" class="input-xxlarge" placeholder="Uri" name="extra[uri]" value="' . ($this->extra ? $this->extra->uri : '') . '" />';
         $display.='
                 <label>Método</label>
                 <select id="tipoMetodo" name="extra[tipoMetodo]">
@@ -47,7 +40,6 @@ class AccionRest extends Accion {
                         $display.='<option value="DELETE">DELETE</option>';
                     }
         $display.='</select>';
-
         $display.='
             <div class="col-md-12" id="divObject" style="display:none;">
                 <label>Request</label>
@@ -56,8 +48,6 @@ class AccionRest extends Accion {
                 <span id="resultRequest" class="spanError"></span>
                 <br /><br />
             </div>';
-
-
         $display.='
             <div class="col-md-12">
                 <label>Header</label>
@@ -66,7 +56,6 @@ class AccionRest extends Accion {
                 <span id="resultHeader" class="spanError"></span>
                 <br /><br />
             </div>';
-
         $display.='
                 <label>Seguridad</label>
                 <select id="tipoSeguridad" name="extra[idSeguridad]">';
@@ -79,38 +68,77 @@ class AccionRest extends Accion {
                             $display.='<option value="'.$seg->id.'">'.$seg->institucion.' - '.$seg->servicio.'</option>';
                         }
                 }
-                $display.='</select>';
-
+        $display.='</select>';
         return $display;
     }
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[url]', 'URL', 'required');
-        $CI->form_validation->set_rules('extra[header]', 'Header', 'required');
+        $CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
+        $CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
-
-        log_message('info', 'ejecutar id idseguridad: '.$this->extra->idSeguridad, FALSE);
-
         $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
-
-        log_message('info', 'Obtiene seguridad desde bd: '.$data->id, FALSE);
-
+        $tipoSeguridad=$data->extra->tipoSeguridad;
+        $user = $data->extra->user;
+        $pass = $data->extra->pass;
+        $ApiKey = $data->extra->apikey;
+        $NameKey='';
+        
+        if(strlen($data->extra->namekey)>3){
+            $NameKey = $data->extra->namekey;
+        }
+        
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
 
-        log_message('info', 'Ejecutar rest url: '.$this->extra->url, FALSE);
-        log_message('info', 'Ejecutar rest tipoMetodo: '.$this->extra->tipoMetodo, FALSE);
+        $caracter="/";
+        $f = substr($url, -1);
+        if($caracter===$f){
+            $url = substr($url, 0, -1);
+        }
+        $r=new Regla($this->extra->uri);
+        $uri=$r->getExpresionParaOutput($etapa->id);
+        $l = substr($uri, 0, 1);
+        if($caracter===$l){
+            $uri = substr($uri, 1);
+        }
+        // Se declara el tipo de seguridad segun sea el caso
+        switch ($tipoSeguridad) {
+            case "HTTP_BASIC":
+                //Seguridad basic
+                $config = array(
+                    'server'          => $url,
+                    'http_user'       => $user,
+                    'http_pass'       => $pass,
+                    'http_auth'       => 'basic'
+                );
+                break;
+            case "API_KEY":
+                //Seguridad api key
+                $config = array(
+                    'server'          => $url,
+                    'api_key'         => $ApiKey,
+                    'api_name'        => $NameKey
+                );
+                break;
+            case "OAUTH2":
+                //SEGURIDAD OAUTH2
+                $config="Config de asuth 2";;
+                break;
+            default:
+                //NO TIENE SEGURIDAD
+                $config = array(
+                    'server'          => $url
+                );
+            break;
+        }
+        //obtenemos el Request
         if(isset($this->extra->request)){
-            log_message('info', 'Ejecutar rest request: '.$this->extra->request, FALSE);
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
-            log_message('info', 'Request: '.$request, FALSE);
         }
-
-
         //Hacemos encoding a la url
         $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
             $key=$matches[1];
@@ -118,10 +146,8 @@ class AccionRest extends Accion {
             return $key.urlencode($value);
         },
         $url);
-
-        log_message('info', 'Inicializando rest client', FALSE);
         $CI = & get_instance();
-
+        //obtenemos el Headers si lo hay
         if(isset($this->extra->header)){
             log_message('info', 'Ejecutar rest headers: '.$this->extra->header, FALSE);
             $r=new Regla($this->extra->header);
@@ -131,29 +157,36 @@ class AccionRest extends Accion {
             foreach ($headers as $name => $value) {
                 $CI->rest->header($name.": ".$value);
             }
-        }
-
+        }       
         try{
+            // Se ejecuta la llamada segun el metodo
             if($this->extra->tipoMetodo == "GET"){
-                log_message('info', 'Lllamando GET', FALSE);
-                $result = $CI->rest->get($url, array(), 'json');
+                log_message('info', 'Entre a una peticion get', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->get($uri, array() , 'json');
             }else if($this->extra->tipoMetodo == "POST"){
-                log_message('info', 'Lllamando POST', FALSE);
-                $result = $CI->rest->post($url, $request, 'json');
+                log_message('info', 'Llamando POST', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->post($uri, $request, 'json');
             }else if($this->extra->tipoMetodo == "PUT"){
-                log_message('info', 'Lllamando PUT', FALSE);
-                $result = $CI->rest->put($url, $request, 'json');
+                log_message('info', 'Llamando PUT', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->put($uri, $request, 'json');
             }else if($this->extra->tipoMetodo == "DELETE"){
-                log_message('info', 'Lllamando DELETE', FALSE);
-                $result = $CI->rest->delete($url, array(), 'json');
+                log_message('info', 'Llamando DELETE', FALSE);
+                $CI->rest->initialize($config);
+                $result = $CI->rest->delete($uri, $request, 'json');
             }
-
-            $result = json_encode($result);
+            log_message('info', 'sali del get', FALSE);
+            //Se obtiene la codigo de la cabecera HTTP
+            $debug = $CI->rest->debug();
+            if($debug['http_code']=='204'){
+                log_message('info', 'Respuesta 204, No Content'. $this->varDump($result), FALSE);
+            }
+            log_message('info', 'Result: '. $this->varDump($result), FALSE);
             $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
-            log_message('info', 'Result: '.$result, FALSE);
-
+            // Se codifica la respuesta a formato json
             $json=json_decode($result);
-
             foreach($json as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
                 if(!$dato)
@@ -172,7 +205,12 @@ class AccionRest extends Accion {
             $dato->etapa_id=$etapa->id;
             $dato->save();
         }
-
     }
-
+    function varDump($data){
+        ob_start();
+        var_dump($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 }

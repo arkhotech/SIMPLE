@@ -57,8 +57,10 @@ class Seguridad extends Doctrine_Record {
 
         $display.='
             <div class="col-md-12" id="DivKey" style="display:none;">
-                <label>Llave de aplicacion</label>
-                <input type="text" id="key" name="extra[key]" class="" value="'.(isset($this->extra->key) ? $this->extra->key : '').'">
+                <label>Llave de aplicación (Api key)</label>
+                <input type="text" id="apikey" name="extra[apikey]" class="" value="'.(isset($this->extra->apikey) ? $this->extra->apikey : '').'">
+                <label>Nombre de aplicación (Name key)</label>
+                <input type="text" id="namekey" name="extra[namekey]" class="" value="'.(isset($this->extra->namekey) ? $this->extra->namekey : '').'">            
             </div>';
         return $display;
     }

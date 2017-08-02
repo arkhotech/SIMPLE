@@ -76,7 +76,7 @@ class Admseguridad extends MY_BackendController {
         $this->form_validation->set_rules('extra[tipoSeguridad]','Tipo de seguridad','required');
         switch ($tipoSeguridad){
             case 'API_KEY':
-                $this->form_validation->set_rules('extra[key]','Key','required');
+                $this->form_validation->set_rules('extra[apikey]','Llave de aplicación','required');
                 break;
             case "HTTP_BASIC": case "OAUTH2":
                 $this->form_validation->set_rules('extra[user]','user','required');
