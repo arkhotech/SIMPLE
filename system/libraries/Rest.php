@@ -52,6 +52,15 @@ class REST
 
     protected $send_cookies = null;
     protected $response_string;
+    
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    // nueva variable para el registro de timeout
+    protected $timeout;
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
 
     function __construct($config = array())
     {
@@ -85,6 +94,11 @@ class REST
      * @author  Chris Kacerguis
      * @version 1.0
      */
+    
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    // Funcion modificada para enviar el timeout
     public function initialize($config)
     {
         $this->rest_server = @$config['server'];
@@ -93,7 +107,7 @@ class REST
         {
             $this->rest_server .= '/';
         }
-        
+        isset($config['timeout']) && $this->timeout = $config['timeout'];
         isset($config['send_cookies']) && $this->send_cookies = $config['send_cookies'];
         
         isset($config['api_name']) && $this->api_name = $config['api_name'];
@@ -105,9 +119,33 @@ class REST
 
         isset($config['ssl_verify_peer']) && $this->ssl_verify_peer = $config['ssl_verify_peer'];
         isset($config['ssl_cainfo']) && $this->ssl_cainfo = $config['ssl_cainfo'];
-
     }
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
 
+
+    // Funcion initialize Original
+    /*public function initialize($config)
+    {
+        $this->rest_server = @$config['server'];
+
+        if (substr($this->rest_server, -1, 1) != '/')
+        {
+            $this->rest_server .= '/';
+        }
+        isset($config['send_cookies']) && $this->send_cookies = $config['send_cookies'];
+        
+        isset($config['api_name']) && $this->api_name = $config['api_name'];
+        isset($config['api_key']) && $this->api_key = $config['api_key'];
+        
+        isset($config['http_auth']) && $this->http_auth = $config['http_auth'];
+        isset($config['http_user']) && $this->http_user = $config['http_user'];
+        isset($config['http_pass']) && $this->http_pass = $config['http_pass'];
+
+        isset($config['ssl_verify_peer']) && $this->ssl_verify_peer = $config['ssl_verify_peer'];
+        isset($config['ssl_cainfo']) && $this->ssl_cainfo = $config['ssl_cainfo'];
+    }*/
     /**
      * get
      *
@@ -227,7 +265,78 @@ class REST
      * @author  Phil Sturgeon
      * @version 1.0
      */
+    
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    //funcion modificada para el timeout
     protected function _call($method, $uri, $params = array(), $format = NULL)
+    {
+        if ($format !== NULL)
+        {
+            $this->format($format);
+        }
+
+        $this->http_header('Accept', $this->mime_type);
+
+        // Initialize cURL session
+        $this->_ci->curl->create($this->rest_server.$uri);
+
+
+        // If using ssl set the ssl verification value and cainfo
+        // contributed by: https://github.com/paulyasi
+        if ($this->ssl_verify_peer === FALSE)
+        {
+            $this->_ci->curl->ssl(FALSE);
+        }
+        elseif ($this->ssl_verify_peer === TRUE)
+        {
+            $this->ssl_cainfo = getcwd() . $this->ssl_cainfo;
+            $this->_ci->curl->ssl(TRUE, 2, $this->ssl_cainfo);
+        }
+
+        // If authentication is enabled use it
+        if ($this->http_auth != '' && $this->http_user != '')
+        {
+            $this->_ci->curl->http_login($this->http_user, $this->http_pass, $this->http_auth);
+        }
+        
+        // If we have an API Key, then use it
+        if ($this->api_key != '')
+        {
+            $this->_ci->curl->http_header($this->api_name, $this->api_key);
+        }
+
+        // Send cookies with curl
+        if ($this->send_cookies != '')
+        {
+                
+            $this->_ci->curl->set_cookies( $_COOKIE );      
+        
+        }
+        
+        // Set the Content-Type (contributed by https://github.com/eriklharper)
+        $this->http_header('Content-type', $this->mime_type);
+        
+
+        // We still want the response even if there is an error code over 400
+        $this->_ci->curl->option('failonerror', FALSE);
+
+        // Call the correct method with parameters
+        $this->_ci->curl->{$method}($params);
+
+        // Execute and return the response from the REST server
+        $response = $this->_ci->curl->execute($this->timeout);
+        log_message('info', 'response desde el  REST CLIENT: '.$this->varDump($response), FALSE);         
+        // Format and return
+        return $this->_format_response($response);
+    }
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+
+    //funcion original
+    /*protected function _call($method, $uri, $params = array(), $format = NULL)
     {
         if ($format !== NULL)
         {
@@ -287,7 +396,11 @@ class REST
 
         // Format and return
         return $this->_format_response($response);
-    }
+    }*/
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+
 
     /**
      * initialize
@@ -324,6 +437,29 @@ class REST
     public function debug()
     {
         $request = $this->_ci->curl->debug_request();
+        if ($this->response_string)
+        {
+            $result['response_string']=$this->response_string;
+        }
+
+        else
+        {
+            $result['response_string']="";
+        }
+        if ($this->_ci->curl->error_string)
+        {
+            $result['error_code']=$this->_ci->curl->error_code;
+            $result['error_string']=$this->_ci->curl->error_string;
+        }
+        $result['info']=$this->_ci->curl->info;
+        return $result;
+    }
+
+
+
+    /*public function debug()
+    {
+        $request = $this->_ci->curl->debug_request();
 
         echo "=============================================<br/>\n";
         echo "<h2>REST Test</h2>\n";
@@ -358,9 +494,7 @@ class REST
         print_r($this->_ci->curl->info);
         echo "</pre>";
 
-    }
-
-
+    }*/
     /**
      * status
      *
@@ -544,6 +678,15 @@ class REST
         $populated = array();
         eval("\$populated = \"$string\";");
         return $populated;
+    }
+
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
     }
 
 }

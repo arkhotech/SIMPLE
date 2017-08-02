@@ -284,8 +284,79 @@ class Curl {
 		return $this;
 	}
 
+	////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+	// Funcion Modificada para recibir timeout
 	// End a session and return the results
-	public function execute()
+	public function execute($timeout)
+	{
+		// Set two default options, and merge any extra ones in
+		if ( ! isset($this->options[CURLOPT_TIMEOUT]))
+		{
+			$this->options[CURLOPT_TIMEOUT] = $timeout;
+		}
+		if ( ! isset($this->options[CURLOPT_RETURNTRANSFER]))
+		{
+			$this->options[CURLOPT_RETURNTRANSFER] = TRUE;
+		}
+		if ( ! isset($this->options[CURLOPT_FAILONERROR]))
+		{
+			$this->options[CURLOPT_FAILONERROR] = TRUE;
+		}
+		// Only set follow location if not running securely
+		if ( ! ini_get('safe_mode') && ! ini_get('open_basedir'))
+		{
+			// Ok, follow location is not set already so lets set it to true
+			if ( ! isset($this->options[CURLOPT_FOLLOWLOCATION]))
+			{
+				$this->options[CURLOPT_FOLLOWLOCATION] = TRUE;
+			}
+		}
+
+		if ( ! empty($this->headers))
+		{
+			$this->option(CURLOPT_HTTPHEADER, $this->headers);
+		}
+		$this->options();
+
+		// Execute the request & and hide all output
+		$this->response = curl_exec($this->session);
+		$this->info = curl_getinfo($this->session);
+		// Request failed
+		if ($this->response === FALSE)
+		{
+			$errno = curl_errno($this->session);
+			$error = curl_error($this->session);
+			log_message('info', 'error: '.$error, FALSE); 
+
+			curl_close($this->session);
+			$this->set_defaults();
+
+			$this->error_code = $errno;
+			$this->error_string = $error;
+
+			return $error;
+			//return FALSE;
+		}
+
+		// Request successful
+		else
+		{
+			curl_close($this->session);
+			$this->last_response = $this->response;
+			$this->set_defaults();
+			return $this->last_response;
+		}
+	}
+	////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+    ////////////////////////////////////////////////
+
+
+	// Funcion original
+	// End a session and return the results
+	/*public function execute()
 	{
 		// Set two default options, and merge any extra ones in
 		if ( ! isset($this->options[CURLOPT_TIMEOUT]))
@@ -345,7 +416,7 @@ class Curl {
 			$this->set_defaults();
 			return $this->last_response;
 		}
-	}
+	}*/
 
 	public function is_enabled()
 	{

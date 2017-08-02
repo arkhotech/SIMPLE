@@ -51,6 +51,9 @@ class AccionRest extends Accion {
                     }
         $display.='</select>';
 
+        $display.= '<label>Timeout</label>';
+        $display.='<input type="text" placeholder="Tiempo en segundos..." name="extra[timeout]" value="' . ($this->extra ? $this->extra->timeout : '') . '" />';
+
         $display.='
             <div class="col-md-12" id="divObject" style="display:none;">
                 <label>Request</label>
@@ -100,12 +103,9 @@ class AccionRest extends Accion {
         $user = $data->extra->user;
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
-        $NameKey='';
-        
-        if(strlen($data->extra->namekey)>3){
-            $NameKey = $data->extra->namekey;
-        }
-        
+        ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
+        ($this->extra->timeout ? $timeout = $this->extra->timeout : $timeout = 30);
+
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
         $caracter="/";
@@ -123,6 +123,7 @@ class AccionRest extends Accion {
         switch ($tipoSeguridad) {
             case "HTTP_BASIC":
                 $config = array(
+                    'timeout'         => $timeout,
                     'server'          => $url,
                     'http_user'       => $user,
                     'http_pass'       => $pass,
@@ -131,6 +132,7 @@ class AccionRest extends Accion {
                 break;
             case "API_KEY":
                 $config = array(
+                    'timeout'         => $timeout,
                     'server'          => $url,
                     'api_key'         => $ApiKey,
                     'api_name'        => $NameKey
@@ -141,9 +143,9 @@ class AccionRest extends Accion {
                 $config="Config de asuth 2";;
                 break;
             default:
-                //NO TIENE SEGURIDAD
-                //print_r("No tiene seguridad");
+                //SIN SEGURIDAD
                 $config = array(
+                    'timeout'         => $timeout,
                     'server'          => $url
                 );
             break;
@@ -164,80 +166,45 @@ class AccionRest extends Accion {
         $CI = & get_instance();
 
         if(isset($this->extra->header)){
-            log_message('info', 'Ejecutar rest headers: '.$this->extra->header, FALSE);
             $r=new Regla($this->extra->header);
             $header=$r->getExpresionParaOutput($etapa->id);
-            log_message('info', 'headers: '.$header, FALSE);
             $headers = json_decode($header);
             foreach ($headers as $name => $value) {
                 $CI->rest->header($name.": ".$value);
             }
-        }
-        /*print_r("<pre>");
-        print_r($config);
-        print_r("</pre>");
-        print_r("<pre>");
-        print_r($request);
-        print_r("</pre>");*/        
+        } 
+    
         try{
             if($this->extra->tipoMetodo == "GET"){
-                log_message('info', 'Entre a una peticion get', FALSE);
                 $CI->rest->initialize($config);
                 $result = $CI->rest->get($uri, array() , 'json');
             }else if($this->extra->tipoMetodo == "POST"){
-                log_message('info', 'Llamando POST', FALSE);
                 $CI->rest->initialize($config);
                 $result = $CI->rest->post($uri, $request, 'json');
             }else if($this->extra->tipoMetodo == "PUT"){
-                log_message('info', 'Llamando PUT', FALSE);
                 $CI->rest->initialize($config);
                 $result = $CI->rest->put($uri, $request, 'json');
-            }else if($this->extra->tipoMetodo == "DELETE"){
-                log_message('info', 'Llamando DELETE', FALSE);
-                //Falta capturar el codigo http de la cabecera.//  
+            }else if($this->extra->tipoMetodo == 'DELETE'){
                 $CI->rest->initialize($config);
                 $result = $CI->rest->delete($uri, $request, 'json');
             }
-
-
-
-            
-           /* print_r("<pre>");
-            print_r($_GET);
-            print_r("</pre>");
-
-            print_r("<pre>");
-            print_r($_POST);
-            print_r("</pre>");
-
-            print_r("<pre>");
-            print_r($_FILES);
-            print_r("</pre>");*/
-
-
-            //print_r("<pre>");
-            //print_r($_SERVER['SERVER_PROTOCOL']);
-            //print_r("</pre>");
-
-
-
-            /*print_r("<pre>");
-            print_r(get_headers($url, 1));
-            print_r("</pre>");
-            $result = json_encode($result);
-            print_r("<pre>");
-            print_r($result);
-            print_r("</pre>");*/
-
-            exit;
-            $result = "{\"response_".$this->extra->tipoMetodo."\":".$result."}";
-            log_message('info', 'IMPRIMIR Result: '.$result, FALSE);
-
-            $json=json_decode($result);
-            log_message('info', 'Result: '.$json, FALSE);
-            print_r($json);
-
-            foreach($json as $key=>$value){
+            $debug = $CI->rest->debug();
+            if($debug['info']['http_code']=='204'){
+                $result2['code']= '204';
+                $result2['des_code']= 'No Content';
+            }else if($debud['info']['http_code']=='0'){
+                $result2['code']= $debug['error_code'];
+                $result2['des_code']= $debug['response_string'];
+            }else{
+                if(!is_object($result)) {
+                    $result2['code']= '2';
+                    $result2['des_code']= $debug['response_string'];
+                }else{
+                    $result2 = get_object_vars($result); 
+                }  
+            }
+            $response["response".$this->extra->tipoMetodo]=$result2;
+            foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
                 if(!$dato)
                     $dato=new DatoSeguimiento();
@@ -255,7 +222,14 @@ class AccionRest extends Accion {
             $dato->etapa_id=$etapa->id;
             $dato->save();
         }
-
+    }
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
     }
 
 }
