@@ -108,6 +108,7 @@ class AccionRest extends Accion {
 
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
+
         $caracter="/";
         $f = substr($url, -1);
         if($caracter===$f){
@@ -140,7 +141,7 @@ class AccionRest extends Accion {
                 break;
             case "OAUTH2":
                 //SEGURIDAD OAUTH2
-                $config="Config de asuth 2";;
+                $config="Config de auth 2";;
                 break;
             default:
                 //SIN SEGURIDAD
@@ -150,6 +151,7 @@ class AccionRest extends Accion {
                 );
             break;
         }
+
         if(isset($this->extra->request)){
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
