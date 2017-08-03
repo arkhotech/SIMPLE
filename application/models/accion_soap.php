@@ -92,6 +92,7 @@ class AccionSoap extends Accion {
         switch ($tipoSeguridad) {
             case "HTTP_BASIC":
                 //SEGURIDAD BASIC
+                log_message('info', 'Setea seguridad BASIC', FALSE);
                 $client->setCredentials($user, $pass, 'basic');
                 break;
             case "API_KEY":
@@ -125,15 +126,22 @@ class AccionSoap extends Accion {
             }
             $err = $client->getError();
             //Se EJECUTA el llamado Soap
-            $result = $client->call($this->extra->operacion, $request);
-            //log_message('info', 'Result: '. $this->varDump($result), FALSE);
+            log_message('info', 'Operacion: '. $this->extra->operacion, FALSE);
+            log_message('info', 'OperacionData: '. $this->varDump($client->getOperationData($this->extra->operacion)), FALSE);
+            log_message('info', 'Request: '. $this->varDump($request), FALSE);
+            //$result = $client->call($this->extra->operacion, $request);
+            $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
+            log_message('info', 'Result: '. $this->varDump($result), FALSE);
 
+            log_message('info', 'Response: '. $this->varDump($client->response), FALSE);
+            log_message('info', 'Response: '. $this->varDump($client->responseData), FALSE);
+            log_message('info', 'Debug: '. $this->varDump($client->getDebug()), FALSE);
             if ($client->fault) {
-                //log_message('info', 'Fault: '. $this->varDump($result), FALSE);
+                log_message('info', 'Fault: '. $this->varDump($result), FALSE);
             }else{
                 $err = $client->getError();
                 if ($err) {
-                    //log_message('info', 'Error: '. $this->varDump($err), FALSE);
+                    log_message('info', 'Error: '. $this->varDump($err), FALSE);
                 }
             }
             /*log_message('info', 'Response: '. $this->varDump($client->response), FALSE);
@@ -189,15 +197,14 @@ class AccionSoap extends Accion {
                 
                 log_message('info', 'TITULO: '.$this->varDump($key), FALSE); 
                 log_message('info', 'VALOR: '.$this->varDump($value), FALSE); 
-                $array = json_encode($value, true);
-                log_message('info', 'CODIFICADO: '.$this->varDump($array), FALSE); 
+                $array = json_encode(json_decode($value, true));
             }
             
 
             //$array = json_decode(json_encode($result['cuerpo']), true);
             //$array = get_object_vars($result['cuerpo']);
             //log_message('info', 'array: '.$this->varDump($array), FALSE); 
-            //foreach($array as $key=>$value){
+            foreach($array as $key=>$value){
         
                 //log_message('info', 'value: '.$this->varDump($key), FALSE); 
                 //$array = json_decode(json_encode($d), true);
@@ -210,7 +217,7 @@ class AccionSoap extends Accion {
                 $dato->valor=$value;
                 $dato->etapa_id=$etapa->id;
                 $dato->save();*/
-            //}
+            }
         }catch (Exception $e){
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
             if(!$dato)

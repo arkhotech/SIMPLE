@@ -17,11 +17,25 @@
 <form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>
         <?php if(!$edit):?>
-            <legend> Crear Acción</legend>
+            <legend> Crear Acción
         <?php endif; ?>
         <?php if($edit):?>
-            <legend> Editar Acción</legend>
+            <legend> Editar Acción
         <?php endif; ?>
+        <?php if ($tipo == "enviar_correo") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#enviar_correo" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "webservice") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "variable") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#variable" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } ?>
+        </legend>
         <div class="validacion"></div>
         <?php if(!$edit):?>
         <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" />

@@ -23,21 +23,25 @@ if(isset($editar) && $editar){
 <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <div class="modal-header">
     <button class="close" data-dismiss="modal">×</button>
-    <h3><?=$title_form ?></h3>
+    <h3><?=$title_form ?>
+        <a href="/assets/ayuda/simple/backend/agenda-agregar.html" target="_blank">
+            <span class="glyphicon glyphicon-info-sign" style="font-size: 16px;"></span>
+        </a>
+    </h3>
 </div>
 <div class="modal-body">
     <div class="validacion valcal"></div>
     <form id="formeditagenda" class="ajaxForm2 frmagenda" method="POST" action="<?= $service ?>">
         <input type="hidden" id="namepertenece" name="namepertenece" />
         <?php
-        if(isset($editar) && $editar){
-            $idagenda=(isset($id) && is_numeric($id))?$id:0;
+        if (isset($editar) && $editar) {
+            $idagenda = (isset($id) && is_numeric($id)) ? $id : 0;
             echo '<input id="codagenda" name="codagenda" type="hidden" value="'.$idagenda.'" />';
             echo '<div class="alert alert-warning">
                   <strong>Advertencia!</strong> "Recuerde que la edici&oacute;n de una agenda no eliminar&aacute; citas futuras".
                 </div>';
-        }else{
-            $idagenda=0;
+        } else {
+            $idagenda = 0;
             echo '<input id="codagenda" name="codagenda" type="hidden" value="0" />';
         }
         ?>

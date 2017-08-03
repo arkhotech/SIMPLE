@@ -19,4 +19,4 @@ composer.lock
 composer.phar
 vendor
 .DS_Store
-application/logs/*
+application/logs/log-*.php

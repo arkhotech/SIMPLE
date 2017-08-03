@@ -8,12 +8,18 @@
             <li>
                 <a href="<?= site_url('backend/configuracion') ?>">Configuración</a> <span class="divider">/</span>
             </li>
-            <li class="active">Mi Sitio</li>
+            <li class="active">Mi Sitio
+                <a href="/assets/ayuda/simple/backend/configuracion/inicial.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </li>
         </ul>
 
         <form class="ajaxForm" method="post" action="<?= site_url('backend/configuracion/misitio_form/') ?>">
             <fieldset>
-                <legend>Editar información de mi sitio</legend>
+                <legend>
+                    Editar información de mi sitio
+                </legend>
                 <div class="validacion"></div>
                 <label>Nombre</label>
                 <input disabled type="text" name="nombre" class="input-xxlarge" value="<?=$cuenta->nombre?>"/>

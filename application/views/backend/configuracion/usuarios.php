@@ -8,7 +8,12 @@
             <li>
                 <a href="<?=site_url('backend/configuracion')?>">Configuración</a> <span class="divider">/</span>
             </li>
-            <li class="active">Usuarios</li>
+            <li class="active">
+                Usuarios
+                <a href="/assets/ayuda/simple/backend/configuracion/usuarios.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </li>
         </ul>
         
         <?php $this->load->view('messages') ?>
