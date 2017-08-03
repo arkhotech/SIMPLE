@@ -173,9 +173,9 @@ class AccionRest extends Accion {
                 $CI->rest->initialize($config);
                 $result = $CI->rest->delete($uri, $request, 'json');
             }
-            log_message('info', 'sali del get', FALSE);
             //Se obtiene la codigo de la cabecera HTTP
             $debug = $CI->rest->debug();
+
             if($debug['info']['http_code']=='204'){
                 $result2['code']= '204';
                 $result2['des_code']= 'No Content';

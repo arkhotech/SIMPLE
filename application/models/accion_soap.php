@@ -16,6 +16,8 @@ class AccionSoap extends Accion {
                     <a class="btn btn-default" id="btn-consultar" ><i class="icon-search icon"></i> Consultar</a>
                     <a class="btn btn-default" href="#modalImportarWsdl" data-toggle="modal" ><i class="icon-upload icon"></i> Importar</a>
                 </div>';
+        $display.= '<label>Timeout</label>';
+        $display.='<input type="text" placeholder="Tiempo en segundos..." name="extra[timeout]" value="' . ($this->extra ? $this->extra->timeout : '') . '" />';
         $display.='
                 <div id="divMetodos" class="col-md-12">
                     <label>Métodos</label>
@@ -32,9 +34,9 @@ class AccionSoap extends Accion {
         $display.='            
             <div class="col-md-12">
                 <label>Request</label>
-                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="Request" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
                 <br />
-                <span id="resultRequest" class="spanError"></span>
+                <!-- <span id="resultRequest" class="spanError"></span> -->
                 <br /><br />
             </div>
            <div class="col-md-12">
@@ -85,23 +87,27 @@ class AccionSoap extends Accion {
         $user = $data->extra->user;
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
-        $NameKey='';
+        
         //Se declara el cliente soap
         $client = new nusoap_client($this->extra->wsdl, 'wsdl');
+        
+        // Se asigna valor de timeout
+        $client->soap_defencoding = 'UTF-8';
+        $client->decode_utf8 = true;
+        $client->timeout = $this->extra->timeout;
+        $client->response_timeout = $this->extra->timeout;
+        
         //Se instancia el tipo de seguridad segun sea el caso
         switch ($tipoSeguridad) {
             case "HTTP_BASIC":
                 //SEGURIDAD BASIC
-                log_message('info', 'Setea seguridad BASIC', FALSE);
                 $client->setCredentials($user, $pass, 'basic');
                 break;
             case "API_KEY":
                 //SEGURIDAD API KEY
                 $header = 
                 "<SECINFO>
-                  <USERNAME>XXXXX</USERNAME>
-                  <PASSWORD>XXXXX</PASSWORD>
-                  <KEY>XXXXXXXXXXXXXXXXX</KEY>
+                  <KEY>".$this->extra->apikey."</KEY>
                 </SECINFO>";
                 $client->setHeaders($header);
                 break;
@@ -121,111 +127,37 @@ class AccionSoap extends Accion {
                 $r=new Regla($this->extra->request);
                 $request=$r->getExpresionParaOutput($etapa->id);
             }
-            if ($err) {
-                //log_message('info', 'Error: '. $this->varDump($err), FALSE);
-            }
-            $err = $client->getError();
+            
             //Se EJECUTA el llamado Soap
-            log_message('info', 'Operacion: '. $this->extra->operacion, FALSE);
-            log_message('info', 'OperacionData: '. $this->varDump($client->getOperationData($this->extra->operacion)), FALSE);
-            log_message('info', 'Request: '. $this->varDump($request), FALSE);
-            //$result = $client->call($this->extra->operacion, $request);
             $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
-            log_message('info', 'Result: '. $this->varDump($result), FALSE);
-
-            log_message('info', 'Response: '. $this->varDump($client->response), FALSE);
-            log_message('info', 'Response: '. $this->varDump($client->responseData), FALSE);
-            log_message('info', 'Debug: '. $this->varDump($client->getDebug()), FALSE);
-            if ($client->fault) {
-                log_message('info', 'Fault: '. $this->varDump($result), FALSE);
-            }else{
-                $err = $client->getError();
-                if ($err) {
-                    log_message('info', 'Error: '. $this->varDump($err), FALSE);
-                }
-            }
-            /*log_message('info', 'Response: '. $this->varDump($client->response), FALSE);
-            $response_xml= $client->response;
-            $pos= strpos($response_xml, "<");
-            $response_xml= substr($response_xml, $pos);
-            log_message('info', 'Response_xml: '. $this->varDump($response_xml), FALSE);
-            $response = simplexml_load_string($response_xml);
-            log_message('info', 'Response: '. $this->varDump($response), FALSE);*/
-
-            //Se obtiene la respuesta del servicio
-            /*$response_name = "";
-            if(isset($this->extra->response)){
-                $response = json_decode($this->extra->response, true);
-                foreach($response as $key=>$value){
-                    $response_name = $key;
-                    break;
-                }
-            }*/
-            /*$posicion=1;
+            log_message('info', 'ResultRESPONSE: '. $this->varDump($client->response), FALSE);
+            $result['response_soap']= $client->response;
             foreach($result as $key=>$value){
-                log_message('info', 'Result '.$posicion++.': '. $this->varDump($key), FALSE);  
-                log_message('info', 'Result '.$posicion++.': '. $this->varDump($value), FALSE);  
-                
-                //$response_xml = $value;
-                //$response = simplexml_load_string($response_xml);
-                $response = json_encode($value);
-                //log_message('info', 'Result '.$posicion++.': '. $this->varDump($result), FALSE);  
-
-            }*/
-
-
-            //$response_xml = $result[$response_name];
-            //$response = simplexml_load_string($response_xml);
-            //log_message('info', 'Result array 1: '. $this->varDump($result['cuerpo']), FALSE); 
-            //$result = json_encode($result['cuerpo']->);
-            //log_message('info', 'Result json: '. $this->varDump($result), FALSE);  
-
-            //$result = "{\"response_soap\":".$result."}";
-           /* $json=json_decode($result);
-            foreach($json as $key=>$value){
+                //$xml=simplexml_load_string($value);
+                /*if($xml){
+                    log_message('info', 'ES UN XML ::::::::::::::::::::::::::::: '.$this->varDump(" ::::::::::::: ES XML "), FALSE);                    
+                    $valor = get_object_vars($xml);
+                }else{
+                    log_message('info', 'NO ES XML ::::::::::::::::::::::::::::: '.$this->varDump(" :::::::::::::::: NO ES XML"), FALSE); 
+                    $valor = json_encode($value);
+                    log_message('info', 'object: '.$this->varDump($valor), FALSE); 
+                }*/
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
                 if(!$dato)
                     $dato=new DatoSeguimiento();
-                $dato->nombre=$key;
-                $dato->valor=$value;
-                $dato->etapa_id=$etapa->id;
-                $dato->save();
-            }*/
-            //log_message('info', 'stdclass: '.$this->varDump($result), FALSE); 
-            $array="";
-            foreach($result as $key=>$value){
-                
-                log_message('info', 'TITULO: '.$this->varDump($key), FALSE); 
-                log_message('info', 'VALOR: '.$this->varDump($value), FALSE); 
-                $array = json_encode(json_decode($value, true));
-            }
-            
-
-            //$array = json_decode(json_encode($result['cuerpo']), true);
-            //$array = get_object_vars($result['cuerpo']);
-            //log_message('info', 'array: '.$this->varDump($array), FALSE); 
-            foreach($array as $key=>$value){
-        
-                //log_message('info', 'value: '.$this->varDump($key), FALSE); 
-                //$array = json_decode(json_encode($d), true);
-                //log_message('info', 'array: '.$this->varDump($value), FALSE); 
-
-                /*$dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
-                if(!$dato)
-                    $dato=new DatoSeguimiento();
-                $dato->nombre=$key;
-                $dato->valor=$value;
-                $dato->etapa_id=$etapa->id;
-                $dato->save();*/
+                    $dato->nombre=$key;
+                    $dato->valor=$value;
+                    $dato->etapa_id=$etapa->id;
+                    $dato->save();
             }
         }catch (Exception $e){
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
-            $dato->nombre="error_soap";
-            $dato->valor=$e;
-            $dato->etapa_id=$etapa->id;
-            $dato->save();
+                $dato->nombre="error_soap";
+                $dato->valor=$e;
+                $dato->etapa_id=$etapa->id;
+                $dato->save();
         }
     }
     function varDump($data){
