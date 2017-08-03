@@ -130,8 +130,13 @@ class AccionSoap extends Accion {
             
             //Se EJECUTA el llamado Soap
             $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
-            log_message('info', 'ResultRESPONSE: '. $this->varDump($client->response), FALSE);
-            $result['response_soap']= $client->response;
+            $error = $client->getError(); 
+            if ($error){
+                $result['response_soap']= $error;   
+            }else{
+                $result['response_soap']= $client->response;                
+            }
+
             foreach($result as $key=>$value){
                 //$xml=simplexml_load_string($value);
                 /*if($xml){
