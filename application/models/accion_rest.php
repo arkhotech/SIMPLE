@@ -157,6 +157,7 @@ class AccionRest extends Accion {
             foreach ($headers as $name => $value) {
                 $CI->rest->header($name.": ".$value);
             }
+        }
         try{
             // Se ejecuta la llamada segun el metodo
             if($this->extra->tipoMetodo == "GET"){
@@ -168,6 +169,7 @@ class AccionRest extends Accion {
             }else if($this->extra->tipoMetodo == "PUT"){
                 $CI->rest->initialize($config);
                 $result = $CI->rest->put($uri, $request, 'json');
+            }else if($this->extra->tipoMetodo == "DELETE"){
                 $CI->rest->initialize($config);
                 $result = $CI->rest->delete($uri, $request, 'json');
             }
