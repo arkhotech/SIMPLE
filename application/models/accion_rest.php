@@ -127,7 +127,20 @@ class AccionRest extends Accion {
                 break;
             case "OAUTH2":
                 //SEGURIDAD OAUTH2
-                $config="Config de auth 2";;
+                //$config="Config de auth 2";
+            //log_message('error', '####################################################################################################');
+
+                //SIN SEGURIDAD
+                $config = array(
+                    'timeout'         => 40,
+                    'server'          => 'https://apis.digital.gob.cl'
+                );
+                $body= '{
+                    "client_id":"ca14081f8acf4109ab26dbe4ab8b528c",
+                    "client_secret":"5414e0361b4d419e9d0bf235f69e0d00",
+                    "scope":"sendmail",
+                    "grant_type":"client_credentials"
+                }';
                 break;
             default:
                 //SIN SEGURIDAD
@@ -150,6 +163,16 @@ class AccionRest extends Accion {
         $url);
         $CI = & get_instance();
         //obtenemos el Headers si lo hay
+                
+                $CI->rest->initialize($config);
+                $result = $CI->rest->post('/correo/oauth2/token', $body, 'json');
+
+                print_r("<pre>");
+                print_r($result);
+                print_r("</pre>");
+                echo "mi respuesta";
+                exit;
+
         if(isset($this->extra->header)){
             $r=new Regla($this->extra->header);
             $header=$r->getExpresionParaOutput($etapa->id);

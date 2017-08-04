@@ -1,28 +1,36 @@
 function CambioSelect(){
+        console.log($("#tipoSeguridad").val());
         switch ($("#tipoSeguridad").val()) {                
-            case "HTTP_BASIC": case "OAUTH2":
-                $("#DivUser").show();
-                $("#DivPass").show();
+            case "HTTP_BASIC":
+                $("#DivBasic").show();
                 $("#DivKey").hide();
-                $("#key").val("");
-                 $("#resultKey").text("");
+                $("#DivAuth").hide();
+                $(".key").val("");
+                $(".oauth").val("");
             break;
             case "API_KEY":
+                $("#DivBasic").hide();
                 $("#DivKey").show();
-                $("#DivUser").hide();
-                $("#DivPass").hide();
-                $("#user").val("");
-                $("#pass").val("");
-                $('#resultUser').text("");
-                $('#resultPass').text("");
+                $("#DivAuth").hide();
+                $(".basic").val("");
+                $(".oauth").val("");
+
             break;
-            default:
-                $("#DivUser").hide();
-                $("#DivPass").hide();
+            case "OAUTH2":
+                console.log("entre en oauth2");
+                $("#DivBasic").hide();
                 $("#DivKey").hide();
-                $("#user").val("");
-                $("#pass").val("");
-                $("#key").val("");
+                $("#DivAuth").show();
+                $(".basic").val("");
+                $(".key").val("");
+            break;            
+            default:
+                $("#DivBasic").hide();
+                $("#DivKey").hide();
+                $("#DivAuth").hide();
+                $(".basic").val("");
+                $(".key").val("");
+                $(".oauth").val("");
             break;
         }
  }
@@ -32,5 +40,4 @@ function CambioSelect(){
     $("#tipoSeguridad").change(function(){
         CambioSelect();
     });
-
 });

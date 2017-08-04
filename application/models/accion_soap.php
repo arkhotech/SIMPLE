@@ -34,7 +34,7 @@ class AccionSoap extends Accion {
         $display.='            
             <div class="col-md-12">
                 <label>Request</label>
-                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="Request" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="<xml></xml>" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
                 <br />
                 <!-- <span id="resultRequest" class="spanError"></span> -->
                 <br /><br />

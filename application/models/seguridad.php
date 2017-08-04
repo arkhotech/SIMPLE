@@ -44,23 +44,37 @@ class Seguridad extends Doctrine_Record {
         $display.='</select>';
          
         $display.='
-            <div class="col-md-12" id="DivUser" style="display:none;">
+            <div class="col-md-12" id="DivBasic">
                 <label>Usuario</label>
-                <input type="text" id="user" name="extra[user]" class="" value="'.(isset($this->extra->user) ? $this->extra->user : '').'">
-            </div>';
-
-        $display.='
-            <div class="col-md-12" id="DivPass" style="display:none;">
+                <input type="text" id="user" name="extra[user]" class="basic" value="'.(isset($this->extra->user) ? $this->extra->user : '').'">
                 <label>Contraseña</label>
-                <input type="text" id="pass" name="extra[pass]" class="" value="'.(isset($this->extra->pass) ? $this->extra->pass : '').'">
+                <input type="text" id="pass" name="extra[pass]" class="basic" value="'.(isset($this->extra->pass) ? $this->extra->pass : '').'">
             </div>';
 
         $display.='
-            <div class="col-md-12" id="DivKey" style="display:none;">
+            <div class="col-md-12" id="DivKey">
                 <label>Llave de aplicación (Api key)</label>
-                <input type="text" id="apikey" name="extra[apikey]" class="" value="'.(isset($this->extra->apikey) ? $this->extra->apikey : '').'">
+                <input type="text" id="apikey" name="extra[apikey]" class="key" value="'.(isset($this->extra->apikey) ? $this->extra->apikey : '').'">
                 <label>Nombre de aplicación (Name key)</label>
-                <input type="text" id="namekey" name="extra[namekey]" class="" value="'.(isset($this->extra->namekey) ? $this->extra->namekey : '').'">            
+                <input type="text" id="namekey" name="extra[namekey]" class="key" value="'.(isset($this->extra->namekey) ? $this->extra->namekey : '').'">            
+            </div>';
+        $display.='
+            <div class="col-md-12" id="DivAuth">
+                
+                <label>Url de Autenticación</label>
+                <input type="text" id="url_auth" name="extra[url_auth]" class="oauth input-xxlarge" value="'.(isset($this->extra->url_auth) ? $this->extra->url_auth : '').'"> 
+
+                <label>Client Id</label>
+                <input type="text" id="client_id" name="extra[client_id]" class="oauth" value="'.(isset($this->extra->client_id) ? $this->extra->client_id : '').'">
+                
+                <label>Client Secret</label>
+                <input type="text" id="client_secret" name="extra[client_secret]" class="oauth" value="'.(isset($this->extra->client_secret) ? $this->extra->client_secret : '').'">
+
+                <label>Scope</label>
+                <input type="text" id="scope" name="extra[scope]" class="oauth" value="'.(isset($this->extra->scope) ? $this->extra->scope : '').'">  
+
+                <label>Grant Type</label>
+                <input type="text" id="grant_type" name="extra[grant_type]" class="oauth" value="'.(isset($this->extra->grant_type) ? $this->extra->grant_type : '').'">              
             </div>';
         return $display;
     }

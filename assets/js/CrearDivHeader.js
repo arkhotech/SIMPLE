@@ -113,8 +113,13 @@ function CovertJson(myArrClean,operaciones){
  }
 
 function CambioSelect(value){
+    console.log("esta cambiando el select");
     validJsonR=0;
     validJsonH=0;
+    $("#request").focusout(function(){
+        console.log("entre a validar el request");
+        isJsonR($("#request"),$("#request").val(),$("#resultRequest"));
+    });
  	switch ($("#tipoMetodo").val()) {                
  		case "POST": case "PUT":
  			$("#divObject").show();
@@ -148,17 +153,19 @@ function CambioSelect(value){
 }
 
 function isJsonR(object,value,id_span){
-   /* try {
-        JSON.parse(value);
-    }catch (e){
-	    object.addClass('invalido');
-	    id_span.text("Formato requerido / json");
-	    validJsonR=1;
-        return false;
-    }
-	object.removeClass('invalido');
-	id_span.text("");*/
-	validJsonR=0;
+    //if(obj.length>1){
+        try {
+            JSON.parse(value);
+        }catch (e){
+            object.addClass('invalido');
+            id_span.text("Formato requerido / json");
+            validJsonR=1;
+            return false;
+        }
+    //}
+    object.removeClass('invalido');
+    id_span.text("");
+    validJsonR=0;
     return true;
 }
 
@@ -230,24 +237,22 @@ var limpiar = function(){
 }
 
  $(document).ready(function(){
-    console.log("REQUEST INICIO:"+validJsonR);
-    console.log("HEADERS INICIO:"+validJsonH);
+    console.log("hola desde aqui");
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")
-    if($("#tipoMetodo").val()=="POST" || $("#tipoMetodo").val()=="POST"){
+    
+    /*if($("#tipoMetodo").val()=="POST" || $("#tipoMetodo").val()=="PUT"){
         $("#divObject").show();
     }else{
         $("#divObject").hide();
-    }
+    }*/
 
     $("#tipoMetodo").change(function(){
         CambioSelect();
     });
 
-    $("#request").focusout(function(){
-    	isJsonR($("#request"),$("#request").val(),$("#resultRequest"));
-	});
+
 
     $("#header").focusout(function(){
     	isJsonH($("#header"),$("#header").val(),$("#resultHeader"));

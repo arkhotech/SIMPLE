@@ -78,10 +78,17 @@ class Admseguridad extends MY_BackendController {
             case 'API_KEY':
                 $this->form_validation->set_rules('extra[apikey]','Llave de aplicación','required');
                 break;
-            case "HTTP_BASIC": case "OAUTH2":
+            case "HTTP_BASIC":
                 $this->form_validation->set_rules('extra[user]','user','required');
                 $this->form_validation->set_rules('extra[pass]','password','required'); 
                 break;
+            case "OAUTH2":
+                $this->form_validation->set_rules('extra[url_auth]','Url de Autenticación','required');
+                $this->form_validation->set_rules('extra[client_id]','Client Id','required'); 
+                $this->form_validation->set_rules('extra[client_secret]','Client Secret','required'); 
+                $this->form_validation->set_rules('extra[scope]','Scope','required'); 
+                $this->form_validation->set_rules('extra[grant_type]','Grant Type','required'); 
+                break;    
         }
         $seguridad->validateForm();
         if(!$seguridad_id){
