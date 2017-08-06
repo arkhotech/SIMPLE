@@ -92,18 +92,34 @@ class AccionRest extends Accion {
 
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
-
         $caracter="/";
         $f = substr($url, -1);
         if($caracter===$f){
             $url = substr($url, 0, -1);
         }
+
         $r=new Regla($this->extra->uri);
         $uri=$r->getExpresionParaOutput($etapa->id);
         $l = substr($uri, 0, 1);
         if($caracter===$l){
             $uri = substr($uri, 1);
         }
+
+        $r=new Regla($data->extra->url_auth);
+        $url_auth=$r->getExpresionParaOutput($etapa->id);
+        $l = substr($url_auth, 0, 1);
+        if($caracter===$l){
+            $url_auth = substr($url_auth, 1);
+        }
+
+        $r=new Regla($data->extra->uri_auth);
+        $uri_auth=$r->getExpresionParaOutput($etapa->id);
+        $l = substr($uri_auth, 0, 1);
+        if($caracter===$l){
+            $uri_auth = substr($uri_auth, 1);
+        }
+
+        $CI = & get_instance();
         // Se declara el tipo de seguridad segun sea el caso
         switch ($tipoSeguridad) {
             case "HTTP_BASIC":
@@ -127,21 +143,26 @@ class AccionRest extends Accion {
                 break;
             case "OAUTH2":
                 //SEGURIDAD OAUTH2
-                //$config="Config de auth 2";
-            //log_message('error', '####################################################################################################');
-
-                //SIN SEGURIDAD
-                $config = array(
-                    'timeout'         => 40,
-                    'server'          => 'https://apis.digital.gob.cl'
+                $config_seg = array(
+                    'timeout'         => $timeout,
+                    'server'          => $url_auth
                 );
-                $body= '{
-                    "client_id":"ca14081f8acf4109ab26dbe4ab8b528c",
-                    "client_secret":"5414e0361b4d419e9d0bf235f69e0d00",
-                    "scope":"sendmail",
-                    "grant_type":"client_credentials"
-                }';
-                break;
+                $request_seg= $data->extra->request_seg;
+                $CI->rest->initialize($config_seg);
+                $result = $CI->rest->post($uri_auth, $request_seg, 'json');
+                //Se obtiene la codigo de la cabecera HTTP
+                $debug_seg = $CI->rest->debug();
+                $response_seg= intval($debug_seg['info']['http_code']);
+                if($response_seg >= 200 && $response_seg < 300){
+                    $config = array(
+                        'timeout'         => $timeout,
+                        'server'          => $url,
+                        'api_key'         => $result->token_type.' '.$result->access_token,
+                        //'api_key'         => $result->token_type.' kjfghiofut485fhgruiotjbfgrhjh4uiyru',
+                        'api_name'        => 'Authorization'
+                    );
+                }
+            break;
             default:
                 //SIN SEGURIDAD
                 $config = array(
@@ -161,18 +182,7 @@ class AccionRest extends Accion {
             return $key.urlencode($value);
         },
         $url);
-        $CI = & get_instance();
         //obtenemos el Headers si lo hay
-                
-                $CI->rest->initialize($config);
-                $result = $CI->rest->post('/correo/oauth2/token', $body, 'json');
-
-                print_r("<pre>");
-                print_r($result);
-                print_r("</pre>");
-                echo "mi respuesta";
-                exit;
-
         if(isset($this->extra->header)){
             $r=new Regla($this->extra->header);
             $header=$r->getExpresionParaOutput($etapa->id);
@@ -198,7 +208,6 @@ class AccionRest extends Accion {
             }
             //Se obtiene la codigo de la cabecera HTTP
             $debug = $CI->rest->debug();
-
             if($debug['info']['http_code']=='204'){
                 $result2['code']= '204';
                 $result2['des_code']= 'No Content';
@@ -210,8 +219,8 @@ class AccionRest extends Accion {
                     $result2['code']= '2';
                     $result2['des_code']= $debug['response_string'];
                 }else{
-                    $result2 = get_object_vars($result); 
-                }  
+                    $result2 = get_object_vars($result);
+                }
             }
             $response["response".$this->extra->tipoMetodo]=$result2;
             foreach($response as $key=>$value){
