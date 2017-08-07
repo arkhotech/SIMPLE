@@ -71,7 +71,11 @@
             <div class="container-fluid">
                 <div class="row-fluid">
                     <div class="span2">
-                        <h1 id="logo"><a href="<?= site_url('backend/portada') ?>"><img src="<?= base_url() ?>assets/img/logo.png" alt="Tramitador" /></a></h1>
+                        <h1 id="logo">
+                            <a href="<?= site_url('backend/portada') ?>">
+                                <img src="<?= base_url() ?>assets/img/logo.png" alt="Tramitador" />
+                            </a>
+                        </h1>
                     </div>
                     <div class="span10">
                         <div class="row-fluid">
@@ -163,8 +167,5 @@
             </div>
         </footer>
         <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=es"></script>
-        <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDOQ2m4sss96dWd5sEs5levoURjrzMUYc&callback=initMap">
-        </script>
     </body>
 </html>

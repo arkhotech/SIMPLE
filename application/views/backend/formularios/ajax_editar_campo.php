@@ -113,10 +113,8 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
 <div class="modal-body">
     <form id="formEditarCampo" class="ajaxForm" method="POST" action="<?= site_url('backend/formularios/editar_campo_form/' . ($edit ? $campo->id : '')) ?>">
         <div class="validacion"></div>
-        <?php if (!$edit): ?>
-            <input type="hidden" name="formulario_id" value="<?= $formulario->id ?>" />
-            <input type="hidden" name="tipo" value="<?= $campo->tipo ?>" />
-        <?php endif; ?>
+        <input type="hidden" name="formulario_id" value="<?= $formulario->id ?>" />
+        <input type="hidden" name="tipo" value="<?= $campo->tipo ?>" />
         <label>Etiqueta
         </label>
         <?php if($campo->etiqueta_tamano=='xxlarge'):?>
@@ -148,8 +146,8 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
         <?php endif ?>
         
         <?php if (!$campo->estatico): ?>
-            <?php if(isset($campo->datos_agenda) && $campo->datos_agenda){ ?>
-                <label style="display:none;" class="checkbox"><input type="checkbox" name="readonly" value="1" <?=$campo->readonly?'checked':''?> /> Solo lectura</label>    
+            <?php if (isset($campo->datos_agenda) && $campo->datos_agenda) { ?>
+                <label style="display: none;" class="checkbox"><input type="checkbox" name="readonly" value="1" <?=$campo->readonly?'checked':''?> /> Solo lectura</label>    
             <?php }else{ ?>
                 <label class="checkbox"><input type="checkbox" name="readonly" value="1" <?=$campo->readonly?'checked':''?> /> Solo lectura</label>
             <?php } ?>
@@ -161,7 +159,7 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
                         <span class="glyphicon glyphicon-info-sign"></span>
                     </a>
                 </label>
-                <input style="display:none;" class='validacion' type="text" name="validacion" value="<?= $edit ? implode('|', $campo->validacion) : 'required' ?>"/>
+                <input style="display: none;" class='validacion' type="text" name="validacion" value="<?= $edit ? implode('|', $campo->validacion) : 'required' ?>"/>
             <?php }else{ ?>
                 <label>Reglas de validación
                     <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/reglas-de-negocio-y-reglas-de-validacion.html#validacion_campos" target="_blank">
@@ -173,10 +171,10 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
             
                <?php endif; ?>
             <?php if(!$campo->estatico):?>
-                <?php if(isset($campo->datos_agenda) && $campo->datos_agenda){ ?>
+                <?php if ((isset($campo->datos_agenda) && $campo->datos_agenda) || (isset($campo->datos_mapa) && $campo->datos_mapa)) { ?>
                         <label style="display:none;">Valor por defecto</label>
                         <input style="display:none;" type="text" name="valor_default" value="<?=htmlspecialchars($campo->valor_default)?>" />
-                <?php }else{ ?>
+                <?php } else { ?>
                         <label>Valor por defecto</label>
                         <input type="text" name="valor_default" value="<?=htmlspecialchars($campo->valor_default)?>" />
                 <?php } ?>
@@ -198,7 +196,7 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
 		            </ul>
 		        </div>
 <!--                 <select class="input-medium" name="dependiente_campo"> -->
-                	
+
 <!--                 </select> -->
                 <div class="btn-group" style="margin-bottom: 9px;">
                     <button type="button" class="buttonIgualdad btn">=</button><button type="button" class="buttonDesigualdad btn">!=</button>
@@ -208,6 +206,22 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
                     <input type="text" name="dependiente_valor" value="<?= isset($campo) ? $campo->dependiente_valor : '' ?>" /><button type="button" class="buttonString btn">String</button><button type="button" class="buttonRegex btn">Regex</button>
                 </span>
                 <input type="hidden" name="dependiente_tipo" value="<?=isset($campo) && $campo->dependiente_tipo? $campo->dependiente_tipo:'string' ?>" />
+
+                <?php if (isset($campo->datos_mapa) && $campo->datos_mapa): ?>
+                    <script type="text/javascript">
+                        $(function() {
+                            $("[name=readonly]").click(function() {
+                                if ($(this).attr('checked')) {
+                                    $('.columnas').show();
+                                } else {
+                                    $("#formEditarCampo .columnas table tbody tr").remove();
+                                    $('.columnas').hide();
+                                }
+                            });
+                        });
+                    </script>
+                <?php endif; ?>
+
                 <?php if(isset($campo->datos_agenda) && $campo->datos_agenda): ?>
                     <label>Pertenece a: </label>
                     <select id="selectgrupo" class="input-xlarge" name="grupos_usuarios">
@@ -226,7 +240,7 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
                                     templateSelection: selection,
                                     templateResult: format
                                 });
-                                
+
                                 $("#selectgrupo").change(function(){
                                     $("#miagenda").html('');
                                     var idseleccionado=$(this).val();
@@ -360,9 +374,8 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
                 </table>
             </div>
         <?php endif; ?>
-        
-        <?=$campo->backendExtraFields()?>
 
+        <?=$campo->backendExtraFields()?>
 
     </form>
 </div>
