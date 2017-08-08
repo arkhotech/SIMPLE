@@ -24,21 +24,63 @@ class API extends MY_BackendController {
         $this->load->view('backend/template',$data);
     }
     
+    private function getBody(){
+        return file_get_contents('php://input');
+    }
+    
     /*
      * Llamadas de la API
      * Tramote id es el identificador del proceso
      */
+    
+    public function especificacion($operacion ,$id_tramite){
 
-    public function tramites($proceso_id = null) {
+        if($tipo!= "servicio" || $tipos != "form" ){
+            show_error("404 No encontrado",404, "No se encuentra la operacion" );
+            exit;
+        }
+        
+        switch($this->input->server('REQUEST_METHOD')){
+            case "GET": 
+                $this->generarEspecificacion($operacion,$id_tramite);
+                break;
+            default:
+                show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
+        }
+        
+    }
+    /**
+     * 
+     * @param type $tipo 
+     * @param type $id_tramite
+     * @param type $id_paso
+     */
+    public function status($tipo,$id_tramite, $id_paso= NULL){
+        
+        if($tipo!= "tramite" ){
+            show_error("404 No encontrado",404, "No se encuentra la operacion" );
+            exit;
+        }
+        
+        switch($this->input->server('REQUEST_METHOD')){
+            case "GET": 
+                echo "hacer algo";
+                break;
+            default:
+                show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
+        }
+    }
+    
+    public function tramites($proceso_id, $etapa = null) {
         
         $method = $this->input->server('REQUEST_METHOD');
-        $body = file_get_contents('php://input');
+        $body = $this->getBody();
         //Tomar los segmentos desde el 3 para adelante
-        $urlSegment = $this->uri->segments;
+        //$urlSegment = $this->uri->segments;
         
-       $headers = $this->input->request_headers();
-        print_r($headers);
-        print_r($urlSegment);
+        $headers = $this->input->request_headers();
+        
+        //print_r($urlSegment);
         //$cuenta = Cuenta::cuentaSegunDominio();
 
         switch($method){
@@ -49,7 +91,10 @@ class API extends MY_BackendController {
                 $this->continuarProceso($input);
                 break;
             case "POST":
-                $this->iniciarProceso($input);
+                $this->iniciarProceso($proceso_id,$this->getBody());
+                break;
+            default:
+                show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
         }
         
          echo $this->input->method(FALSE);
@@ -113,13 +158,49 @@ class API extends MY_BackendController {
         }
         return $retval;
     }
-   
-    function put(){
-        echo "Metodo PUT";
+
+    
+    private function listarCatalogo(){
+        
+        
+        $items[] = array(
+            "id" => 123,
+            "nombre" => "Servicio miltar",
+            "fechaCreacion" => "08/08/2017",
+            "tipo" => "inicio",
+            "descripcion" => "blablcablcabl",
+            "url" => "https://localhost/test"); 
+        
+       $retval["catalogo"] = $items; 
+       header('Content-type: application/json');
+       echo json_indent(json_encode($retval));
     }
     
-    function listarCatalogo(){
-        echo "Metodo GET";
+    private function iniciarProceso($idTramite,$body){
+        //validar la entrada
+       $response = array(
+           "codigoRetorno" => 0,
+           "descRetorno" => "Problemas para iniciar",
+           "idProximoPaso" => 123,
+           "proximoFormulario" => array()
+           );
+        $this->responseJson($response);
+    }
+    
+    private function continuarProceso($idProceso,$idEtapa, $body){
+        
+    }
+    
+    private function responseJson($response){
+         header('Content-type: application/json');
+       echo json_indent(json_encode($response));
     }
 
+    private function generarEspecificacion($operacion,$id_proceso = NULL){
+        $this->load->helper('download');
+        //llamar al generador de Swagger
+        force_download("test.txt", "esto es una prueba");
+        exit;
+    }
+    
 }

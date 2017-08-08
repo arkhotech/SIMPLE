@@ -199,7 +199,16 @@
                         </div>
                         <div class="span6">
                             <script>
+                                function MostrarExponer() {
+                                    if($('#inicial').prop('checked')) {
+                                        $("#DivExponer").show();
+                                    }else{
+                                        $("#DivExponer").hide();
+                                        $("#exponer_tramite").prop('checked',false);
+                                    }
+                                }
                                 $(document).ready(function(){
+                                    MostrarExponer();
                                     $("input[name=activacion]").change(function(){
                                         if($("input[name=activacion]:checked").val()=='entre_fechas')
                                             $("#activacionEntreFechas").show();
@@ -207,16 +216,12 @@
                                             $("#activacionEntreFechas").hide();  
                                     }).change();
                                     $("#inicial").click(function() {
-                                        if($('#inicial').prop('checked')) {
-                                            $("#DivExponer").show();
-                                        } else {
-                                            $("#DivExponer").hide();
-                                        }
+                                      MostrarExponer();  
                                     });
                                 });
                             </script>
                             <div id="DivExponer" style="display:none;">
-                                <label class="checkbox"><input name="exponer" value="1" type="checkbox">Exponer trámite</label>    
+                                <label class="checkbox"><input name="exponer_tramite" id="exponer_tramite" value="1" type="checkbox" <?= $tarea->exponer_tramite ? 'checked' : '' ?>> Exponer trámite</label>
                             </div>
                             <label class="radio"><input name="activacion" value="si" type="radio" <?= $tarea->activacion == 'si' ? 'checked' : '' ?>>Tarea activada</label>
                             <label class="radio"><input name="activacion" value="entre_fechas" type="radio" <?= $tarea->activacion == 'entre_fechas' ? 'checked' : '' ?>>Tarea activa entre fechas</label>

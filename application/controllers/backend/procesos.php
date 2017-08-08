@@ -278,6 +278,7 @@ class Procesos extends MY_BackendController {
             $tarea->vencimiento_notificar_email=$this->input->post('vencimiento_notificar_email');
             $tarea->previsualizacion=$this->input->post('previsualizacion');
             $tarea->externa=$this->input->post('externa');
+            $tarea->exponer_tramite=$this->input->post('exponer_tramite');
             $tarea->save();
             
             $respuesta->validacion=TRUE;
@@ -515,6 +516,40 @@ class Procesos extends MY_BackendController {
         //exit;
         echo json_encode($modelo);
     }
-    
 
+    //Funcion para listar los tramites expuestos como servicios
+    public function listar_expuestos(){
+        $response=Doctrine::getTable('Tarea')->findBy('exponer_tramite',1);
+        //findBy($fieldName, $value, $hydrationMode = null)
+        
+        /*if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+            echo 'Usuario no tiene permisos para editar esta tarea.';
+            exit;
+        }*/
+        
+        if($response){
+            echo $respuesta;
+        }else{
+            echo 0;
+        }  
+    }  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
