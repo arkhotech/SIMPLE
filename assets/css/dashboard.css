@@ -140,3 +140,18 @@
   -ms-backface-visibility: hidden;
   z-index: 1000;
 }
+.invalido{
+  border-color: 1px solid #AA0909;
+}
+.spanError{
+  font-size:10px;
+  color:#AA0909;
+  margin-left: 1px;
+
+}
+.AlignButton{
+  margin-top: 0px;
+}
+.AlignText{
+  margin-top: 9px;
+}

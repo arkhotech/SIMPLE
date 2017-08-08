@@ -19,8 +19,6 @@
         <link href="<?= base_url() ?>assets/css/modelador-formularios.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/dashboard.css" rel="stylesheet">
 
-
-
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
           <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -50,6 +48,14 @@
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
+
+            var onloadCallback = function() {
+                if ($('#form_captcha').length) {
+                    grecaptcha.render("form_captcha", {
+                        sitekey : "6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH"
+                    });
+                }
+            };
         </script>
         <script src="<?= base_url() ?>assets/js/common.js" type="text/javascript"></script>
         <script src="<?= base_url() ?>assets/js/backend.js" type="text/javascript"></script>
@@ -123,7 +129,7 @@
 
         <div id="main">
             <div class="container-fluid">
-        <?php $this->load->view($content) ?>
+        <?php $this->load->view($content) ?> 
             </div>
         </div>
 
@@ -156,6 +162,6 @@
                 </div>
             </div>
         </footer>
-
+        <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=es"></script>
     </body>
 </html>

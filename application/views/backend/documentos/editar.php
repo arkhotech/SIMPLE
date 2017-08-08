@@ -10,6 +10,8 @@
     <li><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li class="active"><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+
 </ul>
 
 <script>
@@ -39,9 +41,16 @@
         <input type="text" name="nombre" value="<?= $edit ? $documento->nombre : '' ?>" />
 
         <label>Tipo de documento</label>
-        <label class="radio"><input type="radio" name="tipo" value="blanco" <?= !$edit || ($edit && $documento->tipo) == 'blanco' ? 'checked' : '' ?> /> En blanco</label>
-        <label class="radio"><input type="radio" name="tipo" value="certificado" <?= $edit && $documento->tipo == 'certificado' ? 'checked' : '' ?> /> Certificado</label>
-
+        <label class="radio"><input type="radio" name="tipo" value="blanco" <?= !$edit || ($edit && $documento->tipo) == 'blanco' ? 'checked' : '' ?> /> En blanco
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/generacion-de-documentos.html#documento_en_blanco" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        </label>
+        <label class="radio"><input type="radio" name="tipo" value="certificado" <?= $edit && $documento->tipo == 'certificado' ? 'checked' : '' ?> /> Certificado
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/generacion-de-documentos.html#documento_certificado" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        </label>
         <div id="certificadoArea">
             <label>Título</label>
             <input class="input-xxlarge" type="text" name="titulo" value="<?= $edit ? $documento->titulo : '' ?>" placeholder="Ej: Certificado de Educación" />
@@ -133,7 +142,6 @@
         <label>Tamaño de la Página</label>
         <label class="radio"><input type="radio" name="tamano" value="letter" <?= !$edit || ($edit && $documento->tamano) == 'letter' ? 'checked' : '' ?> /> Carta</label>
         <label class="radio"><input type="radio" name="tamano" value="legal" <?= $edit && $documento->tamano == 'legal' ? 'checked' : '' ?> /> Oficio</label>
-
 
         <label>Contenido</label>
         <textarea name="contenido" class="input-xxlarge" rows="20"><?= $edit ? $documento->contenido : '' ?></textarea>

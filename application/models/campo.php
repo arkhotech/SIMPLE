@@ -45,9 +45,11 @@ class Campo extends Doctrine_Record {
             $campo=new CampoGrid();
         else if($tipo=='agenda')
             $campo=new CampoAgenda();
+        else if($tipo=='recaptcha')
+            $campo=new CampoRecaptcha();
 
         $campo->assignInheritanceValues();
-        
+
         return $campo;
     }
 
@@ -89,7 +91,8 @@ class Campo extends Doctrine_Record {
                 'CampoDocumento'  => array('tipo' => 'documento'),
                 'CampoJavascript'  => array('tipo' => 'javascript'),
                 'CampoGrid'  => array('tipo' => 'grid'),
-                'CampoAgenda'  => array('tipo' => 'agenda')
+                'CampoAgenda'  => array('tipo' => 'agenda'),
+                'CampoRecaptcha'  => array('tipo' => 'recaptcha')
             ));
     }
 

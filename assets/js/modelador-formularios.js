@@ -29,8 +29,19 @@ function editarCampo(campoId){
     $("#modal").modal();
     return false;
 }
-function agregarCampo(formularioId,tipo){
-    $("#modal").load(site_url+"backend/formularios/ajax_agregar_campo/"+formularioId+"/"+tipo);  
-    $("#modal").modal();
+
+function agregarCampo(formularioId, tipo) {
+    if (tipo == 'recaptcha') {
+        if ($('#form_captcha').length) {
+            alert('Ya existe un componente Captcha dentro del formulario actual.');
+        } else {
+         $("#modal").load(site_url + "backend/formularios/ajax_agregar_campo/" + formularioId + "/" + tipo);
+            $("#modal").modal();
+        }
+    } else {
+        $("#modal").load(site_url + "backend/formularios/ajax_agregar_campo/" + formularioId + "/" + tipo);
+        $("#modal").modal();
+    }
+
     return false;
 }

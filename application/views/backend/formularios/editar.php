@@ -16,6 +16,7 @@
     <li class="active"><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
 
 <div id="areaFormulario">
@@ -37,6 +38,7 @@
             <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'date')">Date</button>
             <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'grid')">Grilla</button>
             <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'agenda')">Agenda</button>
+            <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'recaptcha')">Recaptcha</button>
         </div>
         <div class="btn-group">
             <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'instituciones_gob')">Instituciones</button>
@@ -54,12 +56,16 @@
     <form id="formEditarFormulario" class="form-horizontal dynaForm debugForm" onsubmit="return false">
         <div class="row">
             <div class="span10">
-            <div class="pull-left">
-                <legend><?= $formulario->nombre ?></legend>
-            </div>
-            <div class="pull-right">
-                <a href="#" class="btn btn-primary" onclick="return editarFormulario(<?= $formulario->id ?>)">Cambiar Nombre</a>&nbsp;
-            </div>
+                <div class="pull-left">
+                    <legend><?= $formulario->nombre ?>
+                    <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/diseno-de-formularios.html" target="_blank">
+                        <span class="glyphicon glyphicon-info-sign" style="font-size: 16px;"></span>
+                    </a>
+                    </legend>
+                </div>
+                <div class="pull-right">
+                    <a href="#" class="btn btn-primary" onclick="return editarFormulario(<?= $formulario->id ?>)">Cambiar Nombre</a>&nbsp;
+                </div>
             </div>
         </div>
         <div class="edicionFormulario">

@@ -12,6 +12,8 @@
     <li><a href="<?=site_url('backend/formularios/listar/'.$proceso->id)?>">Formularios</a></li>
     <li class="active"><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    
 </ul>
 
 <a class="btn btn-success" href="<?=site_url('backend/documentos/crear/'.$proceso->id)?>"><i class="icon-white icon-file"></i> Nuevo</a>
@@ -20,7 +22,12 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Documento</th>
+            <th>
+                Documento
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/generacion-de-documentos.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
             <th></th>
         </tr>
     </thead>

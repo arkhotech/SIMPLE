@@ -25,6 +25,7 @@ class AccionWebservice extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
+        log_message('info', 'Ejecutar webservice', FALSE);
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
         
@@ -37,11 +38,13 @@ class AccionWebservice extends Accion {
         $url);
         
         $ch = curl_init();
+        log_message('info', 'URL: '.$url, FALSE);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
-        
+        log_message('info', 'Result: '.$result, FALSE);
+
         $json=json_decode($result);
         
         foreach($json as $key=>$value){

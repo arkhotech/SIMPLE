@@ -41,7 +41,7 @@
 $route['default_controller'] = "portada";
 $route['404_override'] = '';
 
-$route['backend'] = "backend/portada";
+$route['backend'] = "backend/portada"; 
 $route['manager'] = "manager/portada";
 $route['consultas'] = "consultas/portada";
 

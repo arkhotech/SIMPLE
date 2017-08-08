@@ -152,11 +152,18 @@
     <li><a href="<?= site_url('backend/formularios/listar/' . $proceso->id) ?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
 
 
 <div id="areaDibujo">
-    <h1><?= $proceso->nombre ?> <a href="#" title="Editar"><i class="icon-edit" style="vertical-align:middle;"></i></a></h1>
+    <h1 style="float: left;">
+        <?= $proceso->nombre ?> 
+        <a href="#" title="Editar"><i class="icon-edit" style="vertical-align:middle;"></i></a>
+    </h1>
+        <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html" target="_blank" style="float:left; margin: 22px 0 0 5px;">
+            <span class="glyphicon glyphicon-info-sign"></span>
+        </a>
     <div class="botonera btn-toolbar">
         <div class="btn-group">
             <button class="btn createBox" title="Crear tarea"><img src="<?= base_url() ?>assets/img/tarea.png" /></button>

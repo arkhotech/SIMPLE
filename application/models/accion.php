@@ -1,19 +1,21 @@
 <?php
 
-class Accion extends Doctrine_Record {
+class Accion extends Doctrine_Record     {
 
     function setTableDefinition() {        
         $this->hasColumn('id');
         $this->hasColumn('nombre');
         $this->hasColumn('tipo');
         $this->hasColumn('extra');
-        $this->hasColumn('proceso_id');
+        $this->hasColumn('proceso_id'); 
 
-        
+
         $this->setSubclasses(array(
                 'AccionEnviarCorreo'  => array('tipo' => 'enviar_correo'),
                 'AccionWebservice'  => array('tipo' => 'webservice'),
-                'AccionVariable'  => array('tipo' => 'variable')
+                'AccionVariable'  => array('tipo' => 'variable'),
+                'AccionRest'  => array('tipo' => 'rest'),
+                'AccionSoap'  => array('tipo' => 'soap')
             )
         );
     }
@@ -35,6 +37,10 @@ class Accion extends Doctrine_Record {
     public function displayForm(){
         return NULL;
     }
+
+    public function displaySecurityForm($id_proceso){
+        return NULL;
+    }
     
     public function validateForm(){
         return;
@@ -46,10 +52,13 @@ class Accion extends Doctrine_Record {
     }
     
     public function setExtra($datos_array) {
-        if ($datos_array) 
+        if ($datos_array) {
+            log_message('info','Accion.setExtra, $datos_array: ' . json_encode($datos_array));
             $this->_set('extra' , json_encode($datos_array));
-        else 
+        } else {
+            log_message('info','Accion.setExtra, $datos_array: NULL');
             $this->_set('extra' , NULL);
+        }
     }
     
     public function getExtra(){

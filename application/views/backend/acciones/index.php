@@ -12,6 +12,7 @@
     <li><a href="<?=site_url('backend/formularios/listar/'.$proceso->id)?>">Formularios</a></li>
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?=site_url('backend/acciones/listar/'.$proceso->id)?>">Acciones</a></li>
+    <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
 
 <a class="btn btn-success" href="#" onclick="return seleccionarAccion(<?=$proceso->id?>);"><i class="icon-white icon-file"></i> Nuevo</a>
@@ -20,7 +21,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Accion</th>
+            <th>Accion
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </th>
             <th>Tipo</th>
             <th></th>
         </tr>
@@ -38,7 +43,7 @@
         </tr>
         <?php endforeach; ?>
     </tbody>
-</table>
+</table> 
 
 <div id="modalImportarAccion" class="modal hide fade">
     <form method="POST" enctype="multipart/form-data" action="<?=site_url('backend/acciones/importar')?>">

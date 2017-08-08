@@ -1099,3 +1099,7 @@ footer .area2 .container-fluid .footerGob {
     width: 123px; 
   }
 }
+
+.procesos_eliminados {
+    display: none;
+}

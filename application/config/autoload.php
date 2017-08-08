@@ -38,6 +38,8 @@
 */
 
 $autoload['packages'] = array();
+//$autoload['packages'] = array(APPPATH.'third_party');
+
 
 
 /*
@@ -52,8 +54,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('form_validation','session','email');
-
+$autoload['libraries'] = array('form_validation','session','email','rest','curl','nusoap');
 
 /*
 | -------------------------------------------------------------------

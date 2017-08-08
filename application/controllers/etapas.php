@@ -164,14 +164,18 @@ class Etapas extends MY_Controller {
 
         $qs = $this->input->server('QUERY_STRING');
         $paso = $etapa->getPasoEjecutable($secuencia);
+        log_message("info","Ejecutando paso: ".$paso, FALSE);
         if (!$paso) {
+            log_message("info","Entra en no paso: ", FALSE);
             redirect('etapas/ejecutar_fin/' . $etapa->id . ($qs ? '?' . $qs : ''));
         } else if (($etapa->Tarea->final || !$etapa->Tarea->paso_confirmacion) && $paso->getReadonly() && end($etapa->getPasosEjecutables()) == $paso) { //No se requiere mas input
+            log_message("info","NO se necesita mas input: ", FALSE);
             $etapa->iniciarPaso($paso);
             $etapa->finalizarPaso($paso);
             $etapa->avanzar();
             redirect('etapas/ver/' . $etapa->id . '/' . (count($etapa->getPasosEjecutables())-1));
         }else{
+            log_message("info","Flujo pra mostrar form: ", FALSE);
             $etapa->iniciarPaso($paso);
 
             $data['secuencia'] = $secuencia;
@@ -203,7 +207,21 @@ class Etapas extends MY_Controller {
         }
     }
 
+    function validate_captcha() {
+        $CI = & get_instance();
+        $captcha = $this->input->post('g-recaptcha-response');
+        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $CI->config->item('secretkey') . "&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
+        if ($response . 'success' == false) {
+            return FALSE; 
+        } else {
+            return TRUE;
+        }
+    }
+
     public function ejecutar_form($etapa_id, $secuencia) {
+
+        log_message('info', 'ejecutar_form ($etapa_id [' . $etapa_id . '], $secuencia [' . $secuencia . '])');
+
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
         if ($etapa->usuario_id != UsuarioSesion::usuario()->id) {
@@ -228,20 +246,25 @@ class Etapas extends MY_Controller {
         $modo = $paso->modo;
 
         $respuesta = new stdClass();
-        
+
         if ($modo == 'edicion') {
             $validar_formulario = FALSE;
-            foreach ($formulario->Campos as $c) {                
-                //Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+            foreach ($formulario->Campos as $c) {
+                // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
                 if ($c->isEditableWithCurrentPOST($etapa_id)) {
                     $c->formValidate($etapa->id);
-                    $validar_formulario = TRUE;                    
+                    $validar_formulario = TRUE;
+                }
+                if ($c->tipo =='recaptcha') {
+                    $this->form_validation->set_rules('g-recaptcha-response', 'Captcha', 'required|callback_validate_captcha');
+                    $this->form_validation->set_message('validate_captcha', 'Please check the the captcha form');
+                    $validar_formulario = TRUE;
                 }
             }
             if (!$validar_formulario || $this->form_validation->run() == TRUE) {
-                //Almacenamos los campos
+                // Almacenamos los campos
                 foreach ($formulario->Campos as $c) {
-                    //Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+                    // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
 
                     if ($c->isEditableWithCurrentPOST($etapa_id)) {
                         $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
@@ -249,13 +272,13 @@ class Etapas extends MY_Controller {
                             $dato = new DatoSeguimiento();
                         $dato->nombre = $c->nombre;
                         $dato->valor = $this->input->post($c->nombre)=== false?'' :  $this->input->post($c->nombre);
-                        
-                        if(!is_object($dato->valor) && !is_array($dato->valor)){                            
-                                if(preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)){
-                                    $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i","$3-$2-$1",$dato->valor);
-                                }
+
+                        if (!is_object($dato->valor) && !is_array($dato->valor)) {
+                            if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
+                                $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
-                        
+                        }
+
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
                     }

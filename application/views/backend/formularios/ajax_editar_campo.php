@@ -104,7 +104,11 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
 
 <div class="modal-header">
     <button class="close" data-dismiss="modal">×</button>
-    <h3>Edición de Campo</h3>
+    <h3>Edición de Campo
+        <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/diseno-de-formularios.html#btn_<?= $campo->tipo ?>" target="_blank">
+            <span class="glyphicon glyphicon-info-sign" style="font-size: 16px;"></span>
+        </a>
+    </h3>
 </div>
 <div class="modal-body">
     <form id="formEditarCampo" class="ajaxForm" method="POST" action="<?= site_url('backend/formularios/editar_campo_form/' . ($edit ? $campo->id : '')) ?>">
@@ -113,7 +117,8 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
             <input type="hidden" name="formulario_id" value="<?= $formulario->id ?>" />
             <input type="hidden" name="tipo" value="<?= $campo->tipo ?>" />
         <?php endif; ?>
-        <label>Etiqueta</label>
+        <label>Etiqueta
+        </label>
         <?php if($campo->etiqueta_tamano=='xxlarge'):?>
         <textarea class="input-xxlarge" rows="5" name="etiqueta" ><?= htmlspecialchars($campo->etiqueta) ?></textarea>
         <?php else: ?>
@@ -151,10 +156,18 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
         <?php endif; ?>
         <?php if (!$campo->estatico): ?>
             <?php if(isset($campo->datos_agenda) && $campo->datos_agenda){ ?>
-                <label style="display:none;">Reglas de validación</label>
+                <label style="display:none;">Reglas de validación
+                  <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/reglas-de-negocio-y-reglas-de-validacion.html" target="_blank">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </a>
+                </label>
                 <input style="display:none;" class='validacion' type="text" name="validacion" value="<?= $edit ? implode('|', $campo->validacion) : 'required' ?>"/>
             <?php }else{ ?>
-                <label>Reglas de validación</label>
+                <label>Reglas de validación
+                    <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/reglas-de-negocio-y-reglas-de-validacion.html#validacion_campos" target="_blank">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </a>
+                </label>
                 <input class='validacion' type="text" name="validacion" value="<?= $edit ? implode('|', $campo->validacion) : 'required' ?>"/>
             <?php } ?>
             
