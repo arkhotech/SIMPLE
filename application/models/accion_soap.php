@@ -134,8 +134,9 @@ class AccionSoap extends Accion {
             if ($error){
                 $result['response_soap']= $error;   
             }else{
-                $result['response_soap']= $client->response;                
+                $result['response_soap']= $client->response; 
             }
+
 
             foreach($result as $key=>$value){
                 //$xml=simplexml_load_string($value);

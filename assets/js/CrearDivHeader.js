@@ -242,11 +242,11 @@ var limpiar = function(){
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")
     
-    /*if($("#tipoMetodo").val()=="POST" || $("#tipoMetodo").val()=="PUT"){
+    if($("#tipoMetodo").val()=="POST" || $("#tipoMetodo").val()=="PUT"){
         $("#divObject").show();
     }else{
         $("#divObject").hide();
-    }*/
+    }
 
     $("#tipoMetodo").change(function(){
         CambioSelect();
