@@ -189,7 +189,7 @@
                     <label><strong>Activación</strong></label>
                     <div class="row-fluid">
                         <div class="span6">
-                            <label class="checkbox"><input name="inicial" value="1" type="checkbox" <?= $tarea->inicial ? 'checked' : '' ?>> Tarea Inicial</label>
+                            <label class="checkbox"><input name="inicial" id="inicial" value="1" type="checkbox" <?= $tarea->inicial ? 'checked' : '' ?>> Tarea Inicial</label>
                             <label class="checkbox"><input name="final" value="1" type="checkbox" <?= $tarea->final ? 'checked' : '' ?>> Tarea Final</label>
                         </div>
                         <div class="span6">
@@ -201,9 +201,18 @@
                                         else
                                             $("#activacionEntreFechas").hide();  
                                     }).change();
-                                
+                                    $("#inicial").click(function() {
+                                        if($('#inicial').prop('checked')) {
+                                            $("#DivExponer").show();
+                                        } else {
+                                            $("#DivExponer").hide();
+                                        }
+                                    });
                                 });
                             </script>
+                            <div id="DivExponer" style="display:none;">
+                                <label class="checkbox"><input name="exponer" value="1" type="checkbox">Exponer trámite</label>    
+                            </div>
                             <label class="radio"><input name="activacion" value="si" type="radio" <?= $tarea->activacion == 'si' ? 'checked' : '' ?>>Tarea activada</label>
                             <label class="radio"><input name="activacion" value="entre_fechas" type="radio" <?= $tarea->activacion == 'entre_fechas' ? 'checked' : '' ?>>Tarea activa entre fechas</label>
                             <div id="activacionEntreFechas" class="hide" style="margin-left: 20px;">
