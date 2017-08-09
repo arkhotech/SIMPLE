@@ -71,20 +71,7 @@ class Seguridad extends Doctrine_Record {
                 <textarea id="request_seg" name="extra[request_seg]" rows="7" cols="70" placeholder="{ object }" class="oauth input-xxlarge">' . ($this->extra ? $this->extra->request_seg : '') . '</textarea>
                 <br />
                 <span id="resultRequest" class="spanError"></span>
-                <br /><br />
-
-
-                <label>Client Id</label>
-                <input type="text" id="client_id" name="extra[client_id]" class="oauth" value="'.(isset($this->extra->client_id) ? $this->extra->client_id : '').'">
-
-                <label>Client Secret</label>
-                <input type="text" id="client_secret" name="extra[client_secret]" class="oauth" value="'.(isset($this->extra->client_secret) ? $this->extra->client_secret : '').'">
-
-                <label>Scope</label>
-                <input type="text" id="scope" name="extra[scope]" class="oauth" value="'.(isset($this->extra->scope) ? $this->extra->scope : '').'">
-
-                <label>Grant Type</label>
-                <input type="text" id="grant_type" name="extra[grant_type]" class="oauth" value="'.(isset($this->extra->grant_type) ? $this->extra->grant_type : '').'">
+                <br />
             </div>';
         return $display;
     }
