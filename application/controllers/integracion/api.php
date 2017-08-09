@@ -34,12 +34,14 @@ class API extends MY_BackendController {
      */
     
     public function especificacion($operacion ,$id_tramite){
-
-        if($tipo!= "servicio" || $tipos != "form" ){
+        
+        //Cheque que la URL se complete correctamente
+        if($operacion!= "servicio" && $operacion!= "form"){
+            echo "$operacion";die;
             show_error("404 No encontrado",404, "No se encuentra la operacion" );
             exit;
         }
-        
+         
         switch($this->input->server('REQUEST_METHOD')){
             case "GET": 
                 $this->generarEspecificacion($operacion,$id_tramite);
@@ -55,42 +57,53 @@ class API extends MY_BackendController {
      * @param type $id_tramite
      * @param type $id_paso
      */
-    public function status($tipo,$id_tramite, $id_paso= NULL){
+    public function status($tipo,$id_tramite, $rut ){
         
         if($tipo!= "tramite" ){
             show_error("404 No encontrado",404, "No se encuentra la operacion" );
             exit;
         }
         
+        if($rut == NULL || $id_tramite == NULL ){
+            show_error("400 Bad Request",400, "Uno de los parametros de entrada no ha sido especificado" );
+        }
+        
         switch($this->input->server('REQUEST_METHOD')){
             case "GET": 
-                echo "hacer algo";
+                $this->obtenerStatus($id_tramite,$rut);
                 break;
             default:
                 show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
         }
     }
     
+    private function checkJsonHeader(){
+        $headers = $this->input->request_headers();
+        if($headers['Content-Type']==NULL || $headers['Content-Type']!="application/json"){
+            show_error("415 Unsupported Media Type",415, "Se espera application/json" );
+        }
+    }
+    
     public function tramites($proceso_id, $etapa = null) {
         
-        $method = $this->input->server('REQUEST_METHOD');
-        $body = $this->getBody();
         //Tomar los segmentos desde el 3 para adelante
         //$urlSegment = $this->uri->segments;
         
-        $headers = $this->input->request_headers();
+        //$headers = $this->input->request_headers();
         
         //print_r($urlSegment);
         //$cuenta = Cuenta::cuentaSegunDominio();
 
-        switch($method){
+        switch($method = $this->input->server('REQUEST_METHOD')){
             case "GET":
                 $this->listarCatalogo();
                 break;
             case "PUT":
-                $this->continuarProceso($input);
+                $this->checkJsonHeader();
+                $this->continuarProceso($proceso_id,$etapa,$this->getBody());
                 break;
             case "POST":
+                $this->checkJsonHeader();
                 $this->iniciarProceso($proceso_id,$this->getBody());
                 break;
             default:
@@ -98,17 +111,7 @@ class API extends MY_BackendController {
         }
         
          echo $this->input->method(FALSE);
-      //  $api_token=$this->input->get('token');
-        
-        //obtener el token
-//        
-//        
-//        if(!$cuenta->api_token)
-//            show_404 ();
-//        
-//        if($cuenta->api_token!=$api_token)
-//            show_error ('No tiene permisos para acceder a este recurso.', 401);
-        
+  
          die;
         $respuesta = new stdClass();
         if ($proceso_id) {
@@ -143,7 +146,8 @@ class API extends MY_BackendController {
         echo json_indent(json_encode($respuesta));
     }
 
-    
+    //Esta funcion debería estar en modelo
+   
     function normalizarFormulario($json){
         $retval = array();
         foreach( $json['Campos'] as $campo){
@@ -187,20 +191,37 @@ class API extends MY_BackendController {
         $this->responseJson($response);
     }
     
-    private function continuarProceso($idProceso,$idEtapa, $body){
+    private function continuarProceso($idProceso,$idEtapa=NULL, $body){
+        $data = json_decode($body,true);
         
+         $response = array(
+           "codigoRetorno" => 0,
+           "descRetorno" => "Problemas para iniciar",
+           "idProximoPaso" => $idProceso + 1,
+           "proximoFormulario" => $data['data']
+           );
+         $this->responseJson($response);
     }
     
-    private function responseJson($response){
-         header('Content-type: application/json');
-       echo json_indent(json_encode($response));
-    }
-
     private function generarEspecificacion($operacion,$id_proceso = NULL){
         $this->load->helper('download');
         //llamar al generador de Swagger
         force_download("test.txt", "esto es una prueba");
         exit;
+    }
+    
+    private function obtenerStatus($id_tramite, $rut ){
+        
+        $response = array("idTramite" => $id_tramite,
+            "nombreTramite" => "Hardcoded Dummy",
+            "rutUsuario" => $rut,
+            "nombreEtapaActual" => "Eetapa Cero");
+        $this->responseJson($response);
+    }
+    
+     private function responseJson($response){
+         header('Content-type: application/json');
+       echo json_indent(json_encode($response));
     }
     
 }
