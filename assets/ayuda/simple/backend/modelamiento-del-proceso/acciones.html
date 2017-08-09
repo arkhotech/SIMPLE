@@ -76,7 +76,7 @@
 				  <li><a href="../../index.html">Simple</a> <span class="divider">/</span></li><li><a href="../index.html">Backend</a> <span class="divider">/</span></li><li><a href="index.html">Modelamiento del Proceso</a> <span class="divider">/</span></li><li>Acciones</li>
 				</ul>
 				<h3>2.3.3                   Acciones del proceso</h3>
-					<p>Las acciones permiten realizar eventos especiales al iniciar o finalizar una tarea del modelo de procesos, en la actualidad existen dos acciones predefinidas que se pueden utilizar al modelar el proceso, siendo el envío de correos y la consulta hacia un WebService.</p>
+					<p>Las acciones permiten realizar eventos especiales al iniciar o finalizar una tarea del modelo de procesos, en la actualidad existen cuatro acciones predefinidas que se pueden utilizar al modelar el proceso, las cuales son envío de correos, generar variable, consumo de servicio rest y consumo de servicio soap.</p>
 					<p>Para ingresar al menú de acciones simplemente haga clic sobre la pestaña <em>Acciones</em>. Como se indica en la imagen siguiente:</p>
 					<p> </p>
 					<p><img src="../../../assets/img/BackEnd/Acciones/Figura32-AC.png" alt="" width="567" height="225" /></p>
@@ -90,42 +90,11 @@
 					</ul>
 					</li>
 					</ul>
-					<p id="acciones_tipo"><img src="../../../assets/img/BackEnd/Acciones/Acciones-Tipo.png" alt="" width="558" height="158" /><br /> </p>
+					<p id="acciones_tipo"><img src="../../../assets/img/BackEnd/Acciones/Figura33-AC.png" alt="" width="558" height="158" /><br /> </p>
 					<p>Figura 33: "Nueva acción"</p>
 					<p> </p>
 
-					<h4 id="webservice">Acción WebService</h4>
-					<p>De seleccionar Consultar WebService, se desplegará la siguiente imagen:</p>
-					<p> </p>
-					<p><img src="../../../assets/img/BackEnd/Acciones/Figura34-AC.png" alt="" width="454" height="402" /></p>
-					<p>Figura 34: "Ventana para generación de Acción"</p>
-					<p> </p>
-					<p> En donde:</p>
-					<ul>
-					<li>Campo <em>Nombre</em>: Corresponde al nombre de la acción a generar.</li>
-					<li>Campo<em> URL</em>: Corresponde a la dirección del WebService que se desea consultar/ejecutar. Considere que mediante la URL indicada también podrá le podrá pasar valores por parámetro al WebService. Por ejemplo, si usted desea pasar la variable Rut como parámetro, debe escribir la URL de la siguiente forma:</li>
-					</ul>
-					<p>http://servidorweb/webservice/webservice.php?rut=@@rut</p>
-					<p> </p>
-					<p>Tenga presente, que el WebService DEBE OBLIGATORIAMENTE responder con formato JSON y aceptar consultas vía REST, siendo la salida obligatoria, con la siguiente estructura:</p>
-					<p> </p>
-					<p>{</p>
-					<p>    "variable1": "valor1",</p>
-					<p>    "variable2": "valor2",</p>
-					<p>    ...</p>
-					<p>}</p>
-					<p> </p>
-					<p>Las variables de respuesta, podrán ser utilizadas anteponiendo @@, por ejemplo, al utilizar la variable <em>@@variable2</em> informará lo que se devuelva como <em>valor2</em>.</p>
-					<p> </p>
-					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
-					<p> </p>
-					<p>Dado que nos encontramos realizando un ejemplo para la entrega de Cupón de Pago para Afiliados a CPA, uno de los WebService a requerir es para Validar la Afiliación, que nos retorne mediante el Rut si el usuario está afiliado o no. Por lo que la llamada al WebService  quedaría de la siguiente forma:</p>
-					<p> </p>
-					<p><img src="../../../assets/img/BackEnd/Acciones/Figura35-AC.png" alt="" width="454" height="386" /> </p>
-					<p>Figura 35: "Generación de Acción WebService - Ejemplo Valida Afiliación"</p>
-					<p> </p>
-					<p>Para finalizar simplemente presione Guardar.</p>
-					<p> </p>
+
 					<h4 id="enviar_correo">Acción Correo Electrónico</h4>
 					<p>Por otro lado, si selecciona <em>correo electrónico</em>,  se desplegará la siguiente ventana, en la cual simplemente debe completar los datos requeridos:</p>
 					<p> </p>
@@ -235,7 +204,100 @@
 						<b>Visualización en Seguimiento</b>
 						<p><img src="../../../assets/img/img_gen_var/img12_.png" alt="" width="100%" height="349" /></p><br/>
 
-	
+					<h4 id="webservice-rest">Acción Consultar WebService REST</h4>
+					<p>Después de seleccionar Consultar Rest, se desplegará la siguiente imagen:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura34-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 34: "Ventana para generación de Acción"</p>
+					<p> </p>
+					<p> En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em> Endpoint</em>: Corresponde a la dirección del host que provee el servicio.</li>
+						<li>Campo<em> Resource</em>: Corresponde a la direccion del servicio propiemente tal. Considere que mediante esta url, se le podrá valores. Por ejemplo, si usted desea pasar la variable Rut como parámetro, en caso de elegir el método GET, debe escribir la URL de la siguiente forma: http://server/resource/11111111-1</li>
+						<li>Campo<em> Método</em>: Metodos HTTP disponibles para elconsumo de servicios Rest (GET, POST, PUT, DELETE)</li>
+						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout</li>
+						<li>Campo<em> Header</em>: Corresponde a la definición de parámetros a pasar en la cabecera de la petición</li>
+						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
+					</ul>
+					<p>Por ejemplo, para la siguinete URL: http://servidorweb/webservice/webservice.php?rut=@@rut</p>
+ 					<p>La parte <em>http://servidorweb</em> corresponde al Endpoint. Y la parte <em>/webservice/webservice.php</em> corresponde al Resource.</p>
+					<p> </p>
+					<p>Tenga presente, que el WebService DEBE OBLIGATORIAMENTE responder con formato JSON y aceptar consultas vía REST.</p>
+					<p> </p>
+					<p>Las variables de respuesta, podrán ser utilizadas anteponiendo @@, por ejemplo, al utilizar la variable <em>@@variable2</em> informará lo que se devuelva como <em>valor2</em>.</p>
+					<p> </p>
+					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
+
+					<h4 id="webservice-soap">Acción Consultar WebService SOAP</h4>
+					<p>De seleccionar Consultar SOAP, se desplegará la siguiente imagen:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura35-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 35: "Ventana para generación de Acción"</p>
+					<p> </p>
+					<p> En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em> WSDL</em>: URL que especifica el WSDL del servicio SOAP. Opcionalmente existe la opción de cargar un archivo wsdl a través del botón "Importar".</li>
+						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout</li>
+						<li>Campo<em> Métodos</em>: Una vez consultada la URL del web service o cargado el archivo wsdl, los métodos descubiertos son presentados en este listado.</li>
+						<li>Campo<em> Request</em>: En este campo, una vez seleccionado el método a consumir, se debe completar los datos a  enviar al servicio. Una forma gfácil de hacer esto, es probar el servicio con SOAPUI y copiar el request generado dentro de este campo.</li>
+						<li>Campo<em> Response</em>: Corresponde a un ejemplo de respuesta asociado al método seleccionado.</li>
+						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
+					</ul>
+					<p> </p>
+					<p>Tenga presente, que la respuesta del WebService quedará almacenada en una variable llamada "response_soap".</p>
+					<p> </p>
+					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
+
+					<h4 id="webservice-seguridad">Administración de Seguridad en WebServices</h4>
+					<p>Para configurar la seguridad en el consumo de webservices REST y SOAP, es necesario seleccionar la pestaña de Seguridad, la cual se muestra en la siguiente figura:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura37-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 37: "Configuración de seguridad"</p>
+					<p> </p>
+					<p> Al presionar el botón nuevo, se desplegará el siguiente formulario</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura38-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 38: "Ventana para configuración de seguridad"</p>
+					<p> </p>
+					<p>En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la Institución</em>: Corresponde al nombre de la institución que provee el servicio.</li>
+						<li>Campo<em> Nombre del Servicio</em>: Corresponde al nombre del servicio que solicita mecanismos de seguridad.</li>
+						<li>Campo<em> Tipo de Seguridad</em>: Corresponde al tipo de seguridad (HTTP_BASIC, API_KEY, OAUTH2), dependiendo del tipode seguridad elegido se muestran los siguinetes campos:</li>
+						<li><em>HTTP_BASIC</em></li>
+						<ul>
+							<li>Campo<em> Usuario</em>: Corresponde al nombre de usuario con el cual se autenticará el servicio</li>
+							<li>Campo<em> Contraseña</em>: Corresponde a la contraseña del usuario para autenticar el servicio</li>
+						</ul>
+						<li><em>API_KEY</em></li>
+						<ul>
+							<li>Campo<em> Llave de aplicación (Api key)</em>: Corresponde a la key con la cual se autenticará el servicio, se debe especificar junto con la key el tipo, por ejemplo "Bearer <key>"</li>
+							<li>Campo<em> Nombre de aplicación (Name key)</em>: Corresponde al nombre de la propiedad del header, por ejemplo podría ser "X-API-Key"</li>
+						</ul>
+						<li><em>OAUTH2</em></li>
+						<ul>
+							<li>Campo<em> Endpoint</em>: Corresponde al nombre del server que provee el mecanismo de autenticación</li>
+							<li>Campo<em> Resource</em>: Corresponde a la operación que provee el token una vez validadas las credenciales</li>
+							<li>Campo<em> Request</em>: Corresponde a la petición, en donde irán las credenciales solicitadas por el servicio de autenticación</li>
+							<li>Campo<em> Client Id</em>: Corresponde al identificador del cliente que requiere autenticarse</li>
+							<li>Campo<em> Client Secret</em>: Corresponde al secreto que debe saber el cliente</li>
+							<li>Campo<em> Scope</em>: Corresponde al alcance</li>
+							<li>Campo<em> Grant Type</em>: Corresponde al nivel de permisos requerido</li>
+						</ul>
+					</ul>
+					<p> </p>
+					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
 
 				</div>
 			</div>
