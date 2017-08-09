@@ -2,7 +2,7 @@
 	class Migration_40 extends Doctrine_Migration_Base {
 
 	    public function up() {
-	        $this->addColumn('tarea', 'exponer_tramite', 'tinyint', null, array('notnull'=>1,'default'=>0));
+	        $this->addColumn('tarea', 'exponer_tramite', 'tinyint', null, array('notnull'=>1));
 	    }
 
 	    public function postUp() {
