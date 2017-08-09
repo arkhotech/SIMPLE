@@ -10,5 +10,8 @@
         <li class="nav-header">Procesos</li>
         <li class="<?=$this->uri->segment(3)=='procesos_obtener'?'active':''?>"><a href="<?= site_url('backend/api/procesos_obtener') ?>">obtener</a></li>
         <li class="<?=$this->uri->segment(3)=='procesos_listar'?'active':''?>"><a href="<?= site_url('backend/api/procesos_listar') ?>">listar</a></li>
+        <li class="<?=$this->uri->segment(3)=='procesos_disponibles'?'active':''?>"><a href="<?= site_url('backend/api/procesos_disponibles') ?>">listar2</a></li>
+
+    </li>
     </ul>
 </div>

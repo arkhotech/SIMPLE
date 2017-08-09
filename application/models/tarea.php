@@ -376,6 +376,5 @@ class Tarea extends Doctrine_Record {
                 $this->EventosExternos[] = $evento_externo;
             }
         }
-    }
-    
+    }  
 }

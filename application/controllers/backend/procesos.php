@@ -515,23 +515,6 @@ class Procesos extends MY_BackendController {
         //print_r(json_encode($modelo));
         //exit;
         echo json_encode($modelo);
-    }
-
-    //Funcion para listar los tramites expuestos como servicios
-    public function listar_expuestos(){
-        $response=Doctrine::getTable('Tarea')->findBy('exponer_tramite',1);
-        //findBy($fieldName, $value, $hydrationMode = null)
-        
-        /*if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
-            echo 'Usuario no tiene permisos para editar esta tarea.';
-            exit;
-        }*/
-        
-        if($response){
-            echo $respuesta;
-        }else{
-            echo 0;
-        }  
     }  
 }
 

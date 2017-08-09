@@ -161,19 +161,21 @@ class API extends MY_BackendController {
 
     
     private function listarCatalogo(){
-        
-        
-        $items[] = array(
-            "id" => 123,
-            "nombre" => "Servicio miltar",
-            "fechaCreacion" => "08/08/2017",
-            "tipo" => "inicio",
-            "descripcion" => "blablcablcabl",
-            "url" => "https://localhost/test"); 
-        
-       $retval["catalogo"] = $items; 
+        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos();
+        $result = array();
+        foreach($tarea as $res ){
+            array_push($result, array(
+                "id" => $res['id'],
+                "nombre" => $res['nombre'],
+                "tarea" => $res['tarea'],
+                "descripcion" => $res['previsualizacion'],
+                "URL" => 'https://localhost/integracion/api/tramites/espec/{'.$res['id'].'}'
+            )); 
+        }   
+       $retval["catalogo"] = $result; 
        header('Content-type: application/json');
        echo json_indent(json_encode($retval));
+       exit;
     }
     
     private function iniciarProceso($idTramite,$body){
@@ -202,5 +204,6 @@ class API extends MY_BackendController {
         force_download("test.txt", "esto es una prueba");
         exit;
     }
+
     
 }
