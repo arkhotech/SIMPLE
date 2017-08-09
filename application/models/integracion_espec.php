@@ -10,10 +10,12 @@
 
 class FormNormalizer{
     
-    private function mapType($tipo){
-        switch ($tipo){
+    private function mapType($campo){
+        switch ($campo['tipo']){
             case "file": return "base64";
             case "checkbox": return "boolean";
+            case "grid": return "grid";
+            case "date" : return "date";
             default: return "string";
         }
     }
@@ -32,9 +34,9 @@ class FormNormalizer{
                   array( 
                     "nombre" => $campo['nombre'],
                     "tipo_control" => $campo['tipo'],
-                    "tipo" => $this->mapType($campo['tipo']),  //$campo['dependiente_tipo'],
+                    "tipo" => $this->mapType($campo),  //$campo['dependiente_tipo'],
                     "obligatorio" => ($campo['readonly']==0) ? false : true,
-                    "dominio_valores" => $campo['datos'])
+                    "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'])
                     );
                 
         }
