@@ -17,10 +17,18 @@
 <form id="plantillaForm" class="ajaxForm" method="POST" action="<?=site_url('backend/Admseguridad/editar_form/'.($edit?$seguridad->id:''))?>">
     <fieldset>
         <?php if(!$edit):?>
-            <legend> Regitrar métodos de seguridad</legend>
+            <legend> Regitrar métodos de seguridad
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice-seguridad" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </legend>
         <?php endif; ?>
         <?php if($edit):?>
-            <legend> Editar métodos de seguridad</legend>
+            <legend> Editar métodos de seguridad
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice-seguridad" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            </legend>
         <?php endif; ?>
         <div class="validacion"></div>
         <?php if(!$edit):?>
