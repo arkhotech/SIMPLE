@@ -167,13 +167,15 @@ class API extends MY_BackendController {
     private function listarCatalogo(){
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos();
         $result = array();
+        $nombre_host = gethostname();
+        ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
         foreach($tarea as $res ){
             array_push($result, array(
                 "id" => $res['id'],
                 "nombre" => $res['nombre'],
                 "tarea" => $res['tarea'],
                 "descripcion" => $res['previsualizacion'],
-                "URL" => 'https://localhost/integracion/api/tramites/espec/{'.$res['id'].'}'
+                "URL" => $protocol.$nombre_host.'/integracion/api/tramites/espec/'.$res['id']
             )); 
         }   
        $retval["catalogo"] = $result; 

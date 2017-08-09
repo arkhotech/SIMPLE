@@ -75,12 +75,20 @@ class API extends MY_BackendController {
     
     public function tramites_listar(){
         $this->_auth();
-        
         $data['title']='Tramites: listar';
         $data['content']='backend/api/tramites_listar';
         $this->load->view('backend/template',$data);
     }
     
+    public function procesos_disponibles(){
+        $this->_auth();
+        
+        $data['title']='Trámites disponibles como servicios';
+        $data['content']='backend/api/tramites_disponibles';
+        $data['json'] = Doctrine::getTable('Proceso')->findProcesosExpuestos();
+        $this->load->view('backend/template',$data);
+    }
+
     public function tramites_listarporproceso(){
         $this->_auth();
         

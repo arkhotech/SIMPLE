@@ -7,7 +7,7 @@
 
 	    public function postUp() {
 	        $q = Doctrine_Manager::getInstance()->getCurrentConnection();
-	        $q->execute("UPDATE tarea SET exponer_tramite=1");
+	        $q->execute("UPDATE tarea SET exponer_tramite=0");
 	    }
 
 	    public function down() {
