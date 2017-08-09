@@ -34,6 +34,14 @@
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#variable" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
+        <?php } else if ($tipo == "rest") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice-rest" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "soap") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice-soap" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
         <?php } ?>
         </legend>
         <div class="validacion"></div>
