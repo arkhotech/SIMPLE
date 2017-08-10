@@ -1,0 +1,190 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "SIMPLE START",
+    "description": "API REST V1"
+  },
+  "host": "simple.cl",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "basePath": "/integracion/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/tramites/{id_tramite}": {
+      "post": {
+        "summary": "Inicio Trámite SIMPLE",
+        "description": "Servicio responsable de iniciar un trámite en SIMPLE.",
+        "parameters": [
+          {
+            "name": "id_tramite",
+            "in": "path",
+            "description": "Id de la definición del trámite a iniciar",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "description": "Formulario entrada para iniciar trámite",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trámite iniciado con éxito.",
+            "schema": {
+              "$ref": "#/definitions/output"
+            }
+          },
+          "400": {
+            "description": "Input no cumple con lo especificado.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "404": {
+            "description": "Trámite o terea no encontrado",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "500": {
+            "description": "Problemas internos.",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          },
+          "default": {
+            "description": "Error general de aplicación",
+            "schema": {
+              "$ref": "#/definitions/error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "request": {
+      "type": "object",
+      "properties": {
+        "callback": {
+          "type": "string"
+        },
+        "data_entrada": {
+          "type": "object",
+          "properties": {
+            -DATA_ENTRADA-
+        }
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "codigo_retorno": {
+        "type": "integer"
+      },
+      "descripcion_retorno": {
+        "type": "string"
+      },
+      "resultado": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/obj_generico"
+        }
+      },
+      "formularios": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/formulario"
+        }
+      }
+    }
+  },
+  "obj_generico": {
+    "type": "object",
+    "properties": {
+      "clave": {
+        "type": "string"
+      },
+      "valor": {
+        "type": "string"
+      }
+    }
+  },
+  "formulario": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "campos": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/campo"
+        }
+      }
+    }
+  },
+  "campo": {
+    "type": "object",
+    "properties": {
+      "nombre": {
+        "type": "string"
+      },
+      "tipo_control": {
+        "type": "string"
+      },
+      "tipo": {
+        "type": "string"
+      },
+      "valor": {
+        "type": "string"
+      },
+      "obligatorio": {
+        "type": "boolean"
+      },
+      "dominio_valores": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/valores_control"
+        }
+      }
+    }
+  },
+  "valores_control": {
+    "type": "object",
+    "properties": {
+      "clave": {
+        "type": "string"
+      },
+      "valor": {
+        "type": "string"
+      }
+    }
+  },
+  "error": {
+    "type": "object",
+    "properties": {
+      "codigo_retorno": {
+        "type": "integer"
+      },
+      "descripcion_retorno": {
+        "type": "string"
+      }
+    }
+  }
+}
+}
