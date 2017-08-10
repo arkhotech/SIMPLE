@@ -16,7 +16,6 @@
                                             <a class="ministerio" href="http://www.minsegpres.gob.cl" target="_blank">Ministerio Secretaría General de la Presidencia</a></p>
                                         <br />
                                         <p><a href="http://instituciones.chilesinpapeleo.cl/page/view/simple" target="_blank">Powered by SIMPLE</a></p>
-                                        
                                     </div>
                                 </div>
 

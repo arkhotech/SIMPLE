@@ -89,6 +89,7 @@ if ( ! function_exists('current_url'))
 }
 
 // ------------------------------------------------------------------------
+
 /**
  * URL String
  *
@@ -125,6 +126,8 @@ if ( ! function_exists('index_page'))
 	}
 }
 
+// ------------------------------------------------------------------------
+
 /**
  * sitekey
  *
@@ -137,6 +140,23 @@ if (!function_exists('sitekey')) {
 	function sitekey() {
 		$CI =& get_instance();
 		return $CI->config->item('sitekey');
+	}
+}
+
+// ------------------------------------------------------------------------
+
+/**
+ * mapskey
+ *
+ * Returns the "mapskey" from your config file
+ *
+ * @access	public
+ * @return	string
+ */
+if (!function_exists('mapskey')) {
+	function mapskey() {
+		$CI =& get_instance();
+		return $CI->config->item('mapskey');
 	}
 }
 
