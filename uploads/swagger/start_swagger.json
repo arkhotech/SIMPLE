@@ -5,7 +5,7 @@
     "title": "SIMPLE START",
     "description": "API REST V1"
   },
-  "host": "simple.cl",
+  "host": "-HOST-",
   "schemes": [
     "http",
     "https"
