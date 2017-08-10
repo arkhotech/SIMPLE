@@ -27,8 +27,8 @@ class ProcesoTable extends Doctrine_Table {
         return $procesos;
     }
 
-    public function findProcesosExpuestos() {
-        $sql = "select p.id, p.nombre, t.nombre as tarea,  t.exponer_tramite, t.previsualizacion from proceso p, tarea t where p.id = t.proceso_id and t.exponer_tramite=1;";
+    public function findProcesosExpuestos($cuenta_id){
+        $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion from proceso p, tarea t where p.id = t.proceso_id and t.exponer_tramite=1;";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
         ->fetchAll();

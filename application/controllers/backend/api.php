@@ -82,7 +82,6 @@ class API extends MY_BackendController {
     
     public function procesos_disponibles(){
         $this->_auth();
-        
         $data['title']='Trámites disponibles como servicios';
         $data['content']='backend/api/tramites_disponibles';
         $data['json'] = Doctrine::getTable('Proceso')->findProcesosExpuestos();

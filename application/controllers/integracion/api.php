@@ -33,18 +33,18 @@ class API extends MY_BackendController {
      * Tramote id es el identificador del proceso
      */
     
-    public function especificacion($operacion ,$id_tramite){
+    public function especificacion($operacion ,$id_tramite,$id_tarea = NULL,$id_paso = NULL){
         
         //Cheque que la URL se complete correctamente
         if($operacion!= "servicio" && $operacion!= "form"){
             echo "$operacion";die;
-            show_error("404 No encontrado",404, "No se encuentra la operacion" );
+            show_error("404 No encontrado",404, "La operación no existe" );
             exit;
         }
          
         switch($this->input->server('REQUEST_METHOD')){
             case "GET": 
-                $this->generarEspecificacion($operacion,$id_tramite);
+                $this->generarEspecificacion($operacion,$id_tramite,$id_tarea,$id_paso);
                 break;
             default:
                 show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
@@ -166,6 +166,7 @@ class API extends MY_BackendController {
     
     private function listarCatalogo(){
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos();
+        //$tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();
         $nombre_host = gethostname();
         ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
@@ -175,7 +176,7 @@ class API extends MY_BackendController {
                 "nombre" => $res['nombre'],
                 "tarea" => $res['tarea'],
                 "descripcion" => $res['previsualizacion'],
-                "URL" => $protocol.$nombre_host.'/integracion/api/tramites/espec/'.$res['id']
+                "URL" => $protocol.$nombre_host.'/integracion/api/tramites/espec/'.$res['id'].'/'.$res['id_tarea']
             )); 
         }   
        $retval["catalogo"] = $result; 
@@ -207,11 +208,18 @@ class API extends MY_BackendController {
          $this->responseJson($response);
     }
     
-    private function generarEspecificacion($operacion,$id_proceso = NULL){
-        $this->load->helper('download');
-        //llamar al generador de Swagger
-        force_download("test.txt", "esto es una prueba");
-        exit;
+    private function generarEspecificacion($operacion,$id_tramite=NULL,$id_tarea=NULL,$id_paso = NULL){
+        
+        if($operacion === "form"){
+            $integrador = new FormNormalizer();
+            $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
+            $this->responseJson($response);
+        }else{
+            $this->load->helper('download');
+            //llamar al generador de Swagger
+            force_download("test.txt", "esto es una prueba");
+            exit;
+        }
     }
 
     
