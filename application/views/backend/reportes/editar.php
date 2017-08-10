@@ -109,14 +109,11 @@
 
 	        </select>
             <div class="btn-group-vertical" role="group">
-	        
-	        <button class = "btn btn-primary" type="button" onclick="seleccionarHeader()"><i class="icon-white icon-chevron-right"></i></button>
-	        <button class = "btn btn-primary" type="button" onclick="eliminarHeader()"><i class="icon-white icon-chevron-left"></i></button>
-				
+	        	<button class = "btn btn-primary" type="button" onclick="seleccionarHeader()"><i class="icon-white icon-chevron-right"></i></button>
+	        	<button class = "btn btn-primary" type="button" onclick="eliminarHeader()"><i class="icon-white icon-chevron-left"></i></button>
 			</div>
 	        
 	        <select id="seleccionados" name="campos[]" style="height: 240px;" multiple>
-	        	
 	        	<?php foreach($reporte->campos as $c):?>
 	        	<option value="<?=$c?>" name = "<?php 
 	        		if (in_array($c,$tramiteHeaders))
@@ -128,19 +125,12 @@
 	        	
 	        	?>"><?=$c?></option>
 	        	<?php endforeach;?>
-	        	
 	        </select>
 	        
 	        <div class="btn-group-vertical" role="group">
-	        
             <button class = "btn btn-primary" type="button" onclick="subirOrden()"><i class="icon-white icon-chevron-up"></i></button>
 	        <button class = "btn btn-primary" type="button" onclick="bajarOrden()"><i class="icon-white icon-chevron-down"></i></button>
-	        
-	        </div>
-	        
-
-	        
-	        
+	        </div>  
         <div/>
         
         

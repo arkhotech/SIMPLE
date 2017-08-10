@@ -84,7 +84,7 @@ class API extends MY_BackendController {
         $this->_auth();
         $data['title']='Trámites disponibles como servicios';
         $data['content']='backend/api/tramites_disponibles';
-        $data['json'] = Doctrine::getTable('Proceso')->findProcesosExpuestos();
+        $data['json'] = Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $this->load->view('backend/template',$data);
     }
 

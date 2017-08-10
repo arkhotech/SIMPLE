@@ -165,8 +165,7 @@ class API extends MY_BackendController {
 
     
     private function listarCatalogo(){
-        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos();
-        //$tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
+        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();
         $nombre_host = gethostname();
         ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
@@ -176,7 +175,7 @@ class API extends MY_BackendController {
                 "nombre" => $res['nombre'],
                 "tarea" => $res['tarea'],
                 "descripcion" => $res['previsualizacion'],
-                "URL" => $protocol.$nombre_host.'/integracion/api/tramites/espec/'.$res['id'].'/'.$res['id_tarea']
+                "URL" => $protocol.$nombre_host.'/integracion/api/especificacion/servicio/'.$res['id'].'/'.$res['id_tarea']
             )); 
         }   
        $retval["catalogo"] = $result; 
@@ -198,7 +197,6 @@ class API extends MY_BackendController {
     
     private function continuarProceso($idProceso,$idEtapa=NULL, $body){
         $data = json_decode($body,true);
-        
          $response = array(
            "codigoRetorno" => 0,
            "descRetorno" => "Problemas para iniciar",
