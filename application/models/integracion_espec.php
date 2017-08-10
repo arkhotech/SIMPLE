@@ -122,9 +122,9 @@ class FormNormalizer{
         $swagger = "";
 
         $nombre_host = gethostname();
-        ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
+        //($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
 
-        log_message("info", "HOST: ".$protocol.$nombre_host, FALSE);
+        log_message("info", "HOST: ".$nombre_host, FALSE);
 
         if ($file = fopen("uploads/swagger/start_swagger.json", "r")) {
             while(!feof($file)) {
