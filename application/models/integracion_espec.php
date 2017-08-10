@@ -16,6 +16,7 @@ class FormNormalizer{
             case "checkbox": return "boolean";
             case "grid": return "grid";
             case "date" : return "date";
+            case "subtitle" : return "string";
             default: return "string";
         }
     }
@@ -24,8 +25,9 @@ class FormNormalizer{
         
         return "0";
     }
-    
+            
     function normalizarFormulario($json,$id){
+       
         $retval['form'] = array('id' => $id, 'campos' => array() );
         //print_r($json);
         foreach( $json['Campos'] as $campo){
@@ -57,8 +59,7 @@ class FormNormalizer{
         $result = array();
         if($id_tarea== NULL && $id_paso == NULL){
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
-            
-            
+
             foreach($tramite->Formularios as $form){
                 $formSimple = Doctrine::getTable('Formulario')->find($form->id)->exportComplete();
                 $json = json_decode($formSimple,true);
