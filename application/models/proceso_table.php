@@ -28,12 +28,32 @@ class ProcesoTable extends Doctrine_Table {
     }
 
     public function findProcesosExpuestos($cuenta_id){
-        $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion from proceso p, tarea t where p.id = t.proceso_id and t.exponer_tramite=1;";
+        if (strlen($cuenta_id)>0){
+            log_message('info','Si tiene id');
+            $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre as nombre_cuenta from proceso p, tarea t, cuenta c where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1 and p.cuenta_id=".$cuenta_id.";";
+        }else{
+            log_message('info','No tiene id');
+            $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre as nombre_cuenta from proceso p, tarea t, cuenta c where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1;";
+        }
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
         ->fetchAll();
         return $result;
     }
 
+    public function findVariblesFormularios($proceso_id){
+        $sql = "select c.nombre as nombre_campo, c.valor_default, c.tipo, c.validacion, c.dependiente_tipo, f.nombre as nombre_formulario, p.nombre as nombre_proceso from campo c, formulario f, proceso p where c.formulario_id=f.id and f.proceso_id = p.id and p.activo=1 and f.proceso_id=".$proceso_id." and c.valor_default like '%@@%' order by nombre_formulario;";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+        ->fetchAll();
+        return $result;
+    }
 
+    public function findVariblesProcesos($proceso_id){
+        $sql = "select a.nombre as nombre_variable, a.extra, p.nombre as nombre_proceso from accion a, proceso p where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and a.proceso_id=".$proceso_id.";";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+        ->fetchAll();
+        return $result;
+    }
 }

@@ -116,8 +116,7 @@ class API extends MY_BackendController {
 
     
     private function listarCatalogo(){
-        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos();
-        //$tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
+        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();
         $nombre_host = gethostname();
         ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
@@ -127,7 +126,7 @@ class API extends MY_BackendController {
                 "nombre" => $res['nombre'],
                 "tarea" => $res['tarea'],
                 "descripcion" => $res['previsualizacion'],
-                "URL" => $protocol.$nombre_host.'/integracion/api/tramites/espec/'.$res['id'].'/'.$res['id_tarea']
+                "URL" => $protocol.$nombre_host.'/integracion/api/especificacion/servicio/'.$res['id'].'/'.$res['id_tarea']
             )); 
         }   
        $retval["catalogo"] = $result; 
@@ -179,7 +178,6 @@ class API extends MY_BackendController {
     
     private function continuarProceso($idProceso,$idEtapa=NULL, $body){
         $data = json_decode($body,true);
-        
          $response = array(
            "codigoRetorno" => 0,
            "descRetorno" => "Problemas para iniciar",
@@ -190,19 +188,22 @@ class API extends MY_BackendController {
     }
     
     private function generarEspecificacion($operacion,$id_tramite=NULL,$id_tarea=NULL,$id_paso = NULL){
-        try{
-            if($operacion === "form"){
-                $integrador = new FormNormalizer();
-                $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
-                $this->responseJson($response);
-            }else{
-                $this->load->helper('download');
-                //llamar al generador de Swagger
-                force_download("test.txt", "esto es una prueba");
-                exit;
-            }
-        }catch(Exception $e){
-            print_r($e);
+        
+        if($operacion === "form"){
+            $integrador = new FormNormalizer();
+            $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
+            $this->responseJson($response);
+        }else{
+            $this->load->helper('download');
+
+            $integrador = new FormNormalizer();
+            /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
+            $formulario = $integrador->obtenerFormularios($id_tramite, $id_tarea, 0);
+
+            $swagger_file = $integrador->generar_swagger($formulario);
+
+            force_download("start_simple.json", $swagger_file);
+            exit;
         }
     }
 
@@ -220,7 +221,15 @@ class API extends MY_BackendController {
          header('Content-type: application/json');
        echo json_indent(json_encode($response));
     }
-    
+
+    private function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
     
     private function extractVariable($body,$name){
         if(isset($body['data'][$name])){

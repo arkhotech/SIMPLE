@@ -220,16 +220,18 @@ class Procesos extends MY_BackendController {
     
     public function ajax_editar_tarea($proceso_id,$tarea_identificador){
         $tarea=Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$tarea_identificador);
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
         
         if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar esta tarea.';
             exit;
         }
-        
         $data['tarea'] = $tarea;
         $data['formularios']=Doctrine::getTable('Formulario')->findByProcesoId($proceso_id);
         $data['acciones']=Doctrine::getTable('Accion')->findByProcesoId($proceso_id);
-        
+        $data['proceso'] = $proceso;
+        $data['variablesFormularios']=Doctrine::getTable('Proceso')->findVariblesFormularios($proceso_id);
+        $data['variablesProcesos']=Doctrine::getTable('Proceso')->findVariblesProcesos($proceso_id);
         $this->load->view('backend/procesos/ajax_editar_tarea',$data);
     }
     

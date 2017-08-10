@@ -87,7 +87,65 @@ class FormNormalizer{
         }
         
     }
-    
+
+    /**
+     * @param $formulario array con campos del formulario de entrada para iniciar el proceso
+     * @return string
+     */
+    function generar_swagger($formulario){
+
+        log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
+
+        if(isset($formulario) && count($formulario) > 0){
+            log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
+            $data_entrada = "";
+            $form = $formulario[0];
+            log_message("info", "Formulario form: ".$this->varDump($form), FALSE);
+            $campos = $form["form"];
+            log_message("info", "Formulario campos: ".$this->varDump($campos), FALSE);
+            foreach($campos["campos"] as $campo){
+
+                log_message("info", "Campo: ".$this->varDump($campo), FALSE);
+
+                //Campo tipo file será tratado como string asumiendo que el archivo viene en base64
+                if($campo["tipo"] == "string" || $campo["tipo"] == "base64"){
+                    if($data_entrada != "") $data_entrada .= ",";
+                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\"}";
+                }else if($campo["tipo_control"] == "checkbox"){
+                    if($data_entrada != "") $data_entrada .= ",";
+                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}}";
+                }else if($campo["tipo"] == "date"){
+                    if($data_entrada != "") $data_entrada .= ",";
+                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\",\"format\": \"date\"}";
+                }else if($campo["tipo"] == "grid"){
+                    if($data_entrada != "") $data_entrada .= ",";
+                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}}}";
+                }
+            }
+        }
+
+        $swagger = "";
+        if ($file = fopen("uploads/swagger/start_swagger.json", "r")) {
+            while(!feof($file)) {
+                $line = fgets($file);
+                $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
+                $swagger .= $line;
+            }
+            fclose($file);
+        }
+
+        return $swagger;
+
+    }
+
+    private function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 }
 
 ?>
