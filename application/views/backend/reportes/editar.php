@@ -76,12 +76,10 @@
         <label>Campos</label>
         <div class="form-inline">
 	        <select id="disponibles" style="height: 240px;" multiple>
-	        
-	        	<?php 
+	        	<?php
 	        		$tramiteHeaders = Tramite::getReporteHeaders();
 	        		$camposHeaders = $proceso->getCamposReporteHeaders();
 	        		$variablesHeaders = $proceso->getVariablesReporteHeaders();
-	        	
 	        	?>
 	        	<optgroup label="Datos de Trámite">
 	        	<?php foreach($tramiteHeaders as $rh):?>
@@ -93,7 +91,7 @@
 	        	
 	        	<optgroup label="Campos de Formularios">
 					<?php foreach($camposHeaders as $c):?>
-					<?php if (!($edit && in_array($c,$reporte->campos))):?>
+					<?php if (!($edit && in_array($c, $reporte->campos))):?>
 		            	<option value="<?=$c?>" name="Campos de Formularios"><?=$c?></option>
 		            <?php endif;?>
 		            <?php endforeach; ?>

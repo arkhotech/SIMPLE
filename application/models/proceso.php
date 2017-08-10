@@ -407,16 +407,22 @@ class Proceso extends Doctrine_Record {
     	}
     	return $result;
     }
-    
-    public function getCamposReporteHeaders(){
-    	
+
+    public function getCamposReporteHeaders() {
+
     	$campos = $this->getCampos();
-    	
-    	foreach($campos as $c)
-    		$result[]=$c->nombre.' - '.$c->etiqueta;
-    	
+
+    	foreach ($campos as $c) {
+            if ($c->tipo == 'maps') {
+                $result[] = $c->nombre . ' - ' . $c->etiqueta;
+                $result[] = $c->nombre . '->latitude - ' . $c->etiqueta;
+                $result[] = $c->nombre . '->longitude - ' . $c->etiqueta;
+                $result[] = $c->nombre . '->address - ' . $c->etiqueta;
+            } else {
+                $result[] = $c->nombre . ' - ' . $c->etiqueta;
+            }
+        }
     	return $result;
-    	
     }
     
     public function getTramitesCompletos(){

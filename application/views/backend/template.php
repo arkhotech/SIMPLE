@@ -45,6 +45,9 @@
         <script src="<?= base_url() ?>assets/js/jquery.doubletap/jquery.doubletap.js" type="text/javascript"></script> <?php //JS para soportar dobleclick en iPad     ?>
         <script src="<?= base_url() ?>assets/js/json-js/json2.js" type="text/javascript"></script> <?php //JS para convertir objetos a notacion JSON en multiples browsers     ?>
         <script src="<?= base_url() ?>assets/js/highcharts/highcharts.js" type="text/javascript"></script> <?php //JS para hacer graficos     ?>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES"></script>
+
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
@@ -52,7 +55,7 @@
             var onloadCallback = function() {
                 if ($('#form_captcha').length) {
                     grecaptcha.render("form_captcha", {
-                        sitekey : "6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH"
+                        sitekey : site_key
                     });
                 }
             };

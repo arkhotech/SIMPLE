@@ -11,7 +11,6 @@
         <link href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/common.css?v=0.11" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/frontend.css" rel="stylesheet">
-        
 
         <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -28,7 +27,7 @@
         <script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php //JS para hacer grillas     ?>
         <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js"></script> <?php //Soporte para selects con multiple choices    ?>
         <script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js"></script> <?php //Soporte para subir archivos con ajax    ?>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDOQ2m4sss96dWd5sEs5levoURjrzMUYc&libraries=places"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES"></script>
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";

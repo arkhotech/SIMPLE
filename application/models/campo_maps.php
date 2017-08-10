@@ -113,22 +113,8 @@ class CampoMaps extends Campo {
                             deleteMarkers_' . $this->id . '();
                             markers_' . $this->id . '.push(marker);
                             map_' . $this->id . '.panTo(marker.getPosition());
-
                         });
                     }
-
-                    /* if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(function(objPosition) {
-                            myLatLng.lat = objPosition.coords.longitude;
-                            myLatLng.lng = objPosition.coords.latitude;
-                            map_' . $this->id . '.setCenter(myLatLng);
-                        }, function(objPositionError) {
-                            myLatLng = {lat: -25.363, lng: 131.044};
-                        }, {
-                            maximumAge: 75000,
-                            timeout: 15000
-                        });
-                    } */
         ';
 
         if ($columns) {
@@ -163,11 +149,28 @@ class CampoMaps extends Campo {
         }
 
         $display .= '
-                    map_' . $this->id . '.fitBounds(bounds);
 
                     if ($("#' . $this->id . '").length > 0) {
                         new AutocompleteDirectionsHandler_' . $this->id . '(map_' . $this->id . ');
                     }
+
+                    if ($("#' . $this->id . '").length > 0 && markers_' . $this->id . '.length == 0) {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(function(objPosition) {
+
+                                map_' . $this->id . '.panTo({lat: objPosition.coords.latitude, lng: objPosition.coords.longitude});
+                                bounds.extend({lat: objPosition.coords.latitude, lng: objPosition.coords.longitude});
+                                map_' . $this->id . '.fitBounds(bounds);
+
+                            }, function(objPositionError) {
+                                myLatLng = {lat: -25.363, lng: 131.044};
+                            }, {
+                                maximumAge: 75000,
+                                timeout: 15000
+                            });
+                        }
+                    }
+                    map_' . $this->id . '.fitBounds(bounds);
                 }
 
                 function AutocompleteDirectionsHandler_' . $this->id . '(map_' . $this->id . ') {
