@@ -216,8 +216,14 @@ class API extends MY_BackendController {
             $this->responseJson($response);
         }else{
             $this->load->helper('download');
-            //llamar al generador de Swagger
-            force_download("test.txt", "esto es una prueba");
+
+            $integrador = new FormNormalizer();
+            /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
+            $formulario = $integrador->obtenerFormularios($id_tramite, $id_tarea, 0);
+
+            $swagger_file = $integrador->generar_swagger($formulario);
+
+            force_download("start_simple.json", $swagger_file);
             exit;
         }
     }
@@ -236,5 +242,13 @@ class API extends MY_BackendController {
          header('Content-type: application/json');
        echo json_indent(json_encode($response));
     }
-    
+
+    private function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 }
