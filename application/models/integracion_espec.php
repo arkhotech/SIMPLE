@@ -130,7 +130,7 @@ class FormNormalizer{
             while(!feof($file)) {
                 $line = fgets($file);
                 $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
-                $line = str_replace("-HOST-", $protocol.$nombre_host, $line);
+                $line = str_replace("-HOST-", $nombre_host, $line);
                 $swagger .= $line;
             }
             fclose($file);
