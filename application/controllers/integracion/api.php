@@ -73,14 +73,15 @@ class API extends MY_BackendController {
                 $this->obtenerStatus($id_tramite,$rut);
                 break;
             default:
-                show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
+                header("HTTP/1.1 405 Metodo no permitido.");
         }
     }
     
     private function checkJsonHeader(){
         $headers = $this->input->request_headers();
         if($headers['Content-Type']==NULL || $headers['Content-Type']!="application/json"){
-            show_error("415 Unsupported Media Type",415, "Se espera application/json" );
+            //show_error("415 Unsupported Media Type",415, "Se espera application/json" );
+            header("HTTP/1.1 415 Unsupported Media Type. Solo se permite application/json");
         }
     }
     
@@ -104,63 +105,13 @@ class API extends MY_BackendController {
                 break;
             case "POST":
                 $this->checkJsonHeader();
-                $this->iniciarProceso($proceso_id,$this->getBody());
+                $this->iniciarProceso($proceso_id,$etapa,$this->getBody());
                 break;
             default:
-                show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
+                header("HTTP/1.1 405 Metodo no permitido");
+                //show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
         }
         
-         echo $this->input->method(FALSE);
-  
-         die;
-        $respuesta = new stdClass();
-        if ($proceso_id) {
-            $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
-//            echo "<pre>";
-//            print_r();die;
-//            echo "</pre>";
-            $formulario = Doctrine::getTable('Formulario')->find($tramite->Formularios[0]->id);
-            $json = $formulario->exportComplete();
-            //header("Content-Disposition: attachment; filename=\"".mb_convert_case(str_replace(' ','-',$formulario->nombre),MB_CASE_LOWER).".simple\"");
-            
-            $source = json_decode($json,true);
-            $this->load->helper('Catalogo');
-            normalizarFormulario("Test");
-            
-            //header('Content-Type: application/json');
-            echo "<pre>";
-            print_r($this->normalizarFormulario($source));
-            echo "</pre>";
-            die;
-            if (!$tramite)
-                show_404();
-
-            if ($tramite->Proceso->Cuenta != $cuenta)
-                show_error('No tiene permisos para acceder a este recurso.', 401);
-
-            
-            $respuesta->tramite = $tramite->toPublicArray();
-        } 
-
-        header('Content-type: application/json');
-        echo json_indent(json_encode($respuesta));
-    }
-
-    //Esta funcion debería estar en modelo
-   
-    function normalizarFormulario($json){
-        $retval = array();
-        foreach( $json['Campos'] as $campo){
-            
-            //Seleccionar los campos que se van a utilizar solamente
-            echo ">";
-            array_push($retval, array( 
-                $campo['nombre'],
-                $campo['dependiente_tipo'],
-                $campo['readonly']));
-                
-        }
-        return $retval;
     }
 
     
@@ -185,15 +136,45 @@ class API extends MY_BackendController {
        exit;
     }
     
-    private function iniciarProceso($idTramite,$body){
+    private function iniciarProceso($proceso_id,$id_tarea,$body){
         //validar la entrada
-       $response = array(
-           "codigoRetorno" => 0,
-           "descRetorno" => "Problemas para iniciar",
-           "idProximoPaso" => 123,
-           "proximoFormulario" => array()
-           );
-        $this->responseJson($response);
+        
+        if($proceso_id == NULL || $id_tarea == NULL){
+            //show_error("400 Bad Request",400, "Uno de los parametros de entrada no ha sido especificado" );
+            header("HTTP/1.1 400 Bad Request");
+            return;
+        }
+        
+        try{ 
+            $input = json_decode($body,true);
+            
+            
+            $tramite = new Tramite();
+            $tramite->iniciar($proceso_id);
+
+            //llevar a etapas/ejecutar_form + número de tarea y proceso
+            //Se debe seleccionar la etapa que se quiere iniciar.
+            $etapa = $tramite->getEtapasActuales()->get(0)->id;
+            $nextStep = $this->ejecutarEntrada($etapa,$input,true);
+            $integrador = new FormNormalizer();
+            //echo $proceso_id, $id_tarea, $nextStep;die;
+            $nextForm = $integrador->obtenerFormularios($proceso_id, $id_tarea, $nextStep);
+            $this->registrarCallbackURL($input['callback'],$etapa);
+            
+            //validaciones etapa vencida, si existe o algo por el estilo
+             $response = array(
+                "idInstancia" => $tramite->id,
+                "codigoRetorno" => 0,
+                "descRetorno" => "",
+                "idProximoPaso" => $nextStep,
+                "output" => array(),
+                "proximoFormulario" => $nextForm
+                );
+             $this->responseJson($response);
+        }catch(Exception $e){
+           $e->getTrace();
+        }
+      
     }
     
     private function continuarProceso($idProceso,$idEtapa=NULL, $body){
@@ -209,16 +190,19 @@ class API extends MY_BackendController {
     }
     
     private function generarEspecificacion($operacion,$id_tramite=NULL,$id_tarea=NULL,$id_paso = NULL){
-        
-        if($operacion === "form"){
-            $integrador = new FormNormalizer();
-            $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
-            $this->responseJson($response);
-        }else{
-            $this->load->helper('download');
-            //llamar al generador de Swagger
-            force_download("test.txt", "esto es una prueba");
-            exit;
+        try{
+            if($operacion === "form"){
+                $integrador = new FormNormalizer();
+                $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
+                $this->responseJson($response);
+            }else{
+                $this->load->helper('download');
+                //llamar al generador de Swagger
+                force_download("test.txt", "esto es una prueba");
+                exit;
+            }
+        }catch(Exception $e){
+            print_r($e);
         }
     }
 
@@ -236,5 +220,133 @@ class API extends MY_BackendController {
          header('Content-type: application/json');
        echo json_indent(json_encode($response));
     }
+    
+    
+    private function extractVariable($body,$name){
+        if(isset($body['data'][$name])){
+            return $body['data'][$name];
+        }
+        return "NE";
+    }
+    /**
+     * 
+     * @param type $etapa_id
+     * @param type $body
+     * @return type
+     */
+    public function ejecutarEntrada($etapa_id,$body){
+
+        $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
+        //obtener siempre el primer paso de la secuencia
+        $paso = $etapa->getPasoEjecutable(0);
+        $formulario = $paso->Formulario;
+        $modo = $paso->modo;
+
+        $respuesta = new stdClass();
+        $validar_formulario = FALSE;
+        // Almacenamos los campos
+
+        foreach ($formulario->Campos as $c) {
+            // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+
+            if ($c->isEditableWithCurrentPOST($etapa_id,$body)) {
+                $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
+                if (!$dato)
+                    $dato = new DatoSeguimiento();
+                $dato->nombre = $c->nombre;
+                $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
+
+                if (!is_object($dato->valor) && !is_array($dato->valor)) {
+                    if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
+                        $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
+                    }
+                }
+
+                $dato->etapa_id = $etapa->id;
+                $dato->save();
+            }
+        }
+
+        $etapa->save();
+
+        $etapa->finalizarPaso($paso);
+       //Traer el siguiente formualrio
+        $prox_paso = $etapa->getPasoEjecutable(1); 
+        return $prox_paso->id;
+
+    }
+    
+    private function registrarCallbackURL($url,$etapa){
+  
+        $dato = new DatoSeguimiento();
+        $dato->nombre = "callback_url";
+        $dato->valor = "{ url:".$url."}";
+        $dato->etapa_id = $etapa;
+        $dato->save();
+    }
+
+    public function asignar($etapa_id) {
+        $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
+
+        if ($etapa->usuario_id) {
+            echo 'Etapa ya fue asignada.';
+            exit;
+        }
+
+        if (!$etapa->canUsuarioAsignarsela(UsuarioSesion::usuario()->id)) {
+            echo 'Usuario no puede asignarse esta etapa.';
+            exit;
+        }
+
+        $etapa->asignar(UsuarioSesion::usuario()->id);
+
+        redirect('etapas/inbox');
+    }
+    
+    function throwError($numero,$mensaje){
+        $errorcodes = array(
+							200	=> 'OK',
+							201	=> 'Created',
+							202	=> 'Accepted',
+							203	=> 'Non-Authoritative Information',
+							204	=> 'No Content',
+							205	=> 'Reset Content',
+							206	=> 'Partial Content',
+
+							300	=> 'Multiple Choices',
+							301	=> 'Moved Permanently',
+							302	=> 'Found',
+							304	=> 'Not Modified',
+							305	=> 'Use Proxy',
+							307	=> 'Temporary Redirect',
+
+							400	=> 'Bad Request',
+							401	=> 'Unauthorized',
+							403	=> 'Forbidden',
+							404	=> 'Not Found',
+							405	=> 'Method Not Allowed',
+							406	=> 'Not Acceptable',
+							407	=> 'Proxy Authentication Required',
+							408	=> 'Request Timeout',
+							409	=> 'Conflict',
+							410	=> 'Gone',
+							411	=> 'Length Required',
+							412	=> 'Precondition Failed',
+							413	=> 'Request Entity Too Large',
+							414	=> 'Request-URI Too Long',
+							415	=> 'Unsupported Media Type',
+							416	=> 'Requested Range Not Satisfiable',
+							417	=> 'Expectation Failed',
+
+							500	=> 'Internal Server Error',
+							501	=> 'Not Implemented',
+							502	=> 'Bad Gateway',
+							503	=> 'Service Unavailable',
+							504	=> 'Gateway Timeout',
+							505	=> 'HTTP Version Not Supported'
+						);
+        header("HTTP/1.1 ");
+    }
+    
     
 }
