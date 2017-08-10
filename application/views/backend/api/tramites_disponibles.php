@@ -21,7 +21,7 @@
                     <td><? echo $res['tarea'] ?></td>
                     <td><? echo $res['previsualizacion'] ?></td>
                     <td>
-                        <a class="btn btn-default" target="_blank" href="<? echo $protocol.$nombre_host.'/integracion/api/tramites/especificacion/'.$res['id'].'/'.$res['id_tarea']; ?> ">
+                        <a class="btn btn-default" target="_blank" href="<? echo $protocol.$nombre_host.'/integracion/api/especificacion/servicio/'.$res['id'].'/'.$res['id_tarea']; ?> ">
                             <i class="icon-upload icon"></i>Swagger
                         </a>
                     </td>
