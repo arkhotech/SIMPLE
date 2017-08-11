@@ -282,6 +282,10 @@ class Procesos extends MY_BackendController {
             $tarea->externa=$this->input->post('externa');
             $tarea->exponer_tramite=$this->input->post('exponer_tramite');
             $tarea->save();
+            $result=Doctrine::getTable('Proceso')->updateVaribleExposed($this->input->post('varForm'),$this->input->post('varPro'));
+            exit;
+  
+            
             
             $respuesta->validacion=TRUE;
             $respuesta->redirect=site_url('backend/procesos/editar/'.$tarea->Proceso->id);

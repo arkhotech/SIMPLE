@@ -582,50 +582,16 @@
                 </div>
                 <div class="tab-datos-expuestos tab-pane" id="tab8">
                     <script>
-                        function seleccionarHeader(){
-                            $("#disponibles").find(":selected").each(function(i,el){
-                                $(el).detach().appendTo($("#seleccionados"));           
-                            });
-                        }
-
-                        function eliminarHeader(){
-                            $("#seleccionados").find(":selected").each(function(i,el){
-                                $(el).detach().appendTo($("#disponibles").find("[label='"+ $(el).attr("name")+"']"));
-                            });
-                        }
-
-                        function subirOrden(){
-                            $("#seleccionados").find(":selected").each(function(i,el){
-                                var anterior = $(el).prev();
-                                if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
-                                    $(el).detach().insertBefore($(anterior));
-                                }
-                            });
-                            
-                        }
-
-                        function bajarOrden(){
-                            jQuery.fn.reverse = [].reverse;
-                            $("#seleccionados").find(":selected").reverse().each(function(i,el){
-                                var anterior = $(el).next();
-                                if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
-                                    $(el).detach().insertAfter($(anterior));
-                                }
-                            });
-                        }
-
                         function selectAll(){
                             $("#seleccionados").find("*").prop("selected",true);
                         }
 
                         function seleccionarForm(id){
-                            if($("input[name="+id.id+"]:checked").val()){ 
-                                console.log("est check");
-                                $("."+id.id).prop('checked',true);
-                                //$("#activacionEntreFechas").show();
+                            console.log(id);
+                            if($("input[name="+id+"]:checked").val()){ 
+                                $("."+id).prop('checked',true);
                             }else{
-                                console.log("no esta check");
-                                $("."+id.id).prop('checked',false);
+                                $("."+id).prop('checked',false);
                             } 
                         }
                     </script>
@@ -636,15 +602,25 @@
                     </div>
                     <div class="row-fluid">
                         <div class="span6" style="overflow-y: auto; height:280px;width:48%;border:.5px solid;border-radius: 5px;border-color:#DDDDDD;">
-                            <? 
-                                foreach ($variablesFormularios as $res) {
-                                    $id = str_replace(" ","",$res['nombre_formulario']);
-                                    ?>&nbsp;<input type="checkbox" onclick="seleccionarForm(<? echo $id; ?>)" name="<? echo $id; ?>" id="<? echo $id; ?>" value="<? echo $id; ?>"/>&nbsp;<b><? echo $res['nombre_formulario'];?></b><br><?
-                                    $variables = explode(",", $res['variables']);
-                                    foreach ($variables as $d){
-                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="<? echo $d ?>" id="<? echo $d ?>" class="<? echo $id ?>" value="<? echo $d?>">&nbsp;<? echo $d ?><br><?
+                            <?
+                                $formularios = array();
+                                $nameform = array();
+                                foreach($variablesFormularios as $key => $valuesAry){
+                                   $var = $valuesAry[nombre_formulario];
+                                   if(!in_array($var, $nameform)){
+                                      $nameform[] = $var;
+                                   }
+                                   $formIndex = array_search($var, $nameform);
+                                   $formularios[$formIndex][] = $valuesAry;
+                                }
+                                    
+                                foreach ($formularios as $key => $res) {
+                                    $id=$key;
+                                    ?>&nbsp;<input type="checkbox" onclick="seleccionarForm(<? echo $id; ?>)" name="<? echo $id; ?>" id="<? echo $id; ?>" value="<? echo $id; ?>"/>&nbsp;<b><? echo $res[0]['nombre_formulario'];?></b><br><?                                    
+                                    foreach ($res as $d){
+                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="<? echo $id ?>" name="varForm[]" value="<? echo $d['variable_id'] ?>">&nbsp;<? echo $d['nom_variables']; ?><br><?                                     
                                     }
-                                }       
+                                }                                      
                             ?>
                         </div>
                         <div class="span6" style="overflow-y: auto; height:280px;width:47%;border: 0.5px solid;border-radius: 5px;border-color:#DDDDDD;">
@@ -652,7 +628,7 @@
                                 foreach ($variablesProcesos as $res) {
                                     $variables = json_decode($res['extra']);
                                     $variables = get_object_vars($variables);
-                                    ?>&nbsp;<input type="checkbox" name="<? echo $variables['variable'] ?>" id="<? echo $variables['variable'] ?>" value="<? echo $variables['variable'] ?>">&nbsp;<? echo $variables['variable'] ?><br><?                                     
+                                    ?>&nbsp;<input type="checkbox" name="varPro[]" id="<? echo $variables['variable'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?                                     
                                 }       
                             ?>
                         </div>
