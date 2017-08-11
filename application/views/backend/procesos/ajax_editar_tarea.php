@@ -582,122 +582,81 @@
                 </div>
                 <div class="tab-datos-expuestos tab-pane" id="tab8">
                     <script>
-                            function seleccionarHeader(){
-                                $("#disponibles").find(":selected").each(function(i,el){
-                                    $(el).detach().appendTo($("#seleccionados"));           
-                                });
-                            }
+                        function seleccionarHeader(){
+                            $("#disponibles").find(":selected").each(function(i,el){
+                                $(el).detach().appendTo($("#seleccionados"));           
+                            });
+                        }
 
-                            function eliminarHeader(){
-                                $("#seleccionados").find(":selected").each(function(i,el){
-                                    $(el).detach().appendTo($("#disponibles").find("[label='"+ $(el).attr("name")+"']"));
-                                });
-                            }
+                        function eliminarHeader(){
+                            $("#seleccionados").find(":selected").each(function(i,el){
+                                $(el).detach().appendTo($("#disponibles").find("[label='"+ $(el).attr("name")+"']"));
+                            });
+                        }
 
-                            function subirOrden(){
-                                $("#seleccionados").find(":selected").each(function(i,el){
-                                    var anterior = $(el).prev();
-                                    if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
-                                        $(el).detach().insertBefore($(anterior));
-                                    }
-                                });
-                                
-                            }
-
-                            function bajarOrden(){
-                                jQuery.fn.reverse = [].reverse;
-                                $("#seleccionados").find(":selected").reverse().each(function(i,el){
-                                    var anterior = $(el).next();
-                                    if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
-                                        $(el).detach().insertAfter($(anterior));
-                                    }
-                                });
-                            }
-
-                            function selectAll(){
-                                $("#seleccionados").find("*").prop("selected",true);
-                            }
-                        $(document).ready(function(){
-                            console.log("hola desde mi on ready");    
-                           /* 
-                            $("input[name=vencimiento]").change(function(){
-                                if(this.checked)
-                                    $("#vencimientoConfig").show();
-                                else
-                                    $("#vencimientoConfig").hide();
-                            }).change();
+                        function subirOrden(){
+                            $("#seleccionados").find(":selected").each(function(i,el){
+                                var anterior = $(el).prev();
+                                if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
+                                    $(el).detach().insertBefore($(anterior));
+                                }
+                            });
                             
-                            $("select[name=vencimiento_unidad]").change(function(){
-                                if(this.value=="D")
-                                    $("#habilesConfig").show();
-                                else
-                                    $("#habilesConfig").hide();
-                            }).change();
-                            */
-                        });
+                        }
+
+                        function bajarOrden(){
+                            jQuery.fn.reverse = [].reverse;
+                            $("#seleccionados").find(":selected").reverse().each(function(i,el){
+                                var anterior = $(el).next();
+                                if( $(anterior).size()>0 && !($(anterior).prop("selected"))){
+                                    $(el).detach().insertAfter($(anterior));
+                                }
+                            });
+                        }
+
+                        function selectAll(){
+                            $("#seleccionados").find("*").prop("selected",true);
+                        }
+
+                        function seleccionarForm(id){
+                            if($("input[name="+id.id+"]:checked").val()){ 
+                                console.log("est check");
+                                $("."+id.id).prop('checked',true);
+                                //$("#activacionEntreFechas").show();
+                            }else{
+                                console.log("no esta check");
+                                $("."+id.id).prop('checked',false);
+                            } 
+                        }
                     </script>
-                    <hr>
-                        
-
-                        <div class="form-inline">
-                            <select id="disponibles" style="height: 240px;" multiple>
-                            
-                                <?php 
-                                    $tramiteHeaders = Tramite::getReporteHeaders();
-                                    $camposHeaders = $proceso->getCamposReporteHeaders();
-                                    $variablesHeaders = $proceso->getVariablesReporteHeaders();
-                                
-                                ?>
-                                <optgroup label="Formularios">
-                                    <?php foreach($camposHeaders as $c):?>
-                                    <?php if (!($edit && in_array($c,$reporte->campos))):?>
-                                        <option value="<?=$c?>" name="Campos de Formularios"><?=$c?></option>
-                                    <?php endif;?>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                                
-                                <optgroup label="Campos de Formularios">
-                                    <?php foreach($camposHeaders as $c):?>
-                                    <?php if (!($edit && in_array($c,$reporte->campos))):?>
-                                        <option value="<?=$c?>" name="Campos de Formularios"><?=$c?></option>
-                                    <?php endif;?>
-                                    <?php endforeach; ?>
-                                </optgroup>
-                                
-                                <optgroup label="Variables">
-                                    <?php foreach ($variablesHeaders as $v):?>
-                                    <?php if (!($edit && in_array($v,$reporte->campos))):?>
-                                        <option value="<?=$v?>" name="Variables"><?=$v?></option>
-                                    <?php endif;?>
-                                    <?php endforeach;?>
-                                </optgroup>
-
-                            </select>
-                            <div class="btn-group-vertical" role="group">
-                                <button class = "btn btn-primary" type="button" onclick="seleccionarHeader()"><i class="icon-white icon-chevron-right"></i></button>
-                                <button class = "btn btn-primary" type="button" onclick="eliminarHeader()"><i class="icon-white icon-chevron-left"></i></button>
-                            </div>
-                            
-                            <select id="seleccionados" name="campos[]" style="height: 240px;" multiple>
-                                <?php foreach($reporte->campos as $c):?>
-                                <option value="<?=$c?>" name = "<?php 
-                                    if (in_array($c,$tramiteHeaders))
-                                        echo "Datos de Trámite";
-                                    else if (in_array($c,$camposHeaders))
-                                        echo "Campos de Formularios";
-                                    else if (in_array($c, $variablesHeaders))
-                                        echo "Variables";
-                                
-                                ?>"><?=$c?></option>
-                                <?php endforeach;?>
-                            </select>
-                            
-                            <div class="btn-group-vertical" role="group">
-                            <button class = "btn btn-primary" type="button" onclick="subirOrden()"><i class="icon-white icon-chevron-up"></i></button>
-                            <button class = "btn btn-primary" type="button" onclick="bajarOrden()"><i class="icon-white icon-chevron-down"></i></button>
-                            </div>  
-                        <div/>
-                    <hr>
+                   
+                    <div class="row-fluid">
+                        <div class="span6"><h5>Variables de formulario</h5></div>
+                        <div class="span6"><h5>Variables de proceso</h5></div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span6" style="overflow-y: auto; height:280px;width:48%;border:.5px solid;border-radius: 5px;border-color:#DDDDDD;">
+                            <? 
+                                foreach ($variablesFormularios as $res) {
+                                    $id = str_replace(" ","",$res['nombre_formulario']);
+                                    ?>&nbsp;<input type="checkbox" onclick="seleccionarForm(<? echo $id; ?>)" name="<? echo $id; ?>" id="<? echo $id; ?>" value="<? echo $id; ?>"/>&nbsp;<b><? echo $res['nombre_formulario'];?></b><br><?
+                                    $variables = explode(",", $res['variables']);
+                                    foreach ($variables as $d){
+                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="<? echo $d ?>" id="<? echo $d ?>" class="<? echo $id ?>" value="<? echo $d?>">&nbsp;<? echo $d ?><br><?
+                                    }
+                                }       
+                            ?>
+                        </div>
+                        <div class="span6" style="overflow-y: auto; height:280px;width:47%;border: 0.5px solid;border-radius: 5px;border-color:#DDDDDD;">
+                            <?php 
+                                foreach ($variablesProcesos as $res) {
+                                    $variables = json_decode($res['extra']);
+                                    $variables = get_object_vars($variables);
+                                    ?>&nbsp;<input type="checkbox" name="<? echo $variables['variable'] ?>" id="<? echo $variables['variable'] ?>" value="<? echo $variables['variable'] ?>">&nbsp;<? echo $variables['variable'] ?><br><?                                     
+                                }       
+                            ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

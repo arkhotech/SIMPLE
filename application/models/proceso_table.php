@@ -42,7 +42,7 @@ class ProcesoTable extends Doctrine_Table {
     }
 
     public function findVariblesFormularios($proceso_id){
-        $sql = "select c.nombre as nombre_campo, c.valor_default, c.tipo, c.validacion, c.dependiente_tipo, f.nombre as nombre_formulario, p.nombre as nombre_proceso from campo c, formulario f, proceso p where c.formulario_id=f.id and f.proceso_id = p.id and p.activo=1 and f.proceso_id=".$proceso_id." and c.valor_default like '%@@%' order by nombre_formulario;";
+       $sql="select f.nombre as nombre_formulario, GROUP_CONCAT(c.nombre) AS variables from campo c, formulario f, proceso p where c.formulario_id=f.id and f.proceso_id = p.id and f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' GROUP BY f.nombre;";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
         ->fetchAll();
