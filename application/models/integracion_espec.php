@@ -16,6 +16,7 @@ class FormNormalizer{
             case "checkbox": return "boolean";
             case "grid": return "grid";
             case "date" : return "date";
+            case "subtitle" : return "string";
             default: return "string";
         }
     }
@@ -24,8 +25,9 @@ class FormNormalizer{
         
         return "0";
     }
-    
+            
     function normalizarFormulario($json,$id){
+       
         $retval['form'] = array('id' => $id, 'campos' => array() );
         //print_r($json);
         foreach( $json['Campos'] as $campo){
@@ -57,8 +59,7 @@ class FormNormalizer{
         $result = array();
         if($id_tarea== NULL && $id_paso == NULL){
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
-            
-            
+
             foreach($tramite->Formularios as $form){
                 $formSimple = Doctrine::getTable('Formulario')->find($form->id)->exportComplete();
                 $json = json_decode($formSimple,true);
@@ -99,13 +100,8 @@ class FormNormalizer{
             log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
             $data_entrada = "";
             $form = $formulario[0];
-            log_message("info", "Formulario form: ".$this->varDump($form), FALSE);
             $campos = $form["form"];
-            log_message("info", "Formulario campos: ".$this->varDump($campos), FALSE);
             foreach($campos["campos"] as $campo){
-
-                log_message("info", "Campo: ".$this->varDump($campo), FALSE);
-
                 //Campo tipo file será tratado como string asumiendo que el archivo viene en base64
                 if($campo["tipo"] == "string" || $campo["tipo"] == "base64"){
                     if($data_entrada != "") $data_entrada .= ",";
@@ -124,10 +120,17 @@ class FormNormalizer{
         }
 
         $swagger = "";
+
+        $nombre_host = gethostname();
+        //($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
+
+        log_message("info", "HOST: ".$nombre_host, FALSE);
+
         if ($file = fopen("uploads/swagger/start_swagger.json", "r")) {
             while(!feof($file)) {
                 $line = fgets($file);
                 $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
+                $line = str_replace("-HOST-", $nombre_host, $line);
                 $swagger .= $line;
             }
             fclose($file);

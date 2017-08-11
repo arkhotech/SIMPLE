@@ -135,9 +135,24 @@ class Campo extends Doctrine_Record {
         return '';
     }
     
+
+    private function extractVariable( $CI, $nombre, $ispost = TRUE ){
+        if($ispost){
+            return $CI->input->post($nombre);
+        }else{
+            return $CI['data'][$nombre];
+        }
+    }
+    
     //Funcion que retorna si este campo debiera poderse editar de acuerdo al input POST del usuario
-    public function isEditableWithCurrentPOST($etapa_id){
-        $CI=& get_instance();
+    
+    
+    public function isEditableWithCurrentPOST($etapa_id, $body = NULL){
+        $CI = & get_instance();
+        if($body!=NULL){
+            $CI = $body;
+        }
+
 
         $resultado=true;
 
@@ -145,7 +160,7 @@ class Campo extends Doctrine_Record {
            $resultado=false;
         }else if($this->dependiente_campo){
             $nombre_campo=preg_replace('/\[\w*\]$/', '', $this->dependiente_campo);
-            $variable=$CI->input->post($nombre_campo);
+            $variable=  $this->extractVariable($CI,$nombre_campo,($body==NULL)); //$CI->input->post($nombre_campo);
             
             //Parche para el caso de campos dependientes con accesores. Ej: ubicacion[comuna]!='Las Condes|Santiago'
             if(preg_match('/\[(\w+)\]$/',$this->dependiente_campo,$matches))
