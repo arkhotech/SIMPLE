@@ -48,11 +48,12 @@
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
+            var site_key = "<?= sitekey() ?>";
 
             var onloadCallback = function() {
                 if ($('#form_captcha').length) {
                     grecaptcha.render("form_captcha", {
-                        sitekey : "6Le7zycUAAAAAKrvp-ndTrKRni3yeuCZQyrkJRfH"
+                        sitekey : site_key
                     });
                 }
             };
