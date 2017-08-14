@@ -11,7 +11,7 @@
 
         $("#selectGruposUsuarios").select2({tags: true});
         $("[rel=tooltip]").tooltip();
-        
+
         $(".datepicker")
         .datepicker({
             format: "dd-mm-yyyy",
@@ -19,12 +19,12 @@
             autoclose: true,
             language: "es"
         })
-        
+
         $('#formEditarTarea .nav-tabs a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
         });
-        
+
         //Permite borrar pasos
         $(".tab-pasos").on("click",".delete",function(){
             $(this).closest("tr").remove();
@@ -33,7 +33,7 @@
         //Permite agregar nuevos pasos
         $(".tab-pasos .form-agregar-paso button").click(function(){
             var $form=$(".tab-pasos .form-agregar-paso");
-            
+
             var pos=1+$(".tab-pasos table tbody tr").size();
             var formularioId=$form.find(".pasoFormulario option:selected").val();
             var formularioNombre=$form.find(".pasoFormulario option:selected").text();
@@ -53,9 +53,9 @@
             html+='<a class="delete" title="Eliminar" href="#"><i class="icon-remove"></i></a>';
             html+='</td>';
             html+="</tr>";
-            
+
             $(".tab-pasos table tbody").append(html);
-            
+
             return false;
         });
         //Permite que los pasos sean reordenables
@@ -71,8 +71,8 @@
                 });
             }
         });
-        
-        
+
+
         //Permite borrar eventos
         $(".tab-eventos").on("click",".delete",function(){
             $(this).closest("tr").remove();
@@ -81,7 +81,7 @@
         //Permite agregar nuevos eventos
         $(".tab-eventos .form-agregar-evento button").click(function(){
             var $form=$(".tab-eventos .form-agregar-evento");
-            
+
             var pos=1+$(".tab-eventos table tbody tr").size();
             var accionId=$form.find(".eventoAccion option:selected").val();
             var accionNombre=$form.find(".eventoAccion option:selected").text();
@@ -90,7 +90,7 @@
             var pasoId=$form.find(".eventoPasoId option:selected").val();
             var pasoNombre=$form.find(".eventoPasoId option:selected").text();
             var pasoTitle=$form.find(".eventoPasoId option:selected").attr("title");
-            
+
             var html="<tr>";
             html+="<td>"+pos+"</td>";
             html+='<td><a title="Editar" target="_blank" href="'+site_url+'backend/acciones/editar/'+accionId+'">'+accionNombre+'</td>';
@@ -105,16 +105,16 @@
             html+='<a class="delete" title="Eliminar" href="#"><i class="icon-remove"></i></a>';
             html+='</td>';
             html+="</tr>";
-            
+
             $(".tab-eventos table tbody").append(html);
-            
+
             return false;
         });
 
         //Permite agregar nuevos eventos externos
         $(".tab-eventos-externos .form-agregar-evento-externo button").click(function(){
             var $form=$(".tab-eventos-externos .form-agregar-evento-externo");
-            
+
             var pos=1+$(".tab-eventos-externos table tbody tr").size();
             var nombre=$form.find("#nombre").val();
             var metodo=$form.find(".eventoSentido option:selected").val();
@@ -122,7 +122,7 @@
             var mensaje=$form.find("#mensaje").val();
             var regla=$form.find("#regla").val();
             var opciones=$form.find("#opciones").val();
-            
+
             var html="<tr>";
             html+="<td>"+pos+"</td>";
             html+="<td>"+nombre+"</td>";
@@ -142,9 +142,9 @@
             html+='<a class="delete" title="Eliminar" href="#"><i class="icon-remove"></i></a>';
             html+='</td>';
             html+="</tr>";
-            
+
             $(".tab-eventos-externos table tbody").append(html);
-            
+
             return false;
         });
 
@@ -152,7 +152,7 @@
             $(this).closest("tr").remove();
             return false;
         });
-        
+
         //$("#modalEditarTarea form input[name=socket_id_emisor]").val(socketId);
         //$("#modalEditarTarea .botonEliminar").attr("href",function(i,href){return href+"?socket_id_emisor="+socketId;})
     });
@@ -214,10 +214,10 @@
                                         if($("input[name=activacion]:checked").val()=='entre_fechas')
                                             $("#activacionEntreFechas").show();
                                         else
-                                            $("#activacionEntreFechas").hide();  
+                                            $("#activacionEntreFechas").hide();
                                     }).change();
                                     $("#inicial").click(function() {
-                                      MostrarExponer();  
+                                      MostrarExponer();
                                     });
                                 });
                             </script>
@@ -421,7 +421,7 @@
                                         <input type="hidden" name="eventos[<?= $key + 1 ?>][accion_id]" value="<?= $p->accion_id ?>" />
                                         <input type="hidden" name="eventos[<?= $key + 1 ?>][regla]" value="<?= $p->regla ?>" />
                                         <input type="hidden" name="eventos[<?= $key + 1 ?>][instante]" value="<?= $p->instante ?>" />
-                                        <?php 
+                                        <?php
                                             $paso_ee_id = !is_null($p->paso_id) ? $p->paso_id : $p->evento_externo_id;
                                         ?>
                                         <input type="hidden" name="eventos[<?= $key + 1 ?>][paso_id]" value="<?= $paso_ee_id ?>" />
@@ -431,7 +431,7 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <label class="checkbox">Para mayor información puedes consultar en el siguiente enlace. 
+                    <label class="checkbox">Para mayor información puedes consultar en el siguiente enlace.
                         <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#pestana_eventos" target="_blank">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </a>
@@ -446,7 +446,7 @@
                                 else
                                     $("#vencimientoConfig").hide();
                             }).change();
-                            
+
                             $("select[name=vencimiento_unidad]").change(function(){
                                 if(this.value=="D")
                                     $("#habilesConfig").show();
@@ -475,7 +475,7 @@
                         despues de completada la etapa anterior.
                         <br />
                         <label id='habilesConfig' class='checkbox'><input type='checkbox' name='vencimiento_habiles' value='1' <?=$tarea->vencimiento_habiles?'checked':''?> /> Considerar solo días habiles.</label>
-                        
+
                         <label class="checkbox"><input type="checkbox" name="vencimiento_notificar" value="1" <?=$tarea->vencimiento_notificar?'checked':''?> /> Notificar cuando quede <input class="input-mini" type="text" name="vencimiento_notificar_dias" value="<?=$tarea->vencimiento_notificar_dias?>" /> día al siguiente correo:</label>
                          <input style="margin-left: 20px;" type="text" name="vencimiento_notificar_email" placeholder="ejemplo@mail.com" value="<?=$tarea->vencimiento_notificar_email?>" />
                          <div style="margin-left: 20px;" class="help-block">Tambien se pueden usar variables. Ej: @@email</div>
@@ -588,14 +588,14 @@
 
                         function seleccionarForm(id){
                             console.log(id);
-                            if($("input[name="+id+"]:checked").val()){ 
+                            if($("input[name="+id+"]:checked").val()){
                                 $("."+id).prop('checked',true);
                             }else{
                                 $("."+id).prop('checked',false);
-                            } 
+                            }
                         }
                     </script>
-                   
+
                     <div class="row-fluid">
                         <div class="span6"><h5>Variables de formulario</h5></div>
                         <div class="span6"><h5>Variables de proceso</h5></div>
@@ -613,23 +613,33 @@
                                    $formIndex = array_search($var, $nameform);
                                    $formularios[$formIndex][] = $valuesAry;
                                 }
-                                    
+
                                 foreach ($formularios as $key => $res) {
                                     $id=$key;
-                                    ?>&nbsp;<input type="checkbox" onclick="seleccionarForm(<? echo $id; ?>)" name="<? echo $id; ?>" id="<? echo $id; ?>" value="<? echo $id; ?>"/>&nbsp;<b><? echo $res[0]['nombre_formulario'];?></b><br><?                                    
+                                    ?>&nbsp;<input type="checkbox" onclick="seleccionarForm(<? echo $id; ?>)" name="<? echo $id; ?>" id="<? echo $id; ?>" value="<? echo $id; ?>"/>&nbsp;<b><? echo $res[0]['nombre_formulario'];?></b><br><?
                                     foreach ($res as $d){
-                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="<? echo $id ?>" name="varForm[]" value="<? echo $d['variable_id'] ?>">&nbsp;<? echo $d['nom_variables']; ?><br><?                                     
+                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="<? echo $id ?>" name="varForm[]" id="<? echo $d['variable_id'] ?>" value="<? echo $d['variable_id'] ?>">&nbsp;<? echo $d['nom_variables']; ?><br><?
+                                        if ($d['exponer_campo']==1){?>
+                                            <script type="text/javascript">
+                                            $("#"+<? echo $d['variable_id'] ?>).prop('checked',true);
+                                            </script>
+                                        <?}
                                     }
-                                }                                      
+                                }
                             ?>
                         </div>
                         <div class="span6" style="overflow-y: auto; height:280px;width:47%;border: 0.5px solid;border-radius: 5px;border-color:#DDDDDD;">
-                            <?php 
+                            <?php
                                 foreach ($variablesProcesos as $res) {
                                     $variables = json_decode($res['extra']);
                                     $variables = get_object_vars($variables);
-                                    ?>&nbsp;<input type="checkbox" name="varPro[]" id="<? echo $variables['variable'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?                                     
-                                }       
+                                    ?>&nbsp;<input type="checkbox" name="varPro[]" id="var<? echo $res['variable_id'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?
+                                    if ($res['exponer_variable']==1){?>
+                                            <script type="text/javascript">
+                                                $("#var"+<? echo $res['variable_id'] ?>).prop('checked',true);
+                                            </script>
+                                        <?}
+                                }
                             ?>
                         </div>
                     </div>
