@@ -100,6 +100,15 @@ class ProcesoTable extends Doctrine_Table {
             $result4->execute();
         }
     }
+
+    public function findVaribleCallback($proceso_id){
+        // $sql = "select count(1) from accion a where tipo='callback' and a.proceso_id=".$proceso_id.";";
+        $sql = "select count(1) from accion a where tipo='callback' and a.proceso_id=2;";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)->fetchAll();
+        return $result;
+    }
+
     function varDump($data){
         ob_start();
         //var_dump($data);

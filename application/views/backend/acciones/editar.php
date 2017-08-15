@@ -12,7 +12,7 @@
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
 </ul>
-  
+
 
 <form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>
@@ -55,7 +55,7 @@
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
 
         <?php
-        if($tipo == "rest" || $tipo == "soap" || $accion->tipo == "rest" || $accion->tipo == "soap") {
+        if($tipo == "rest" || $tipo == "soap" || $tipo == "callback" || $accion->tipo == "rest" || $accion->tipo == "soap" || $accion->tipo == "callback"){
             echo $accion->displaySecurityForm($proceso->id);
         }else{
             echo $accion->displayForm();

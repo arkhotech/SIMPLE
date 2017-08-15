@@ -15,6 +15,7 @@
             <option value="variable">Generar Variable</option>
             <option value="rest">Consultar Rest</option>
             <option value="soap">Consultar Soap</option>
+            <option value="callback">Generar Callback</option>
         </select>
     </form>
 </div>

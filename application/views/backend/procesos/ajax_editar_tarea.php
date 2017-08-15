@@ -586,8 +586,15 @@
                             $("#seleccionados").find("*").prop("selected",true);
                         }
 
+                        function SelectAllFunction(){
+                            if($("input[name=SelectAll]:checked").val()){
+                                $(".SelectAll").prop('checked',true);
+                            }else{
+                                $(".SelectAll").prop('checked',false);
+                            }
+                        }
+
                         function seleccionarForm(id){
-                            console.log(id);
                             if($("input[name="+id+"]:checked").val()){
                                 $("."+id).prop('checked',true);
                             }else{
@@ -629,11 +636,13 @@
                             ?>
                         </div>
                         <div class="span6" style="overflow-y: auto; height:280px;width:47%;border: 0.5px solid;border-radius: 5px;border-color:#DDDDDD;">
+                            &nbsp;<input type="checkbox" onclick="SelectAllFunction();" name="SelectAll" value="0">&nbsp;All<br>
+
                             <?php
                                 foreach ($variablesProcesos as $res) {
                                     $variables = json_decode($res['extra']);
                                     $variables = get_object_vars($variables);
-                                    ?>&nbsp;<input type="checkbox" name="varPro[]" id="var<? echo $res['variable_id'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?
+                                    ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="SelectAll" name="varPro[]" id="var<? echo $res['variable_id'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?
                                     if ($res['exponer_variable']==1){?>
                                             <script type="text/javascript">
                                                 $("#var"+<? echo $res['variable_id'] ?>).prop('checked',true);
