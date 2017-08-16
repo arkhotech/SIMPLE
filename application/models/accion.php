@@ -2,12 +2,12 @@
 
 class Accion extends Doctrine_Record     {
 
-    function setTableDefinition() {        
+    function setTableDefinition() {
         $this->hasColumn('id');
         $this->hasColumn('nombre');
         $this->hasColumn('tipo');
         $this->hasColumn('extra');
-        $this->hasColumn('proceso_id'); 
+        $this->hasColumn('proceso_id');
 
 
         $this->setSubclasses(array(
@@ -15,7 +15,8 @@ class Accion extends Doctrine_Record     {
                 'AccionWebservice'  => array('tipo' => 'webservice'),
                 'AccionVariable'  => array('tipo' => 'variable'),
                 'AccionRest'  => array('tipo' => 'rest'),
-                'AccionSoap'  => array('tipo' => 'soap')
+                'AccionSoap'  => array('tipo' => 'soap'),
+                'AccionCallback'  => array('tipo' => 'callback')
             )
         );
     }
@@ -27,13 +28,13 @@ class Accion extends Doctrine_Record     {
             'local' => 'proceso_id',
             'foreign' => 'id'
         ));
-        
+
         $this->hasMany('Evento as Eventos', array(
             'local' => 'id',
             'foreign' => 'accion_id'
         ));
     }
-    
+
     public function displayForm(){
         return NULL;
     }
@@ -41,16 +42,16 @@ class Accion extends Doctrine_Record     {
     public function displaySecurityForm($id_proceso){
         return NULL;
     }
-    
+
     public function validateForm(){
         return;
     }
-    
+
     //Ejecuta la regla, de acuerdo a los datos del tramite tramite_id
     public function ejecutar($tramite_id){
         return;
     }
-    
+
     public function setExtra($datos_array) {
         if ($datos_array) {
             log_message('info','Accion.setExtra, $datos_array: ' . json_encode($datos_array));
@@ -60,19 +61,19 @@ class Accion extends Doctrine_Record     {
             $this->_set('extra' , NULL);
         }
     }
-    
+
     public function getExtra(){
         return json_decode($this->_get('extra'));
     }
-    
+
     public function exportComplete()
-    {        
-        $accion = $this;                
+    {
+        $accion = $this;
         $object = $accion->toArray();
 
         return json_encode($object);
     }
-    
+
     /**
      * @param $input
      * @return Accion
@@ -81,9 +82,9 @@ class Accion extends Doctrine_Record     {
     {
         $json = json_decode($input);
         $accion = new Accion();
-        
+
         try {
-            
+
             //Asignamos los valores a las propiedades de la Accion
             foreach ($json as $keyp => $p_attr) {
                 if ($keyp != 'id' && $keyp != 'proceso_id')
@@ -91,7 +92,7 @@ class Accion extends Doctrine_Record     {
             }
         } catch (Exception $ex) {
             throw new Exception($ex->getMessage(), $ex->getCode());
-        }                
+        }
 
         return $accion;
     }
