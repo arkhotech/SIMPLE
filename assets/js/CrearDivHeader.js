@@ -11,7 +11,9 @@ function ConsultarFunciones(){
  }
 
  function validateForm(){    
-    if(validJsonR==0 && validJsonR==0){
+    //var result = isJsonR($("#request"),$("#request").val(),$("#resultRequest"));
+    console.log(result);
+    if(validJsonH==0 && validJsonR==0){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{
@@ -113,7 +115,6 @@ function CovertJson(myArrClean,operaciones){
  }
 
 function CambioSelect(value){
-    console.log("esta cambiando el select");
     validJsonR=0;
     validJsonH=0;
     $("#request").focusout(function(){
@@ -153,7 +154,7 @@ function CambioSelect(value){
 }
 
 function isJsonR(object,value,id_span){
-    //if(obj.length>1){
+    if(obj.length>1){
         try {
             JSON.parse(value);
         }catch (e){
@@ -162,7 +163,7 @@ function isJsonR(object,value,id_span){
             validJsonR=1;
             return false;
         }
-    //}
+    }
     object.removeClass('invalido');
     id_span.text("");
     validJsonR=0;
@@ -237,7 +238,6 @@ var limpiar = function(){
 }
 
  $(document).ready(function(){
-    console.log("hola desde aqui");
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")

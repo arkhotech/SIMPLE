@@ -636,18 +636,20 @@
                             ?>
                         </div>
                         <div class="span6" style="overflow-y: auto; height:280px;width:47%;border: 0.5px solid;border-radius: 5px;border-color:#DDDDDD;">
-                            &nbsp;<input type="checkbox" onclick="SelectAllFunction();" name="SelectAll" value="0">&nbsp;All<br>
-
                             <?php
-                                foreach ($variablesProcesos as $res) {
-                                    $variables = json_decode($res['extra']);
-                                    $variables = get_object_vars($variables);
-                                    ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="SelectAll" name="varPro[]" id="var<? echo $res['variable_id'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?
-                                    if ($res['exponer_variable']==1){?>
-                                            <script type="text/javascript">
-                                                $("#var"+<? echo $res['variable_id'] ?>).prop('checked',true);
-                                            </script>
-                                        <?}
+                                $count=count($variablesProcesos); 
+                                if($count>0){
+                                    ?>&nbsp;<input type="checkbox" onclick="SelectAllFunction();" name="SelectAll" value="0">&nbsp;<b>All</b><br><?
+                                    foreach ($variablesProcesos as $res) {
+                                        $variables = json_decode($res['extra']);
+                                        $variables = get_object_vars($variables);
+                                        ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="SelectAll" name="varPro[]" id="var<? echo $res['variable_id'] ?>" value="<? echo $res['variable_id'] ?>">&nbsp;<? echo $variables['variable'];echo " "; echo $res['exponer_varible'];  ?><br><?
+                                        if ($res['exponer_variable']==1){?>
+                                                <script type="text/javascript">
+                                                    $("#var"+<? echo $res['variable_id'] ?>).prop('checked',true);
+                                                </script>
+                                            <?}
+                                    }
                                 }
                             ?>
                         </div>
