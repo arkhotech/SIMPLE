@@ -87,6 +87,15 @@ class FormNormalizer{
         }
         
     }
+    /**
+     * Obtiene directamente un formulario
+     * @param type $form_id
+     */
+    function obtenerFormulario($form_id){
+        $formSimple = Doctrine::getTable('Formulario') ->find($form_id)->exportComplete();
+        $data = json_decode($formSimple,true);
+        return $this->normalizarFormulario($data);
+    }
 
     /**
      * @param $formulario array con campos del formulario de entrada para iniciar el proceso

@@ -147,17 +147,22 @@ class API extends MY_BackendController {
         try{ 
             $input = json_decode($body,true);
             
+            UsuarioSesion::login('admin@admin.com', '123456');
+            
+            $this->load->library('SaferEval');
             
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
-
+            
             //llevar a etapas/ejecutar_form + número de tarea y proceso
             //Se debe seleccionar la etapa que se quiere iniciar.
             $etapa = $tramite->getEtapasActuales()->get(0)->id;
             $nextStep = $this->ejecutarEntrada($etapa,$input,true);
+            
             $integrador = new FormNormalizer();
             //echo $proceso_id, $id_tarea, $nextStep;die;
-            $nextForm = $integrador->obtenerFormularios($proceso_id, $id_tarea, $nextStep);
+            $nextForm = $integrador->obtenerFormulario($nextStep->formulario_id);
+            
             $this->registrarCallbackURL($input['callback'],$etapa);
             
             //validaciones etapa vencida, si existe o algo por el estilo
@@ -199,6 +204,12 @@ class API extends MY_BackendController {
             $integrador = new FormNormalizer();
             /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
             $formulario = $integrador->obtenerFormularios($id_tramite, $id_tarea, 0);
+            
+            if($id_tramite == NULL || $id_tarea == NULL ){
+                header("HTTP/1.1 400 Bad Request");
+                exit;
+            }
+            
 
             $swagger_file = $integrador->generar_swagger($formulario);
 
@@ -254,7 +265,7 @@ class API extends MY_BackendController {
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
-
+         
         foreach ($formulario->Campos as $c) {
             // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
 
@@ -275,13 +286,21 @@ class API extends MY_BackendController {
                 $dato->save();
             }
         }
-
+        
         $etapa->save();
-
-        $etapa->finalizarPaso($paso);
-       //Traer el siguiente formualrio
-        $prox_paso = $etapa->getPasoEjecutable(1); 
-        return $prox_paso->id;
+        try{
+            echo "iniciando fin paso->";
+            $etapa->finalizarPaso($paso);
+            echo "fin fianlizacion paso->";
+            echo "Extrayendo proximos paso..";
+            $prox_paso = $etapa->getPasoEjecutable(1); 
+            echo "Salidoendo del próximo paso";die;
+        }catch(Exception $e){
+            echo $e->getMessage();
+        }
+        //print_r($paso);die;
+        
+        return $prox_paso;
 
     }
     
@@ -354,7 +373,7 @@ class API extends MY_BackendController {
 							504	=> 'Gateway Timeout',
 							505	=> 'HTTP Version Not Supported'
 						);
-        header("HTTP/1.1 ");
+        header("HTTP/1.1 ".$numero." ".$$errorcodes[$numero]);
     }
     
     
