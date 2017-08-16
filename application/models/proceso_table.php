@@ -1,4 +1,4 @@
-<?php
+<?php  
 
 class ProcesoTable extends Doctrine_Table {
 
@@ -41,10 +41,8 @@ class ProcesoTable extends Doctrine_Table {
         return $result;
     }
 
-    public function findVariblesFormularios($proceso_id){
-       //$sql="select f.nombre as nombre_formulario, GROUP_CONCAT(c.nombre,' ',c.exponer_campo) AS variables from campo c, formulario f, proceso p where c.formulario_id=f.id and f.proceso_id = p.id and f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' GROUP BY f.nombre;";
-
-        $sql="select f.nombre as nombre_formulario, c.id as variable_id, c.nombre as nom_variables, c.exponer_campo from campo c, formulario f, proceso p, tarea t where c.formulario_id=f.id and f.proceso_id = p.id and f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' and p.id=t.proceso_id GROUP by f.nombre, c.id, c.nombre, c.exponer_campo";
+    public function findVariblesFormularios($proceso_id, $tarea_id){
+        $sql="select f.nombre as nombre_formulario, c.id as variable_id, c.nombre as nom_variables, c.exponer_campo from proceso p,tarea t, paso pa, formulario f, campo c where p.id=t.proceso_id and p.id=".$proceso_id." and t.id=".$tarea_id." and t.id=pa.tarea_id and pa.formulario_id=f.id and f.id=c.formulario_id and p.activo=1 and c.tipo<>'title' GROUP by f.nombre, c.id, c.nombre, c.exponer_campo;";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
         ->fetchAll();
@@ -69,8 +67,9 @@ class ProcesoTable extends Doctrine_Table {
             INNER JOIN formulario f on c.formulario_id=f.id
             INNER JOIN proceso p on f.proceso_id = p.id
             INNER JOIN tarea t on t.proceso_id = p.id
+            INNER JOIN paso pa on t.id=pa.tarea_id
             SET exponer_campo = 0
-            WHERE  f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' and p.id=t.proceso_id and c.id not in (".$varForm.");";
+            WHERE  f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' and p.id=t.proceso_id and pa.formulario_id=f.id and t.id=".$tarea_id." and c.id not in (".$varForm.");";
             $result2 = $stmn->prepare($sql2);
             $result2->execute();
         }else{
@@ -78,13 +77,13 @@ class ProcesoTable extends Doctrine_Table {
             INNER JOIN formulario f on c.formulario_id=f.id
             INNER JOIN proceso p on f.proceso_id = p.id
             INNER JOIN tarea t on t.proceso_id = p.id
+            INNER JOIN paso pa on t.id=pa.tarea_id
             SET exponer_campo = 0
-            WHERE  f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' and p.id=t.proceso_id;";
+            WHERE  f.proceso_id=".$proceso_id." and p.activo=1 and c.tipo<>'title' and p.id=t.proceso_id and pa.formulario_id=f.id and t.id=".$tarea_id.";";
             $result2 = $stmn->prepare($sql2);
             $result2->execute();
 
         }
-
 
         if ($varPro){
             $varPro = implode(",", $varPro);
@@ -102,11 +101,18 @@ class ProcesoTable extends Doctrine_Table {
     }
 
     public function findVaribleCallback($proceso_id){
-        // $sql = "select count(1) from accion a where tipo='callback' and a.proceso_id=".$proceso_id.";";
-        $sql = "select count(1) from accion a where tipo='callback' and a.proceso_id=2;";
+        $return =0;
+        $sql = "select * from accion a where a.tipo='variable' and a.proceso_id=".$proceso_id.";";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)->fetchAll();
-        return $result;
+        foreach ($result as $res) {
+            $busqueda=json_decode($res['extra']);
+            $obj = get_object_vars($busqueda);
+            if($obj['variable']=='callback'){
+                $return=1;
+            }  
+        }                          
+        return $return;
     }
 
     function varDump($data){

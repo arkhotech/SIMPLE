@@ -11,7 +11,8 @@ function ConsultarFunciones(){
  }
 
  function validateForm(){    
-    if(validJsonR==0 && validJsonR==0){
+    var result = isJsonR($("#request"),$("#request").val(),$("#resultRequest"));
+    if(validJsonH==0 && validJsonR==0){
  		javascript:$('#plantillaForm').submit();
  		return false;
  	}else{
@@ -113,7 +114,6 @@ function CovertJson(myArrClean,operaciones){
  }
 
 function CambioSelect(value){
-    console.log("esta cambiando el select");
     validJsonR=0;
     validJsonH=0;
     $("#request").focusout(function(){
@@ -237,7 +237,6 @@ var limpiar = function(){
 }
 
  $(document).ready(function(){
-    console.log("hola desde aqui");
  	$('#divMetodosE').hide();
  	$('#resultRequest').text("Formato requerido / json")
  	$('#resultHeader').text("Formato requerido / json")

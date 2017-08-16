@@ -4,8 +4,6 @@ require_once('accion.php');
 class AccionVariable extends Accion {
 
     public function displayForm() {
-
-
         $display = '<label>Variable</label>';
         $display.='<div class="input-prepend">';
         $display.='<span class="add-on">@@</span>';
@@ -13,7 +11,6 @@ class AccionVariable extends Accion {
         $display.='</div>';
         $display.='<label>Expresión a evaluar</label>';
         $display.='<textarea name="extra[expresion]" class="input-xxlarge">' . ($this->extra ? $this->extra->expresion : '') . '</textarea>';
-
         return $display;
     }
 

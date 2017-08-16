@@ -12,29 +12,38 @@ class AccionCallback extends Accion {
             </p>
         ';
 
-        $display.= '<label>identificador de cliente</label>';
-        $display.='<input type="text" class="input-xxlarge" placeholder="Identificador del cliente para reconocer quien hace el callback" name="extra[cliente]" value="' . ($this->extra ? $this->extra->cliente : '') . '" />';
-
         $display.= '<label>URL de callback</label>';
-        $display.='<input type="text" class="input-xxlarge" placeholder="https://midominio.cl" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
-
-        $display.= '<label>URI de callback</label>';
-        $display.='<input type="text" class="input-xxlarge" placeholder="/recibir/9" name="extra[uri]" value="' . ($this->extra ? $this->extra->uri : '') . '" />';
+        $display.='<input type="text" class="input-xxlarge" placeholder="https://midominio.cl" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '"/>';
 
         $display.='
                 <label>Método</label>
-                <select id="tipoMetodo" name="extra[tipoMetodo]">';
+                <select id="tipoMetodo" name="extra[tipoMetodo]">. 
+                    <option value="">Seleccione...</option>';
                     if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "POST"){
                         $display.='<option value="POST" selected>POST</option>';
                     }else{
                         $display.='<option value="POST">POST</option>';
                     }
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "PUT"){
+                        $display.='<option value="PUT" selected>PUT</option>';
+                    }else{
+                        $display.='<option value="PUT">PUT</option>';
+                    }
+                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "DELETE"){
+                        $display.='<option value="DELETE" selected>DELETE</option>';
+                    }else{
+                        $display.='<option value="DELETE">DELETE</option>';
+                    }
         $display.='</select>';
-
+        
         $display.='
             <div class="col-md-12" id="divObject" style="display:none;">
-                <label>Request</label>';
-        $display.='<input type="text" placeholder="@@Callback" name="extra[request]" value="' . ($this->extra ? $this->extra->request : '') . '" />';
+                <label>Request</label>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ Request }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <br />
+                <span id="resultHeader" class="spanError"></span>
+                <br /><br />
+            </div>';
 
         $display.='
             <div class="col-md-12">
@@ -44,20 +53,38 @@ class AccionCallback extends Accion {
                 <span id="resultHeader" class="spanError"></span>
                 <br /><br />
             </div>';
+        $display.='
+            <label>Seguridad</label>
+            <select id="tipoSeguridad" name="extra[idSeguridad]">';
+            foreach($conf_seguridad as $seg){
+                $display.='
+                    <option value="">Sin seguridad</option>';
+                    if ($this->extra->idSeguridad && $this->extra->idSeguridad == $seg->id){
+                        $display.='<option value="'.$seg->id.'" selected>'.$seg->institucion.' - '.$seg->servicio.'</option>';
+                    }else{
+                        $display.='<option value="'.$seg->id.'">'.$seg->institucion.' - '.$seg->servicio.'</option>';
+                    }
+            }
+        $display.='</select>';    
         return $display;
     }
 
     public function validateForm() {
         $CI = & get_instance();
         $CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
-        $CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
+        //$CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
         $CI->form_validation->set_rules('extra[tipoMetodo]', 'Método', 'required');
-        // $CI->form_validation->set_rules('extra[request]', 'Request', 'required');
+        $CI->form_validation->set_rules('extra[request]', 'Request', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
         $required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
-        if ($required[0][0]>0){
+        $tipoSeguridad=$data->extra->tipoSeguridad;
+        $user = $data->extra->user;
+        $pass = $data->extra->pass;
+        $ApiKey = $data->extra->apikey;
+        ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
+        if ($required>0){
             $r=new Regla($this->extra->cliente);
             $cliente=$r->getExpresionParaOutput($etapa->id);
 
@@ -69,22 +96,6 @@ class AccionCallback extends Accion {
                 $url = substr($url, 0, -1);
             }
 
-            $r=new Regla($this->extra->uri);
-            $uri=$r->getExpresionParaOutput($etapa->id);
-            $l = substr($uri, 0, 1);
-            if($caracter===$l){
-                $uri = substr($uri, 1);
-            }
-
-            $config = array(
-                'server' => $url
-            );
-
-            $CI = & get_instance();
-            if(isset($this->extra->request)){
-                $r=new Regla($this->extra->request);
-                $request=$r->getExpresionParaOutput($etapa->id);
-            }
             //Hacemos encoding a la url
             $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
                 $key=$matches[1];
@@ -92,6 +103,67 @@ class AccionCallback extends Accion {
                 return $key.urlencode($value);
             },
             $url);
+
+            $nuevo = parse_url($url);
+            $caracter="/";
+            $server= $nuevo['scheme'].'://'.$nuevo['host'];
+            $uri = $nuevo['path'];
+            $l = substr($uri, 0, 1);
+            if($caracter===$l){
+                $uri = substr($uri, 1);
+            }
+   
+            $CI = & get_instance();
+            switch ($tipoSeguridad) {
+                case "HTTP_BASIC":
+                    //Seguridad basic
+                    $config = array(
+                        'server'          => $server,
+                        'http_user'       => $user,
+                        'http_pass'       => $pass,
+                        'http_auth'       => 'basic'
+                    );
+                    break;
+                case "API_KEY":
+                    //Seguriad api key
+                    $config = array(
+                        'server'          => $server,
+                        'api_key'         => $ApiKey,
+                        'api_name'        => $NameKey
+                    );
+                    break;
+                case "OAUTH2":
+                    //SEGURIDAD OAUTH2
+                    $config_seg = array(
+                        'server'          => $url_auth
+                    );
+                    $request_seg= $data->extra->request_seg;
+                    $CI->rest->initialize($config_seg);
+                    $result = $CI->rest->post($uri_auth, $request_seg, 'json');
+                    //Se obtiene la codigo de la cabecera HTTP
+                    $debug_seg = $CI->rest->debug();
+                    $response_seg= intval($debug_seg['info']['http_code']);
+                    if($response_seg >= 200 && $response_seg < 300){
+                        $config = array(
+                            'server'          => $server,
+                            'api_key'         => $result->token_type.' '.$result->access_token,
+                            'api_name'        => 'Authorization'
+                        );
+                    }
+                break;
+                default:
+                    //SIN SEGURIDAD
+                    $config = array(
+                        'server'          => $server
+                    );
+                break;
+            }
+
+            if(isset($this->extra->request)){
+                $r=new Regla($this->extra->request);
+                $request=$r->getExpresionParaOutput($etapa->id);
+            }
+
             //obtenemos el Headers si lo hay
             if(isset($this->extra->header)){
                 $r=new Regla($this->extra->header);
@@ -103,8 +175,16 @@ class AccionCallback extends Accion {
             }
             try{
                 // Se ejecuta la llamada segun el metodo
-                $CI->rest->initialize($config);
-                $result = $CI->rest->post($uri, $request, 'json');
+                if($this->extra->tipoMetodo == "POST"){
+                    $CI->rest->initialize($config);
+                    $result = $CI->rest->post($uri, $request, 'json');
+                }else if($this->extra->tipoMetodo == "PUT"){
+                    $CI->rest->initialize($config);
+                    $result = $CI->rest->put($uri, $request, 'json');
+                }else if($this->extra->tipoMetodo == "DELETE"){
+                    $CI->rest->initialize($config);
+                    $result = $CI->rest->delete($uri, $request, 'json');
+                }
                 //Se obtiene la codigo de la cabecera HTTP
                 $debug = $CI->rest->debug();
                 if($debug['info']['http_code']=='204'){
@@ -146,7 +226,9 @@ class AccionCallback extends Accion {
             //  Aqui falta agregar la auditoria.
             /////////////////////////////////////////////////////////////////////////////////////
             $response="No se ejecuto el proceso callback porque no hay una variable Callback definida en el proceso";
+            log_message('info','####################################################################################');
             log_message('info',$this->varDump($response));
+            log_message('info','####################################################################################');
         }
     }
     function varDump($data){
