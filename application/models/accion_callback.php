@@ -79,6 +79,8 @@ class AccionCallback extends Accion {
 
     public function ejecutar(Etapa $etapa) {
         $required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
+        $accion=Doctrine::getTable('Accion')->find($this->id);
+        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
         $tipoSeguridad=$data->extra->tipoSeguridad;
         $user = $data->extra->user;
         $pass = $data->extra->pass;
@@ -199,6 +201,7 @@ class AccionCallback extends Accion {
                         $result2['des_code']= $debug['response_string'];
                     }else{
                         $result2 = get_object_vars($result);
+                        //crear variable callback_error
                     }
                 }
                 $response["response".$this->extra->tipoMetodo]=$result2;
@@ -225,10 +228,30 @@ class AccionCallback extends Accion {
             /// Caso donde no existe la variable callback y no se ejecuta la accion,
             //  Aqui falta agregar la auditoria.
             /////////////////////////////////////////////////////////////////////////////////////
-            $response="No se ejecuto el proceso callback porque no hay una variable Callback definida en el proceso";
+            $response="No se pudo ejecutar el proceso de Callback debiado a que no existe una variable para tal fin.";
             log_message('info','####################################################################################');
-            log_message('info',$this->varDump($response));
+            log_message('info',$response);
             log_message('info','####################################################################################');
+            $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
+            // Auditoria
+            $fecha = new DateTime();
+            $registro_auditoria = new AuditoriaOperaciones ();
+            $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+            $registro_auditoria->operacion = 'Error en llamada Callback';
+            $usuario = UsuarioBackendSesion::usuario ();
+            // Se necesita cambiar el usuario al usuario público. 
+            $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
+            $registro_auditoria->proceso = $proceso->nombre;
+            $registro_auditoria->cuenta_id = 1;
+            $registro_auditoria->motivo = $response;
+            
+            //Detalles
+            $accion_array['proceso'] = $proceso;
+            $accion_array['accion'] = $accion->toArray(false);
+            unset($accion_array['accion']['proceso_id']);
+            $registro_auditoria->detalles= 'Detalles';
+            $registro_auditoria->detalles=  json_encode($accion_array);
+            $registro_auditoria->save();  
         }
     }
     function varDump($data){

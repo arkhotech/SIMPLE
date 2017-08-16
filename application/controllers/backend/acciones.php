@@ -179,8 +179,9 @@ class Acciones extends MY_BackendController {
         $fecha = new DateTime ();
 
         // Auditar
+        $fecha = new DateTime();
         $registro_auditoria = new AuditoriaOperaciones ();
-        $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+        $registro_auditoria->fecha = $fecha->format( "Y-m-d H:i:s" );
         $registro_auditoria->operacion = 'Eliminación de Acción';
         $usuario = UsuarioBackendSesion::usuario ();
         $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';

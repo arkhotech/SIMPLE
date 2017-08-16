@@ -108,11 +108,18 @@ class ProcesoTable extends Doctrine_Table {
         foreach ($result as $res) {
             $busqueda=json_decode($res['extra']);
             $obj = get_object_vars($busqueda);
-            if($obj['variable']=='callback'){
+            if($obj['variable']=='callback22553'){
                 $return=1;
             }  
         }                          
         return $return;
+    }
+
+    public function findProceso($proceso_id){
+        $sql = "select * from proceso p where p.id=".$proceso_id.";";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)->fetchObject();
+        return $result;
     }
 
     function varDump($data){
