@@ -40,7 +40,7 @@
         <div style='text-align: right;'><a href='#' onclick='toggleBusquedaAvanzada()'>Busqueda avanzada</a></div>
     </div>
 
-    <?php // if(UsuarioBackendSesion::usuario()->rol!='seguimiento'): 
+    <?php // if(UsuarioBackendSesion::usuario()->rol!='seguimiento'):
         if(in_array( 'super',explode(',',UsuarioBackendSesion::usuario()->rol))):
     ?>
     <div class="btn-group pull-left">
@@ -51,7 +51,9 @@
 
 		<ul class="dropdown-menu">
             <li><a href="<?= site_url('backend/seguimiento/reset_proc_cont/' . $proceso->id) ?>" onclick="return confirm('¿Esta seguro que desea reiniciar el contador de Proceso?');">Reiniciar contador de Proceso</a></li>
-            <li><a href="<?= site_url('backend/seguimiento/borrar_proceso/' . $proceso->id) ?>" onclick="return borrarProceso(<?=$proceso->id?>);">Borrar todo</a></li>
+            <?php if ($proceso->Cuenta->ambiente != 'prod'):?>
+                <li><a href="<?= site_url('backend/seguimiento/borrar_proceso/' . $proceso->id) ?>" onclick="return borrarProceso(<?=$proceso->id?>);">Borrar todo</a></li>
+            <?php endif ?>
         </ul>
     </div>
     <?php endif ?>
@@ -126,33 +128,33 @@
         <?php foreach ($tramites as $t): ?>
             <tr>
                 <td><?= $t->id ?></td>
-                <?php 
+                <?php
                     $etapa_id = $t->getUltimaEtapa()->id;
                     $etapa = Doctrine::getTable ('Etapa')->find ($etapa_id);
                 ?>
                 <td><?= !$etapa->usuario_id ? 'Ninguno' : !$etapa->Usuario->registrado ? 'No registrado' : $etapa->Usuario->displayUsername() ?></td>
-               <td class="name">  
-                 <?php 
+               <td class="name">
+                 <?php
                       $tramite_nro ='';
                       foreach ($t->getValorDatoSeguimiento() as $tra_nro){
                         if($tra_nro->nombre == 'tramite_ref'){
                               $tramite_nro = $tra_nro->valor;
-                         }                              
-                      }                         
+                         }
+                      }
                       echo $tramite_nro != '' ? $tramite_nro : 'N/A';
                 ?>
                 </td>
-                <td class="name">  
-                 <?php 
+                <td class="name">
+                 <?php
                       $tramite_descripcion ='';
                       foreach ($t->getValorDatoSeguimiento() as $tra){
                          if($tra->nombre == 'tramite_descripcion'){
                               $tramite_descripcion = $tra->valor;
-                         }  
+                         }
                       }
                      echo $tramite_descripcion != '' ? $tramite_descripcion : 'N/A';
                 ?>
-                </td>  
+                </td>
 
                 <td><?= $t->pendiente ? 'En curso' : 'Completado' ?></td>
                 <td>
@@ -167,7 +169,7 @@
                 <td><?= strftime('%c', mysql_to_unix($t->updated_at)) ?></td>
                 <td style="text-align: right;">
                     <a class="btn btn-primary" href="<?= site_url('backend/seguimiento/ver/' . $t->id) ?>"><i class="icon-white icon-eye-open"></i> Seguimiento</a>
-                    <?php // if(UsuarioBackendSesion::usuario()->rol!='seguimiento'): 
+                    <?php // if(UsuarioBackendSesion::usuario()->rol!='seguimiento'):
                         if(in_array( 'super',explode(',',UsuarioBackendSesion::usuario()->rol))):
                     ?><a class="btn btn-danger" href="#" onclick="return eliminarTramite(<?=$t->id?>);"><i class="icon-white icon-trash"></i> Borrar</a><?php endif ?>
                 </td>
