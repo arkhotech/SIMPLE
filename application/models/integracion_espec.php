@@ -27,10 +27,18 @@ class FormNormalizer{
     }
             
     function normalizarFormulario($json,$id){
+        
+        if($id==NULL){
+            throw new Exception("El formulario viene sin ID");
+        }
        
         $retval['form'] = array('id' => $id, 'campos' => array() );
         //print_r($json);
+        
         foreach( $json['Campos'] as $campo){
+            if($campo['tipo'] == "subtitle"){
+                continue;  //se ignoran los campos de tipo subtitle
+            }
             array_push($retval['form']['campos'], 
             
                   array( 
@@ -93,6 +101,18 @@ class FormNormalizer{
             
         }
         
+    }
+    /**
+     * Obtiene directamente un formulario
+     * @param type $form_id
+     */
+    function obtenerFormulario($form_id){
+        $formSimple = Doctrine::getTable('Formulario') ->find($form_id)->exportComplete();
+        if($formSimple == NULL){
+            throw new Exception("Fomrulario $form_id no existe");
+        }
+        $data = json_decode($formSimple,true);
+        return $this->normalizarFormulario($data,$form_id);
     }
 
     /**
