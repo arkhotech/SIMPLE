@@ -104,6 +104,7 @@ class API extends MY_BackendController {
                 $this->continuarProceso($proceso_id,$etapa,$this->getBody());
                 break;
             case "POST":
+                log_message("INFO", "inicio proceso", FALSE);
                 $this->checkJsonHeader();
                 $this->iniciarProceso($proceso_id,$etapa,$this->getBody());
                 break;
@@ -148,16 +149,21 @@ class API extends MY_BackendController {
         
         try{ 
             $input = json_decode($body,true);
+            log_message("INFO", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
             if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
+
+            log_message("INFO", "inicio proceso", FALSE);
             
             UsuarioSesion::login('admin@admin.com', '123456');
-            
+
+            log_message("INFO", "carga libreria", FALSE);
             $this->load->library('SaferEval');
-            
+
+            log_message("INFO", "inicia tramite", FALSE);
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
             
