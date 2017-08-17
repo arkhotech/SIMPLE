@@ -221,7 +221,6 @@ class Procesos extends MY_BackendController {
     public function ajax_editar_tarea($proceso_id,$tarea_identificador){
         $tarea=Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$tarea_identificador);
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
-
         if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar esta tarea.';
             exit;
@@ -230,7 +229,7 @@ class Procesos extends MY_BackendController {
         $data['formularios']=Doctrine::getTable('Formulario')->findByProcesoId($proceso_id);
         $data['acciones']=Doctrine::getTable('Accion')->findByProcesoId($proceso_id);
         $data['proceso'] = $proceso;
-        $data['variablesFormularios']=Doctrine::getTable('Proceso')->findVariblesFormularios($proceso_id);
+        $data['variablesFormularios']=Doctrine::getTable('Proceso')->findVariblesFormularios($proceso_id,$tarea['id']);
         $data['variablesProcesos']=Doctrine::getTable('Proceso')->findVariblesProcesos($proceso_id);
         $this->load->view('backend/procesos/ajax_editar_tarea',$data);
     }
@@ -251,9 +250,7 @@ class Procesos extends MY_BackendController {
                 $this->form_validation->set_rules('vencimiento_notificar_email','Correo electronico para notificar vencimiento','required');
             }
         }
-
         Doctrine::getTable('Proceso')->updateVaribleExposed($this->input->post('varForm'),$this->input->post('varPro'),$tarea->Proceso->id,$tarea_id);
-
         $respuesta=new stdClass();
         if ($this->form_validation->run() == TRUE) {
             $tarea->nombre=$this->input->post('nombre');
