@@ -81,12 +81,16 @@ class AccionCallback extends Accion {
         $required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
         $accion=Doctrine::getTable('Accion')->find($this->id);
         $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
+        $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
         $tipoSeguridad=$data->extra->tipoSeguridad;
         $user = $data->extra->user;
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
         ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
-        if ($required>0){
+        
+        
+        $var=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback",$etapa->id);
+        if ($var|| $required>0){
             $r=new Regla($this->extra->cliente);
             $cliente=$r->getExpresionParaOutput($etapa->id);
 
@@ -187,32 +191,64 @@ class AccionCallback extends Accion {
                     $CI->rest->initialize($config);
                     $result = $CI->rest->delete($uri, $request, 'json');
                 }
+
                 //Se obtiene la codigo de la cabecera HTTP
                 $debug = $CI->rest->debug();
-                if($debug['info']['http_code']=='204'){
-                    $result2['code']= '204';
-                    $result2['des_code']= 'No Content';
-                }else if($debud['info']['http_code']=='0'){
-                    $result2['code']= $debug['error_code'];
-                    $result2['des_code']= $debug['response_string'];
-                }else{
-                    if(!is_object($result)) {
-                        $result2['code']= '2';
-                        $result2['des_code']= $debug['response_string'];
-                    }else{
-                        $result2 = get_object_vars($result);
-                        //crear variable callback_error
-                    }
-                }
-                $response["response".$this->extra->tipoMetodo]=$result2;
-                foreach($response as $key=>$value){
-                    $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
-                    if(!$dato)
+
+                $parseInt=intval($debug['info']['http_code']);
+                if ($parseInt<200 || $parseInt>204){
+                    // Ocurio un error en el server del Callback ## Error en el servidor externo ##
+
+                    // Se guarda en Auditoria el error
+                    $response['code']=$debug['info']['http_code'];
+                    $response['des_code']=$debug['response_string'];
+                    $response=json_encode($response);
+                    $fecha = new DateTime();
+                    $registro_auditoria = new AuditoriaOperaciones ();
+                    $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+                    $registro_auditoria->operacion = 'Error en respuesta de Callback';
+                    $usuario = UsuarioBackendSesion::usuario ();
+                    
+                    // Se necesita cambiar el usuario al usuario público. 
+                    $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
+                    $registro_auditoria->proceso = $proceso->nombre;
+                    $registro_auditoria->cuenta_id = 1;
+                    $registro_auditoria->motivo = $response;
+                    
+                    //Detalles de proceso
+                    $accion_array['proceso'] = $proceso;
+                    $accion_array['accion'] = $accion->toArray(false);
+                    unset($accion_array['accion']['proceso_id']);
+                    $registro_auditoria->detalles= 'Detalles';
+                    $registro_auditoria->detalles=  json_encode($accion_array);
+                    $registro_auditoria->save();
+                   
+                    // Se genera la variable callback_error y se le asigna el codigo y la descripcion del error.
+                    $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_error",$etapa->id);
+                    if(!$dato){
                         $dato=new DatoSeguimiento();
-                    $dato->nombre=$key;
-                    $dato->valor=$value;
-                    $dato->etapa_id=$etapa->id;
-                    $dato->save();
+                        $dato->nombre="callback_error";
+                        $dato->valor=$response;
+                        $dato->etapa_id=$etapa->id;
+                        $dato->save();
+                    }else{
+                        $dato->valor=$response;
+                        $dato->save();
+                    }
+                }else{
+                    $result2 = get_object_vars($result);
+                    $response=$result2;
+                        $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId('callback',$etapa->id);
+                        if(!$dato){
+                            $dato=new DatoSeguimiento();
+                            $dato->nombre='callback';
+                            $dato->valor=$response;
+                            $dato->etapa_id=$etapa->id;
+                            $dato->save();
+                        }else{
+                            $dato->valor=$response;
+                            $dato->save();
+                        }
                 }
             }catch (Exception $e){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
@@ -228,11 +264,10 @@ class AccionCallback extends Accion {
             /// Caso donde no existe la variable callback y no se ejecuta la accion,
             //  Aqui falta agregar la auditoria.
             /////////////////////////////////////////////////////////////////////////////////////
-            $response="No se pudo ejecutar el proceso de Callback debiado a que no existe una variable para tal fin.";
+            $response="No se pudo ejecutar el proceso de Callback debido a que no existe una variable para tal fin.";
             log_message('info','####################################################################################');
             log_message('info',$response);
             log_message('info','####################################################################################');
-            $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
             // Auditoria
             $fecha = new DateTime();
             $registro_auditoria = new AuditoriaOperaciones ();

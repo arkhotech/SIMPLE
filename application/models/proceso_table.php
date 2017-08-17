@@ -108,7 +108,7 @@ class ProcesoTable extends Doctrine_Table {
         foreach ($result as $res) {
             $busqueda=json_decode($res['extra']);
             $obj = get_object_vars($busqueda);
-            if($obj['variable']=='callback22553'){
+            if($obj['variable']=='callback'){
                 $return=1;
             }  
         }                          
