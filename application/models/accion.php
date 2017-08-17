@@ -8,6 +8,7 @@ class Accion extends Doctrine_Record     {
         $this->hasColumn('tipo');
         $this->hasColumn('extra');
         $this->hasColumn('proceso_id');
+        $this->hasColumn('exponer_variable');
 
 
         $this->setSubclasses(array(

@@ -18,11 +18,11 @@ class Regla {
         $new_regla = $this->getExpresionParaEvaluar($etapa_id,$ev);
         $new_regla = 'return ' . $new_regla . ';';
         $CI = & get_instance();
-        $CI->load->library('SaferEval');
+        //$CI->load->library('SaferEval');
         $resultado = FALSE;
-        if (!$errores = $CI->safereval->checkScript($new_regla, FALSE))
+        //if (!$errores = $CI->safereval->checkScript($new_regla, FALSE))
             $resultado = @eval($new_regla);
-        
+
         return $resultado;
     }
     

@@ -7,6 +7,7 @@ class Campo extends Doctrine_Record {
     public $etiqueta_tamano='large'; //Indica el tamaño default que tendra el campo de etiqueta. Puede ser large o xxlarge.
     public $requiere_nombre=true;    //Indica si requiere que se le ingrese un nombre (Es decir, no generarlo aleatoriamente)
     public $datos_agenda=false;     // Indica si se deben mostrar los satos adicionales para la agenda.
+
     
     public static function factory($tipo){
         if($tipo=='text')
@@ -72,6 +73,7 @@ class Campo extends Doctrine_Record {
         $this->hasColumn('documento_id');
         $this->hasColumn('extra');
         $this->hasColumn('agenda_campo');
+        $this->hasColumn('exponer_campo');
         
         $this->setSubclasses(array(
                 'CampoText'  => array('tipo' => 'text'),
