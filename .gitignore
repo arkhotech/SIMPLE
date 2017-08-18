@@ -9,6 +9,7 @@ uploads/firmas
 uploads/logos
 uploads/logos_certificados
 uploads/timbres
+uploads/timbres
 application/libraries/tcpdf/cache
 sphinx/index
 sphinx/run
