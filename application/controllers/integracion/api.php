@@ -148,6 +148,7 @@ class API extends MY_BackendController {
         
         try{ 
             $input = json_decode($body,true);
+            
             //Validar entrada
             if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
                 header("HTTP/1.1 400 Bad Request");
@@ -243,8 +244,9 @@ class API extends MY_BackendController {
     }
     
     private function extractVariable($body,$name){
+        
         if(isset($body['data'][$name])){
-            return $body['data'][$name];
+            return (is_array($body['data'][$name])) ? json_encode($body['data'][$name]) : $body['data'][$name];
         }
         return "NE";
     }
@@ -265,11 +267,12 @@ class API extends MY_BackendController {
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
-         
+       
         foreach ($formulario->Campos as $c) {
             // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
 
             if ($c->isEditableWithCurrentPOST($etapa_id,$body)) {
+
                 $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
                 if (!$dato)
                     $dato = new DatoSeguimiento();
@@ -334,7 +337,13 @@ class API extends MY_BackendController {
         return $result;
 
     }
-    
+    /**
+     * 
+     * @param type $etapa Objeto de tipo Etapa
+     * @return type retorna un JSON con un array JSON clave-valor
+     * 
+     * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
+     */
     private function obtenerResultados($etapa){
         $campos = array();
         foreach($etapa->Tarea->Pasos as $paso ){
@@ -355,7 +364,11 @@ class API extends MY_BackendController {
         return $retval;
       
     }
-    
+    /**
+     * 
+     * @param type $etapa Pbjeto de tipo etapa 
+     * @return type Array de clave valor con las variables que son exportables.
+     */
     private function getVariablesExportables($etapa){
         $retval = array();
         $id_proceso = $etapa->Tarea->proceso_id;
@@ -367,6 +380,13 @@ class API extends MY_BackendController {
         return $retval;
     }
     
+    /**
+     * Recupera los valores de las variables de tipo Campo que son exportables
+     * @param type $nombre nombre de la variable
+     * @param type $etapa objeto de tipo etapa
+     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso 
+     * que deberóia ser excepcional, entonces retorna N/D 
+     */
     private function getVariableValor($nombre,$etapa){
         $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId( $nombre, $etapa->id);
         if($var != NULL){
@@ -376,7 +396,12 @@ class API extends MY_BackendController {
         }
     }
     
-    
+    /**
+     * Pbtiene las variblaes exportables de un formulario
+     * 
+     * @param type $form_id
+     * @return array
+     */
     private function getListaExportables($form_id){
         $lista= array();
         $campos = Doctrine::getTable('Campo')->findByFormularioId($form_id);
