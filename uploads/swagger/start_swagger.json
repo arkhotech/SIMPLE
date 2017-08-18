@@ -38,7 +38,7 @@
             "type": "integer"
           },
           {
-            "name": "data",
+            "name": "input",
             "in": "body",
             "description": "Formulario entrada para iniciar trámite",
             "required": true,
@@ -89,7 +89,10 @@
         "callback": {
           "type": "string"
         },
-        "data_entrada": {
+        "callback-id": {
+          "type": "string"
+        },
+        "data": {
           "type": "object",
           "properties": {
             -DATA_ENTRADA-

@@ -138,7 +138,19 @@ class FormNormalizer{
                     $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\",\"format\": \"date\"}";
                 }else if($campo["tipo"] == "grid"){
                     if($data_entrada != "") $data_entrada .= ",";
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}}}";
+
+                    $columnas = array();
+                    $columnas = $campo["dominio_valores"];
+
+                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"object\",\"properties\": {";
+                    foreach ($columnas["columns"] as $column){
+                        if (substr($data_entrada, -1) == '}') {
+                            $data_entrada .= ",";
+                        }
+                        $data_entrada .= "\"".$column["header"]."\": {\"type\": \"".$column["type"]."\"}";
+                    }
+
+                    $data_entrada .= "}}}";
                 }
             }
         }

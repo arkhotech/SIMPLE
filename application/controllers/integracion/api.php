@@ -237,7 +237,6 @@ class API extends MY_BackendController {
                 header("HTTP/1.1 400 Bad Request");
                 exit;
             }
-            
 
             $swagger_file = $integrador->generar_swagger($formulario);
 
@@ -296,7 +295,7 @@ class API extends MY_BackendController {
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
         if (!$etapa) {
-            header("HTTP/1.1 412 Etapa no fue encontrada");
+            header("HTTP/1.1 404 Etapa no fue encontrada");
             exit;
         }
         if ($etapa->tramite_id != $id_proceso) {
