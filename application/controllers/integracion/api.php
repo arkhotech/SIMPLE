@@ -317,15 +317,6 @@ class API extends MY_BackendController {
         }
 
         $this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body); 
-        
-        $nombre_proceo = $etapa->Tarea->Proceso->nombre;
-        $data['headers'] = $this->getHeaders();
-        $data['input'] = $body['data'];
-        $data['response_data'] = 
-                array("Callback url" => $body['callback'],
-                     "Callback id" => $body['callback-id']);
-        $this->registrarAuditoria($nombre_proceo,"Iniciar Proceso" ,
-                'Auditoría de llamados API',  json_encode($data));
    
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
