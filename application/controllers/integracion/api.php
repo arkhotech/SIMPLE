@@ -101,15 +101,15 @@ class API extends MY_BackendController {
                 break;
             case "PUT":
                 $this->checkJsonHeader();
-                $this->continuarProceso($proceso_id,$etapa,$this->getBody());
+                $this->continuarProceso($proceso_id,$this->getBody());
                 break;
             case "POST":
+                log_message("INFO", "inicio proceso", FALSE);
                 $this->checkJsonHeader();
                 $this->iniciarProceso($proceso_id,$etapa,$this->getBody());
                 break;
             default:
                 header("HTTP/1.1 405 Metodo no permitido");
-                //show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
         }
         
     }
@@ -137,42 +137,48 @@ class API extends MY_BackendController {
        exit;
     }
     
-    private function iniciarProceso($proceso_id,$id_tarea,$body){
+    private function iniciarProceso($proceso_id, $id_tarea, $body){
         //validar la entrada
         
         if($proceso_id == NULL || $id_tarea == NULL){
-            //show_error("400 Bad Request",400, "Uno de los parametros de entrada no ha sido especificado" );
             header("HTTP/1.1 400 Bad Request");
             return;
         }
         
         try{ 
             $input = json_decode($body,true);
-            
+            log_message("INFO", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
             if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
+
+            log_message("INFO", "inicio proceso", FALSE);
             
             UsuarioSesion::login('admin@admin.com', '123456');
-            
+
+            log_message("INFO", "carga libreria", FALSE);
             $this->load->library('SaferEval');
-            
+
+            log_message("INFO", "inicia tramite", FALSE);
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
             
-            //llevar a etapas/ejecutar_form + número de tarea y proceso
-            //Se debe seleccionar la etapa que se quiere iniciar.
+            log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
+
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
-            $result = $this->ejecutarEntrada($etapa_id,$input,true);
+            $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
                         
             $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
-            
+
             //validaciones etapa vencida, si existe o algo por el estilo
+
              $response = array(
                 "idInstancia" => $tramite->id,
                 "output" => $result ['result']['output'],
+                 "idEtapa" => $result ['result']['idEtapa'],
+                 "secuencia" => $result ['result']['secuencia'],
                 "proximoFormulario" => $result['result']['proximoForlulario']
                 );
              $this->responseJson($response);
@@ -182,15 +188,38 @@ class API extends MY_BackendController {
       
     }
     
-    private function continuarProceso($idProceso,$idEtapa=NULL, $body){
-        $data = json_decode($body,true);
-         $response = array(
-           "codigoRetorno" => 0,
-           "descRetorno" => "Problemas para iniciar",
-           "idProximoPaso" => $idProceso + 1,
-           "proximoFormulario" => $data['data']
-           );
-         $this->responseJson($response);
+    private function continuarProceso($id_proceso, $body){
+
+        log_message("INFO", "En continuar proceso, input data: ".$body);
+
+        try{
+            $input = json_decode($body,true);
+
+            if(!isset($input["idEtapa"]) || !isset($input["secuencia"])){
+                header("HTTP/1.1 400 Bad Request");
+                return;
+            }
+
+            $id_etapa = $input["idEtapa"];
+            $secuencia = $input["secuencia"];
+
+            log_message("INFO", "id_etapa: ".$id_etapa);
+            log_message("INFO", "secuencia: ".$secuencia);
+
+            $result = $this->ejecutarEntrada($id_etapa, $input, $secuencia, $id_proceso);
+
+            $response = array(
+                "idInstancia" => $id_proceso,
+                "output" => $result ['result']['output'],
+                "idEtapa" => $result ['result']['idEtapa'],
+                "secuencia" => $result ['result']['secuencia'],
+                "proximoFormulario" => $result['result']['proximoForlulario']
+            );
+            $this->responseJson($response);
+        }catch(Exception $e){
+            $e->getTrace();
+        }
+
     }
     
     private function generarEspecificacion($operacion,$id_tramite=NULL,$id_tarea=NULL,$id_paso = NULL){
@@ -256,79 +285,89 @@ class API extends MY_BackendController {
      * @param type $body
      * @return type
      */
-    public function ejecutarEntrada($etapa_id,$body){
+    public function ejecutarEntrada($etapa_id,$body, $secuencia = 0, $id_proceso){
+
+        log_message("INFO", "Ejecutar Entrada", FALSE);
 
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
-        //obtener siempre el primer paso de la secuencia
-        $paso = $etapa->getPasoEjecutable(0);
-        $formulario = $paso->Formulario;
-        $modo = $paso->modo;
 
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
-       
-        foreach ($formulario->Campos as $c) {
-            // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+         
+        log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
-            if ($c->isEditableWithCurrentPOST($etapa_id,$body)) {
-
-                $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
-                if (!$dato)
-                    $dato = new DatoSeguimiento();
-                $dato->nombre = $c->nombre;
-                $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
-
-                if (!is_object($dato->valor) && !is_array($dato->valor)) {
-                    if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
-                        $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
-                    }
-                }
-
-                $dato->etapa_id = $etapa->id;
-                $dato->save();
-            }
+        if (!$etapa) {
+            header("HTTP/1.1 412 Etapa no fue encontrada");
+            exit;
         }
-        
-        $etapa->save();
-        $result['result']=array();
-        $result['result']['proximoForlulario']=array();
+        if ($etapa->tramite_id != $id_proceso) {
+            header("HTTP/1.1 412 Etapa no pertenece al proceso ingresado");
+            exit;
+        }
+        if (!$etapa->pendiente) {
+            header("HTTP/1.1 412 Esta etapa ya fue completada");
+            exit;
+        }
+        if (!$etapa->Tarea->activa()) {
+            header("HTTP/1.1 412 Esta etapa no se encuentra activa");
+            exit;
+        }
+        if ($etapa->vencida()) {
+            header("HTTP/1.1 412 Esta etapa se encuentra vencida");
+            exit;
+        }
+
         try{
-            
-            $etapa->finalizarPaso($paso);
-           
-            //$etapa = Doctrine::getTable('Etapa')->find($etapa_id);
-            //Obtiene el siguiete paso
-            $next_step = $etapa->getPasoEjecutable(1);
-            $integrador = new FormNormalizer();
-            $form_norm=array();
-            if($next_step == NULL){
-                //Finlaizar etapa
-                $etapa->avanzar();
-                //Obtener la siguiente tarea
-                $next = $etapa->getTareasProximas();
-                //FIX verificar que pasa cunado es mas de un formulario
-                
-                //Si no existe la proxima etapa entonce se ha terminado
-                
-                if(count($next->tareas) > 1){
-                    foreach($next->tareas as $tarea ){
-                        $idf = $tarea->Pasos[0]->Formulario->id;
-                        $form_norm = $integrador->obtenerFormulario($idf);                  
+            //obtener el primer paso de la secuencia o el pasado por parámetro
+            $paso = $etapa->getPasoEjecutable($secuencia);
+
+            log_message("INFO", "Paso: ".$paso, FALSE);
+            log_message("INFO", "Paso ejecutable nro secuencia[".$secuencia."]: ".$paso->id, FALSE);
+
+            $next_step = null;
+            if(isset($paso)){
+                $formulario = $paso->Formulario;
+                $modo = $paso->modo;
+
+                //TODO validar campos de formulario
+                $respuesta = new stdClass();
+                $validar_formulario = FALSE;
+                // Almacenamos los campos
+
+                foreach ($formulario->Campos as $c) {
+                    // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+
+                    if ($c->isEditableWithCurrentPOST($etapa_id,$body)) {
+                        $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
+                        if (!$dato)
+                            $dato = new DatoSeguimiento();
+                        $dato->nombre = $c->nombre;
+                        $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
+
+                        if (!is_object($dato->valor) && !is_array($dato->valor)) {
+                            if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
+                                $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
+                            }
+                        }
+
+                        $dato->etapa_id = $etapa->id;
+                        $dato->save();
                     }
-                }else{
-                    $form_norm = $integrador->obtenerFormulario($next->tareas[0]->Pasos[0]->Formulario->id);
                 }
-          
-                
-            }else{
-                $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
+
+                $etapa->save();
+
+                $etapa->finalizarPaso($paso);
+
+                //Obtiene el siguiete paso
+                $next_step = $etapa->getPasoEjecutable($secuencia+1);
+
             }
-            
-            $result['result']['proximoForlulario'] = $form_norm;
-            $result['result']['output']= $this->obtenerResultados($etapa);
- 
-            //echo "Salidoendo del próximo paso";die;
+
+            $result = $this->procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso);
+
+
         }catch(Exception $e){
             print_r($e->getMessage());die;
             echo $e->getMessage();
@@ -374,7 +413,7 @@ class API extends MY_BackendController {
         $id_proceso = $etapa->Tarea->proceso_id;
         $accion = Doctrine::getTable("Accion")->findOneByProcesoId($id_proceso);
         
-        if($accion->exponer_variable){
+        if(isset($accion) && $accion->exponer_variable){
             $retval[$accion->extra->variable]= $this->getVariableValor($accion->nombre,$etapa);
         }
         return $retval;
@@ -445,7 +484,70 @@ class API extends MY_BackendController {
 
         redirect('etapas/inbox');
     }
-    
+
+    /**
+     * @param $secuencia
+     * @param $next_step
+     * @param $etapa
+     * @param $id_proceso
+     * @return mixed
+     */
+    private function procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso) {
+
+        $result['result']=array();
+        $result['result']['proximoForlulario']=array();
+        $form_norm=array();
+
+        $etapa_id = $etapa->id;
+
+        $integrador = new FormNormalizer();
+        $secuencia = $secuencia+1;
+        if($next_step == NULL){
+            //Finlaizar etapa
+            $etapa->avanzar();
+            log_message("INFO", "Id etapa despues de avanzar: ".$etapa->id, FALSE);
+
+            //Obtener la siguiente tarea
+            $next = $etapa->getTareasProximas();
+            //FIX verificar que pasa cunado es mas de un formulario
+
+            //Si no existe la proxima etapa entonces se ha terminado
+
+            if(isset($next->tareas)){
+                if(count($next->tareas) > 1){
+                    foreach($next->tareas as $tarea ){
+                        $idf = $tarea->Pasos[0]->Formulario->id;
+                        $form_norm = $integrador->obtenerFormulario($idf);
+                        $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
+                        $etapa_id = $etapa_prox->id;
+                        $secuencia = 0;
+                    }
+                }else{
+                    $form_norm = $integrador->obtenerFormulario($next->tareas[0]->Pasos[0]->Formulario->id);
+                    $tarea_id = $next->tareas[0]->id;
+                    $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
+                    $etapa_id = $etapa_prox->id;
+                    $secuencia = 0;
+                }
+            }else{
+                $secuencia = null;
+            }
+
+        }else{
+            $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
+        }
+
+        log_message("INFO", "Id etapa asignado: ".$etapa_id, FALSE);
+        $result['result']['proximoForlulario'] = $form_norm;
+        $result['result']['idEtapa'] = $etapa_id;
+        $result['result']['secuencia'] = $secuencia;
+        $result['result']['output']= $this->obtenerResultados($etapa);
+
+
+        return $result;
+    }
+
+
     function throwError($numero,$mensaje){
         $errorcodes = array(
 							200	=> 'OK',
@@ -488,7 +590,7 @@ class API extends MY_BackendController {
 							504	=> 'Gateway Timeout',
 							505	=> 'HTTP Version Not Supported'
 						);
-        header("HTTP/1.1 ".$numero." ".$$errorcodes[$numero]);
+        header("HTTP/1.1 ".$numero." ".$errorcodes[$numero]);
     }
     
     
