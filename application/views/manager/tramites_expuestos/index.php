@@ -13,8 +13,8 @@
         <div>
             <label>Cuenta</label>
             <select id="cuenta_id" name="cuenta_id" class="AlignText">
-                <?php foreach($cuentas as $c):?>
                 <option value="">Seleccione...</option>
+                <?php foreach($cuentas as $c):?>
                 <option value="<?=$c->id?>" <?=$c->id==$usuario->cuenta_id?'selected':''?>><?=$c->nombre?></option>
                 <?php endforeach ?>
             </select>

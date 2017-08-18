@@ -15,7 +15,7 @@ class API extends MY_BackendController {
     /*
      * Documentacion de la API
      */
-    
+    /*
     public function index(){
         $this->_auth();
         
@@ -23,7 +23,7 @@ class API extends MY_BackendController {
         $data['content']='backend/api/index';
         $this->load->view('backend/template',$data);
     }
-    
+    */
     private function getBody(){
         return file_get_contents('php://input');
     }
@@ -89,12 +89,9 @@ class API extends MY_BackendController {
         
         //Tomar los segmentos desde el 3 para adelante
         //$urlSegment = $this->uri->segments;
-        
-        //$headers = $this->input->request_headers();
-        
         //print_r($urlSegment);
         //$cuenta = Cuenta::cuentaSegunDominio();
-
+   
         switch($method = $this->input->server('REQUEST_METHOD')){
             case "GET":
                 $this->listarCatalogo();
@@ -153,7 +150,7 @@ class API extends MY_BackendController {
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
-
+            
             log_message("INFO", "inicio proceso", FALSE);
             
             UsuarioSesion::login('admin@admin.com', '123456');
@@ -166,10 +163,10 @@ class API extends MY_BackendController {
             $tramite->iniciar($proceso_id);
             
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
-
+            
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
             $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
-                        
+            echo ".";            
             $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
 
             //validaciones etapa vencida, si existe o algo por el estilo
@@ -199,7 +196,8 @@ class API extends MY_BackendController {
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
-
+            //Obtener el nombre del proceso
+            $this->crearRegistroAuditoria($nombre_proceso, $body);
             $id_etapa = $input["idEtapa"];
             $secuencia = $input["secuencia"];
 
@@ -272,8 +270,9 @@ class API extends MY_BackendController {
     }
     
     private function extractVariable($body,$name){
+        
         if(isset($body['data'][$name])){
-            return $body['data'][$name];
+            return (is_array($body['data'][$name])) ? json_encode($body['data'][$name]) : $body['data'][$name];
         }
         return "NE";
     }
@@ -286,9 +285,13 @@ class API extends MY_BackendController {
     public function ejecutarEntrada($etapa_id,$body, $secuencia = 0, $id_proceso){
 
         log_message("INFO", "Ejecutar Entrada", FALSE);
-
+      
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
+        $respuesta = new stdClass();
+        $validar_formulario = FALSE;
+        // Almacenamos los campos
+         
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
         if (!$etapa) {
@@ -312,6 +315,17 @@ class API extends MY_BackendController {
             exit;
         }
 
+        $this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body); 
+        
+        $nombre_proceo = $etapa->Tarea->Proceso->nombre;
+        $data['headers'] = $this->getHeaders();
+        $data['input'] = $body['data'];
+        $data['response_data'] = 
+                array("Callback url" => $body['callback'],
+                     "Callback id" => $body['callback-id']);
+        $this->registrarAuditoria($nombre_proceo,"Iniciar Proceso" ,
+                'Auditoría de llamados API',  json_encode($data));
+   
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
             $paso = $etapa->getPasoEjecutable($secuencia);
@@ -370,7 +384,13 @@ class API extends MY_BackendController {
         return $result;
 
     }
-    
+    /**
+     * 
+     * @param type $etapa Objeto de tipo Etapa
+     * @return type retorna un JSON con un array JSON clave-valor
+     * 
+     * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
+     */
     private function obtenerResultados($etapa){
         $campos = array();
         foreach($etapa->Tarea->Pasos as $paso ){
@@ -391,7 +411,11 @@ class API extends MY_BackendController {
         return $retval;
       
     }
-    
+    /**
+     * 
+     * @param type $etapa Pbjeto de tipo etapa 
+     * @return type Array de clave valor con las variables que son exportables.
+     */
     private function getVariablesExportables($etapa){
         $retval = array();
         $id_proceso = $etapa->Tarea->proceso_id;
@@ -403,6 +427,13 @@ class API extends MY_BackendController {
         return $retval;
     }
     
+    /**
+     * Recupera los valores de las variables de tipo Campo que son exportables
+     * @param type $nombre nombre de la variable
+     * @param type $etapa objeto de tipo etapa
+     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso 
+     * que deberóia ser excepcional, entonces retorna N/D 
+     */
     private function getVariableValor($nombre,$etapa){
         $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId( $nombre, $etapa->id);
         if($var != NULL){
@@ -412,7 +443,12 @@ class API extends MY_BackendController {
         }
     }
     
-    
+    /**
+     * Pbtiene las variblaes exportables de un formulario
+     * 
+     * @param type $form_id
+     * @return array
+     */
     private function getListaExportables($form_id){
         $lista= array();
         $campos = Doctrine::getTable('Campo')->findByFormularioId($form_id);
@@ -425,7 +461,6 @@ class API extends MY_BackendController {
     }
     
     private function registrarCallbackURL($callback,$callback_id,$etapa){
-        echo "Etapa:  $etapa";
         $dato = new DatoSeguimiento();
         $dato->nombre = "callback";
         $dato->valor = $callback; //"{ url:".$url."}";
@@ -519,8 +554,26 @@ class API extends MY_BackendController {
         return $result;
     }
 
+    private function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
+         $fecha = new DateTime();
+         $registro_auditoria = new AuditoriaOperaciones ();
+         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+         $registro_auditoria->operacion = $operacion;
+         $usuario = UsuarioBackendSesion::usuario ();
+            // Se necesita cambiar el usuario al usuario público. 
+         $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
+         $registro_auditoria->proceso = $proceso_nombre;
+         $registro_auditoria->cuenta_id = 1;
+         $registro_auditoria->motivo = $motivo;
+            
+         //unset($accion_array['accion']['proceso_id']);
+         $registro_auditoria->detalles= 'Detalles';
+         $registro_auditoria->detalles=  $detalles;//json_encode($accion_array);
+         $registro_auditoria->save();  
+    }
 
-    function throwError($numero,$mensaje){
+    function throwError($numero,$mensaje,$nombre_proceso,$body){
+        
         $errorcodes = array(
 							200	=> 'OK',
 							201	=> 'Created',
@@ -562,8 +615,27 @@ class API extends MY_BackendController {
 							504	=> 'Gateway Timeout',
 							505	=> 'HTTP Version Not Supported'
 						);
+        
+        $this->crearRegistroAuditoria($nombre_proceso, $body, "ERROR");
         header("HTTP/1.1 ".$numero." ".$errorcodes[$numero]);
     }
     
+    
+    private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
+        
+        $headers = $this->input->request_headers();
+        $new_headers = array('host' => $headers['Host'],
+              'Origin' => $headers['Origin'],
+            'largo-mensaje' => $headers['Content-Length'],
+            'Content-type' => $headers['Content-type']);
+      
+        $data['headers'] = $new_headers;
+        $data['input'] = $body['data'];
+        $data['response_data'] = 
+                array("Callback url" => $body['callback'],
+                     "Callback id" => $body['callback-id']);
+        $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
+                $tipo.': Auditoría de llamados API',  json_encode($data));
+    }
     
 }

@@ -55,6 +55,8 @@
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
 
         <?php
+        $key='';
+        ($tipo ? $key = $tipo : $key = $accion->tipo);
         if($tipo == "rest" || $tipo == "soap" || $tipo == "callback" || $accion->tipo == "rest" || $accion->tipo == "soap" || $accion->tipo == "callback"){
             echo $accion->displaySecurityForm($proceso->id);
         }else{
@@ -69,4 +71,19 @@
     </fieldset>
 </form>
 </div>
-<script src="<?= base_url() ?>assets/js/CrearDivHeader.js"></script>
+<?php
+    switch ($key) {
+        case "rest":
+            ?><script src="<?= base_url() ?>assets/js/accion_rest.js"></script><?
+            break;
+        case "soap":
+            ?><script src="<?= base_url() ?>assets/js/accion_soap.js"></script><?
+            break;
+        case "callback":
+            ?><script src="<?= base_url() ?>assets/js/accion_callback.js"></script><?
+            break;
+        default:
+            ?><script src="<?= base_url() ?>assets/js/accion_otras.js"></script><?
+            break;
+    }
+?>
