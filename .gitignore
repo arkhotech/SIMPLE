@@ -22,3 +22,5 @@ vendor
 .DS_Store
 logs
 application/logs/log-*.php
+wsdl
+.wsdl

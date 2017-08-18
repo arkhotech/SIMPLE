@@ -177,7 +177,7 @@ class Etapa extends Doctrine_Record {
         $resultado = new stdClass();
         $resultado->tareas = null;
         $resultado->estado = 'sincontinuacion';
-        $resultado->conexion=null;
+        $resultado->conexion = null;
 
 
         $tarea_actual = $this->Tarea;
@@ -358,6 +358,8 @@ class Etapa extends Doctrine_Record {
     //Es decir, tomando en cuenta las condiciones para que se ejecute cada paso.
     public function getPasoEjecutable($secuencia) {
         $pasos = $this->getPasosEjecutables($this->tramite_id);
+
+        log_message("INFO", "Cantidad de pasos: ".count($pasos), FALSE);
 
         if (isset($pasos[$secuencia]))
             return $pasos[$secuencia];
@@ -635,5 +637,15 @@ class Etapa extends Doctrine_Record {
             }
         }
     }
-    
+
+    public function getEtapaPorTareaId($id_tarea, $id_proceso) {
+        $etapa = Doctrine_Query::create()
+                ->from('Etapa e')
+                ->where('e.tarea_id = ?',$id_tarea)
+                ->andWhere('e.tramite_id = ?', $id_proceso)
+            ->execute();
+
+        return $etapa[0];
+    }
+
 }

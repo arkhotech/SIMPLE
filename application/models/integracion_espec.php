@@ -65,6 +65,7 @@ class FormNormalizer{
         //Paso uno, obtener las tareas que son de inicio
         //Trae todos los formularios del proceso, si no se especifica tarea ni paso
         $result = array();
+        log_message("INFO", "Busqueda de siguiente formulario", FALSE);
         if($id_tarea== NULL && $id_paso == NULL){
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
 
@@ -76,16 +77,19 @@ class FormNormalizer{
             }
             return $result;
         }else{
+            log_message("INFO", "Recuperando tarea: ".$id_tarea, FALSE);
             $tarea = Doctrine::getTable("Tarea")->find($id_tarea);
+            log_message("INFO", "Comprobando proceso id: ".$tarea->proceso_id, FALSE);
             if( $tarea->proceso_id === $proceso_id ){  //Si pertenece al proceso
                 foreach($tarea->Pasos as $paso ){ //Se extraen los pasos
                     //print_r($paso);
-                    if( $id_paso != NULL && $paso->Formulario->id != $id_paso ){
+                    if( $id_paso != NULL && $paso->paso->Formulario->id != $id_paso ){
                         continue;
                     }
                     $formSimple = 
                             Doctrine::getTable('Formulario') ->find($paso->Formulario->id)->exportComplete();
                     $json = json_decode($formSimple,true);
+                    log_message("INFO", "Json formulario: ".$json, FALSE);
                     array_push($result,$this->normalizarFormulario($json,$paso->Formulario->id));
                 }
                 

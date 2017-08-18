@@ -18,7 +18,7 @@
     "application/json"
   ],
   "paths": {
-    "/tramites/{id_tramite}": {
+    "/tramites/{id_tramite}/{id_tarea}": {
       "post": {
         "summary": "Inicio Trámite SIMPLE",
         "description": "Servicio responsable de iniciar un trámite en SIMPLE.",
@@ -27,6 +27,13 @@
             "name": "id_tramite",
             "in": "path",
             "description": "Id de la definición del trámite a iniciar",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "id_tarea",
+            "in": "path",
+            "description": "Id de la tarea de inicio del trámite",
             "required": true,
             "type": "integer"
           },
