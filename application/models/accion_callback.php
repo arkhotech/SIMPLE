@@ -12,43 +12,31 @@ class AccionCallback extends Accion {
             </p>
         ';
 
-        $display.= '<label>URL de callback</label>';
-        $display.='<input type="text" class="input-xxlarge" placeholder="https://midominio.cl" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '"/>';
-
         $display.='
                 <label>Método</label>
-                <select id="tipoMetodo" name="extra[tipoMetodo]">. 
+                <select id="tipoMetodoC" name="extra[tipoMetodoC]">. 
                     <option value="">Seleccione...</option>';
-                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "POST"){
+                    if ($this->extra->tipoMetodoC && $this->extra->tipoMetodoC == "POST"){
                         $display.='<option value="POST" selected>POST</option>';
                     }else{
                         $display.='<option value="POST">POST</option>';
                     }
-                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "PUT"){
+                    if ($this->extra->tipoMetodoC && $this->extra->tipoMetodoC == "PUT"){
                         $display.='<option value="PUT" selected>PUT</option>';
                     }else{
                         $display.='<option value="PUT">PUT</option>';
                     }
-                    if ($this->extra->tipoMetodo && $this->extra->tipoMetodo == "DELETE"){
+                    if ($this->extra->tipoMetodoC && $this->extra->tipoMetodoC == "DELETE"){
                         $display.='<option value="DELETE" selected>DELETE</option>';
                     }else{
                         $display.='<option value="DELETE">DELETE</option>';
                     }
         $display.='</select>';
-        
-        $display.='
-            <div class="col-md-12" id="divObject" style="display:none;">
-                <label>Request</label>
-                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ Request }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
-                <br />
-                <span id="resultHeader" class="spanError"></span>
-                <br /><br />
-            </div>';
 
         $display.='
             <div class="col-md-12">
                 <label>Header</label>
-                <textarea name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
+                <textarea id="header" name="extra[header]" rows="7" cols="70" placeholder="{ Header }" class="input-xxlarge">' . ($this->extra ? $this->extra->header : '') . '</textarea>
                 <br />
                 <span id="resultHeader" class="spanError"></span>
                 <br /><br />
@@ -71,10 +59,10 @@ class AccionCallback extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
+        //$CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
         //$CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
-        $CI->form_validation->set_rules('extra[tipoMetodo]', 'Método', 'required');
-        $CI->form_validation->set_rules('extra[request]', 'Request', 'required');
+        $CI->form_validation->set_rules('extra[tipoMetodoC]', 'Método', 'required');
+        //$CI->form_validation->set_rules('extra[request]', 'Request', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
@@ -87,30 +75,36 @@ class AccionCallback extends Accion {
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
         ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
-        
-        
+         
         $var=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback",$etapa->id);
-        if ($var|| $required>0){
-            $r=new Regla($this->extra->cliente);
-            $cliente=$r->getExpresionParaOutput($etapa->id);
+        $callback_url=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_url",$etapa->id);
+        $callback_request=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_request",$etapa->id);
+        $callback_id=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_id",$etapa->id);
+        $request2['callback_response']=json_encode($callback_request->valor);
+        $request2['callback_id']=$callback_id->valor;
+        $request2['tramite_id']=$etapa['Tarea']['proceso_id'];
+        $request2['etapa_id']=$etapa->id;
+        $request=json_encode($request2);
+        log_message('info',$this->varDump($request));
 
-            $r=new Regla($this->extra->url);
-            $url=$r->getExpresionParaOutput($etapa->id);
-            $caracter="/";
-            $f = substr($url, -1);
-            if($caracter===$f){
-                $url = substr($url, 0, -1);
-            }
+        if ( $callback_url || $required>0){
+            // $r=new Regla($this->extra->url);
+            // $url=$r->getExpresionParaOutput($etapa->id);
+            // $caracter="/";
+            // $f = substr($url, -1);
+            // if($caracter===$f){
+            //     $url = substr($url, 0, -1);
+            // }
 
             //Hacemos encoding a la url
-            $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
-                $key=$matches[1];
-                $value=$matches[2];
-                return $key.urlencode($value);
-            },
-            $url);
+            // $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
+            //     $key=$matches[1];
+            //     $value=$matches[2];
+            //     return $key.urlencode($value);
+            // },
+            // $url);
 
-            $nuevo = parse_url($url);
+            $nuevo = parse_url($callback_url->valor);
             $caracter="/";
             $server= $nuevo['scheme'].'://'.$nuevo['host'];
             $uri = $nuevo['path'];
@@ -165,10 +159,10 @@ class AccionCallback extends Accion {
                 break;
             }
 
-            if(isset($this->extra->request)){
+            /*if(isset($this->extra->request)){
                 $r=new Regla($this->extra->request);
                 $request=$r->getExpresionParaOutput($etapa->id);
-            }
+            }*/
 
             //obtenemos el Headers si lo hay
             if(isset($this->extra->header)){
@@ -181,24 +175,23 @@ class AccionCallback extends Accion {
             }
             try{
                 // Se ejecuta la llamada segun el metodo
-                if($this->extra->tipoMetodo == "POST"){
+                if($this->extra->tipoMetodoC == "POST"){
                     $CI->rest->initialize($config);
                     $result = $CI->rest->post($uri, $request, 'json');
-                }else if($this->extra->tipoMetodo == "PUT"){
+                }else if($this->extra->tipoMetodoC == "PUT"){
                     $CI->rest->initialize($config);
                     $result = $CI->rest->put($uri, $request, 'json');
-                }else if($this->extra->tipoMetodo == "DELETE"){
+                }else if($this->extra->tipoMetodoC == "DELETE"){
                     $CI->rest->initialize($config);
                     $result = $CI->rest->delete($uri, $request, 'json');
                 }
 
                 //Se obtiene la codigo de la cabecera HTTP
                 $debug = $CI->rest->debug();
-
                 $parseInt=intval($debug['info']['http_code']);
                 if ($parseInt<200 || $parseInt>204){
+                    
                     // Ocurio un error en el server del Callback ## Error en el servidor externo ##
-
                     // Se guarda en Auditoria el error
                     $response['code']=$debug['info']['http_code'];
                     $response['des_code']=$debug['response_string'];
@@ -236,6 +229,7 @@ class AccionCallback extends Accion {
                         $dato->save();
                     }
                 }else{
+                    // Caso OK, sin errores
                     $result2 = get_object_vars($result);
                     $response=$result2;
                         $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId('callback',$etapa->id);

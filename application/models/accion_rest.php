@@ -211,7 +211,7 @@ class AccionRest extends Accion {
             if($debug['info']['http_code']=='204'){
                 $result2['code']= '204';
                 $result2['des_code']= 'No Content';
-            }else if($debud['info']['http_code']=='0'){
+            }else if($debug['info']['http_code']=='0'){
                 $result2['code']= $debug['error_code'];
                 $result2['des_code']= $debug['response_string'];
             }else{
