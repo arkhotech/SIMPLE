@@ -42,9 +42,14 @@ class MY_BackendController extends CI_Controller {
 
     function __construct(){
         parent::__construct();
-
-        $this->force_cuenta();
-
+        //FIXME asar esto a la configuración
+        $re = '/^\/integracion\/api\/([A-Za-z0-9]+[\/]*)+/';
+        //$str = '/integracion/api/tramites/51/21';
+        //Generar la excepcion con la capa de servicios
+        if(!preg_match_all($re, $_SERVER['REQUEST_URI'], $matches, PREG_SET_ORDER, 0)){
+            $this->force_cuenta();
+        }
+ 
         if($this->config->item('https'))
             $this->force_ssl();
 
@@ -52,6 +57,7 @@ class MY_BackendController extends CI_Controller {
 
     //Fuerza a que se este ingresando en un dominio con una cuenta valida
     private function force_cuenta(){
+ 
         if(!Cuenta::cuentaSegunDominio())
             exit;
     }
