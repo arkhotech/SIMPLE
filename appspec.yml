@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /   
-  - destination: /home/simple/SIMPLE
+    destination: /home/simple/SIMPLE
 
 permisions:
   - object: application/logs
