@@ -13,7 +13,7 @@ permisions:
      - files
 
   - object: upload
-    chmod 775
+    chmod: 775
     type:
      - directory
 
