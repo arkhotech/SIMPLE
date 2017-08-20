@@ -1,0 +1,38 @@
+version: 0.0
+os: linux
+files:
+  - source: /   
+    destination: /home/simple/SIMPLE
+
+permisions:
+  - object: /home/simple/SIMPLE
+    owner: simple
+    group: simple
+    type:
+     - file
+
+  - object: /home/simple/SIMPLE/simple-start.sh
+    mode: 775
+    type:
+     - file
+
+  - object: /home/simple/SIMPLE
+    owner: simple
+    group: simple
+    type:
+     - directory
+
+  - object: /home/simple/SIMPLE/upload
+    chmod: 775
+    type:
+     - directory
+
+  - object: /home/simple/SIMPLE/application/logs
+    mode: 775
+    owner: simple
+    type:
+     - directory
+
+hooks:
+  ApplicationStart:
+    - location: simple-start.sh  
