@@ -9,7 +9,12 @@ permisions:
     owner: simple
     group: simple
     type:
-     - files
+     - file
+
+  - object: /home/simple/SIMPLE/simple-start.sh
+    mode: 775
+    type:
+     - file
 
   - object: /home/simple/SIMPLE
     owner: simple

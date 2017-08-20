@@ -11,7 +11,9 @@ if [ -z $INSTALL_HOME ]; then
    INSTALL_HOME=/home/simple
 fi
 
-DOKER_SIMPLE_URL="https://github.com/sebekmsd/docker-simple.git/"
+DOCKER_DIR="/docker-simple/simple"
+
+DOCKER_SIMPLE_URL="https://github.com/sebekmsd/docker-simple.git/"
 
 cd $INSTALL_HOME 
 
@@ -23,6 +25,6 @@ fi
 
 echo "Instalando servidor SIMPLE"
 
-cd $INSTALL_HOME/docker-simple/docker
+cd $INSTALL_HOME/$DOCKER_DIR
 
-./install.sh
+./install.sh $INSTALL_HOME
