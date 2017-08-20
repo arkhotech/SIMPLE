@@ -5,19 +5,24 @@ files:
     destination: /home/simple/SIMPLE
 
 permisions:
-  - object: /
-    pattern: "*"
+  - object: /home/simple/SIMPLE
     owner: simple
     group: simple
     type:
      - files
 
-  - object: upload
+  - object: /home/simple/SIMPLE
+    owner: simple
+    group: simple
+    type:
+     - directory
+
+  - object: /home/simple/SIMPLE/upload
     chmod: 775
     type:
      - directory
 
-  - object: application/logs
+  - object: /home/simple/SIMPLE/application/logs
     mode: 775
     owner: simple
     type:
