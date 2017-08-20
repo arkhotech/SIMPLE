@@ -5,6 +5,18 @@ files:
     destination: /home/simple/SIMPLE
 
 permisions:
+  - object: /
+    pattern: "*"
+    owner: simple
+    group: simple
+    type:
+     - files
+
+  - object: upload
+    chmod 775
+    type:
+     - directory
+
   - object: application/logs
     mode: 775
     owner: simple
@@ -13,4 +25,4 @@ permisions:
 
 hooks:
   ApplicationStart:
-    - location: start-simple.sh  
+    - location: simple-start.sh  
