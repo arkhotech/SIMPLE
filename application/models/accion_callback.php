@@ -59,51 +59,64 @@ class AccionCallback extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        //$CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
-        //$CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
         $CI->form_validation->set_rules('extra[tipoMetodoC]', 'Método', 'required');
-        //$CI->form_validation->set_rules('extra[request]', 'Request', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
-        $required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
+        log_message('info','####################################################################################################################');
+        log_message('info','comence a ejecutar');
+        //$required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
         $accion=Doctrine::getTable('Accion')->find($this->id);
         $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
-        $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
+        //$proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
+        $proceso = Doctrine::getTable('Proceso')->find($etapa['Tarea']['proceso_id']);
+
+
+
+        //log_message('info',$this->varDump($proceso->Etapa));
+        //Mejorar este metodo, no es el mas optimo
+       
+        // $var_callback = '';
+        // foreach($proceso->Etapas as $etapa){
+        //     foreach($etapa->DatoSeguimiento as $dato) {
+        //         if($dato->nombre === 'callback'){
+        //             log_message('info','dato nombre: '.$dato->nombre);
+        //             log_message('info','dato valor: '.$dato->valor);
+        //             $var_callback = $dato->valor;
+        //             break;
+        //         }
+        //     }
+        // }
+
+        log_message('info','####################################################################################################################');
+        log_message('info','####################################################################################################################');
+        log_message('info','####################################################################################################################');
+        log_message('info',$etapa->id);
+        log_message('info','####################################################################################################################');
+        log_message('info','####################################################################################################################');
+        log_message('info','####################################################################################################################');
+        //
+
         $tipoSeguridad=$data->extra->tipoSeguridad;
         $user = $data->extra->user;
         $pass = $data->extra->pass;
         $ApiKey = $data->extra->apikey;
         ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
          
-        $var=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback",$etapa->id);
-        $callback_url=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_url",$etapa->id);
-        $callback_request=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_request",$etapa->id);
-        $callback_id=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_id",$etapa->id);
+        $callback=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback",$etapa['Tarea']['proceso_id']);
+
+         $callback_url=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_url",$etapa->id);
+        // $callback_request=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_request",$etapa->id);
+        // $callback_id=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_id",$etapa->id);
         $request2['callback_response']=json_encode($callback_request->valor);
         $request2['callback_id']=$callback_id->valor;
         $request2['tramite_id']=$etapa['Tarea']['proceso_id'];
         $request2['etapa_id']=$etapa->id;
         $request=json_encode($request2);
-        log_message('info',$this->varDump($request));
+        log_message('info','callback: '.$callback);
+        log_message('info','callback valor: '.$callback->valor);
 
-        if ( $callback_url || $required>0){
-            // $r=new Regla($this->extra->url);
-            // $url=$r->getExpresionParaOutput($etapa->id);
-            // $caracter="/";
-            // $f = substr($url, -1);
-            // if($caracter===$f){
-            //     $url = substr($url, 0, -1);
-            // }
-
-            //Hacemos encoding a la url
-            // $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
-            //     $key=$matches[1];
-            //     $value=$matches[2];
-            //     return $key.urlencode($value);
-            // },
-            // $url);
-
+        if ($callback->valor){
             $nuevo = parse_url($callback_url->valor);
             $caracter="/";
             $server= $nuevo['scheme'].'://'.$nuevo['host'];
@@ -159,11 +172,6 @@ class AccionCallback extends Accion {
                 break;
             }
 
-            /*if(isset($this->extra->request)){
-                $r=new Regla($this->extra->request);
-                $request=$r->getExpresionParaOutput($etapa->id);
-            }*/
-
             //obtenemos el Headers si lo hay
             if(isset($this->extra->header)){
                 $r=new Regla($this->extra->header);
@@ -196,26 +204,9 @@ class AccionCallback extends Accion {
                     $response['code']=$debug['info']['http_code'];
                     $response['des_code']=$debug['response_string'];
                     $response=json_encode($response);
-                    $fecha = new DateTime();
-                    $registro_auditoria = new AuditoriaOperaciones ();
-                    $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-                    $registro_auditoria->operacion = 'Error en respuesta de Callback';
-                    $usuario = UsuarioBackendSesion::usuario ();
-                    
-                    // Se necesita cambiar el usuario al usuario público. 
-                    $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
-                    $registro_auditoria->proceso = $proceso->nombre;
-                    $registro_auditoria->cuenta_id = 1;
-                    $registro_auditoria->motivo = $response;
-                    
-                    //Detalles de proceso
-                    $accion_array['proceso'] = $proceso;
-                    $accion_array['accion'] = $accion->toArray(false);
-                    unset($accion_array['accion']['proceso_id']);
-                    $registro_auditoria->detalles= 'Detalles';
-                    $registro_auditoria->detalles=  json_encode($accion_array);
-                    $registro_auditoria->save();
-                   
+                    $operacion = 'Error en llamada Callback';
+                    $user = 'Admin Admin <admin@admin.com>';
+                    $this->saveAuditoria($operacion,$user,$proceso->cuenta_id,$proceso,$accion,$response);                   
                     // Se genera la variable callback_error y se le asigna el codigo y la descripcion del error.
                     $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_error",$etapa->id);
                     if(!$dato){
@@ -263,26 +254,33 @@ class AccionCallback extends Accion {
             log_message('info',$response);
             log_message('info','####################################################################################');
             // Auditoria
-            $fecha = new DateTime();
-            $registro_auditoria = new AuditoriaOperaciones ();
-            $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-            $registro_auditoria->operacion = 'Error en llamada Callback';
-            $usuario = UsuarioBackendSesion::usuario ();
-            // Se necesita cambiar el usuario al usuario público. 
-            $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
-            $registro_auditoria->proceso = $proceso->nombre;
-            $registro_auditoria->cuenta_id = 1;
-            $registro_auditoria->motivo = $response;
-            
-            //Detalles
-            $accion_array['proceso'] = $proceso;
-            $accion_array['accion'] = $accion->toArray(false);
-            unset($accion_array['accion']['proceso_id']);
-            $registro_auditoria->detalles= 'Detalles';
-            $registro_auditoria->detalles=  json_encode($accion_array);
-            $registro_auditoria->save();  
+            $operacion = 'Error en llamada Callback';
+            $user = 'Admin Admin <admin@admin.com>';
+            $cuenta_id=1;
+            $this->saveAuditoria($operacion,$user,$proceso->cuenta_id,$proceso,$accion,$response); 
         }
     }
+
+    function saveAuditoria($operacion,$user,$cuenta_id,$proceso,$accion,$response){
+        $fecha = new DateTime();
+        $registro_auditoria = new AuditoriaOperaciones ();
+        $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+        $registro_auditoria->operacion = $operacion;
+        
+        // Se necesita cambiar el usuario al usuario público. 
+        $registro_auditoria->usuario = $user;
+        $registro_auditoria->proceso = $proceso->nombre;
+        $registro_auditoria->cuenta_id = $cuenta_id;
+        $registro_auditoria->motivo = $response;
+        
+        //Detalles
+        $accion_array['proceso'] = $proceso;
+        $accion_array['accion'] = $accion->toArray(false);
+        unset($accion_array['accion']['proceso_id']);
+        $registro_auditoria->detalles=  json_encode($accion_array);
+        $registro_auditoria->save(); 
+    }
+
     function varDump($data){
         ob_start();
         //var_dump($data);
