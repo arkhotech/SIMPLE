@@ -1,0 +1,16 @@
+version: 0.0
+os: linux
+files:
+  - source: /   
+  - destination: /home/simple/SIMPLE
+
+permisions:
+  - object: application/logs
+    mode: 775
+    owner: simple
+    type:
+     - directory
+
+hooks:
+  ApplicationStart:
+    - location: start-simple.sh  

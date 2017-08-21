@@ -50,25 +50,3 @@
         </div>
     </form>
 </div>
-<script>
-/*
-function ConsultarFunciones(){
-    var cuenta_id = $("#cuenta_id").val();
-    $.post("/manager/tramites_expuestos/buscar_cuenta", {cuenta_id: cuenta_id}, function(d,e){
-        //manejorespuesta(d);
-        console.log(d);
-    });
- }
-$(document).ready(function(){
-    $.get("/manager/tramites_expuestos/index", function(data) {
-        console.log(data);
-        $( ".result" ).html( data );
-        alert( "Load was performed." );
-    });
-
-    console.log("hola desde aqui");
-    $(document).on('click','#btn-consultar',ConsultarFunciones);
-});
-*/
-
-</script>

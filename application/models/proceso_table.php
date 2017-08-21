@@ -1,4 +1,4 @@
-<?php  
+<?php
 
 class ProcesoTable extends Doctrine_Table {
 
@@ -100,19 +100,26 @@ class ProcesoTable extends Doctrine_Table {
         }
     }
 
-    public function findVaribleCallback($proceso_id){
-        $return =0;
-        $sql = "select * from accion a where a.tipo='variable' and a.proceso_id=".$proceso_id.";";
+    public function findVaribleCallback($etapa_id){
+        $valor=0;
+        $sql ="select tramite_id from etapa where id=".$etapa_id.";";
         $stmn = Doctrine_Manager::getInstance()->connection();
-        $result = $stmn->execute($sql)->fetchAll();
-        foreach ($result as $res) {
-            $busqueda=json_decode($res['extra']);
-            $obj = get_object_vars($busqueda);
-            if($obj['variable']=='callback'){
-                $return=1;
-            }  
-        }                          
-        return $return;
+        $result = $stmn->execute($sql)->fetchAll(PDO::FETCH_COLUMN);
+        $sql2 ="select id as etapa_id from etapa where tramite_id=".$result[0].";";
+        $result2 = $stmn->execute($sql2)->fetchAll(PDO::FETCH_COLUMN);
+        $etapa_id = implode(",",$result2);
+        $sql3 ="select * from dato_seguimiento where etapa_id in (".$etapa_id.");";
+        $result3 = $stmn->execute($sql3)->fetchAll();
+        foreach ($result3 as $res){
+            if($res['nombre']=='callback'){
+                if(strlen($res['valor'])>5){
+                    $valor = 1;
+                }
+            }
+        }
+        $salida['valor']=$valor;
+        $salida['data']=$result3;
+        return $salida;
     }
 
     public function findProceso($proceso_id){
