@@ -197,7 +197,7 @@ class API extends MY_BackendController {
                 return;
             }
             //Obtener el nombre del proceso
-            $this->crearRegistroAuditoria($nombre_proceso, $body);
+            //$this->crearRegistroAuditoria($nombre_proceso, $body);
             $id_etapa = $input["idEtapa"];
             $secuencia = $input["secuencia"];
 
@@ -511,15 +511,17 @@ class API extends MY_BackendController {
 
             //Si no existe la proxima etapa entonces se ha terminado
 
-            $etapa_prox = null;
             if(isset($next->tareas)){
                 if(count($next->tareas) > 1){
                     foreach($next->tareas as $tarea ){
+                        $idf = $tarea->Pasos[0]->Formulario->id;
+                        $form_norm = $integrador->obtenerFormulario($idf);
                         $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
                         $etapa_id = $etapa_prox->id;
                         $secuencia = 0;
                     }
                 }else{
+                    $form_norm = $integrador->obtenerFormulario($next->tareas[0]->Pasos[0]->Formulario->id);
                     $tarea_id = $next->tareas[0]->id;
                     $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
                     $etapa_id = $etapa_prox->id;
@@ -527,13 +529,6 @@ class API extends MY_BackendController {
                 }
             }else{
                 $secuencia = null;
-            }
-
-            if(isset($etapa_prox)){
-                //Obtiene el siguiete paso
-                $next_step = $etapa_prox->getPasoEjecutable($secuencia);
-                $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
-                $secuencia = $secuencia+1;
             }
 
         }else{
