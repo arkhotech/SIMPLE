@@ -63,16 +63,10 @@ class AccionCallback extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
-        //$required = Doctrine::getTable('Proceso')->findVaribleCallback($etapa['Tarea']['proceso_id']);
         $accion=Doctrine::getTable('Accion')->find($this->id);
         $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
         $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
         $callback = Doctrine::getTable('Proceso')->findVaribleCallback($etapa->id);
-        //$callback = json_encode($callback);
-        // log_message('info','#######################################################################################');
-        // log_message('info','var_callback: '.$this->varDump($callback));
-        // log_message('info','#######################################################################################');
-
         if ($callback['valor']>0){
 
             $tipoSeguridad=$data->extra->tipoSeguridad;
@@ -86,12 +80,16 @@ class AccionCallback extends Accion {
                     if(strlen($res['valor'])>5){
                         $callback_url = $res['valor'];
                     }
+                }else if($res['nombre']=='callback_id'){
+                    $callback_id = $res['valor'];
                 }
             }
 
+   
             $callback_url = str_replace('\/', '/', $callback_url);
             $base = explode("/", $callback_url);
             $server = $base[0].'//'.$base[2];
+            $server = str_replace('"', '', $server);
             $uri ='';
             for ($i = 3; $i <= count($base); $i++){
                 $uri .='/'.$base[$i];
@@ -102,6 +100,21 @@ class AccionCallback extends Accion {
             if($caracter===$l){
                 $uri = substr($uri, 1);
             }
+            $uri = str_replace('"', '', $uri);
+            
+
+            log_message('info',$this->varDump($output));
+
+            $campo = new Campo();
+            $data=$campo->obtenerResultados($etapa,$etapa['Tarea']['proceso_id']);
+            $output['idInstancia']=$etapa['tramite_id'];
+            $output['idTarea']=$etapa['Tarea']['id'];
+            $output['callback-id']=$callback_id;
+            $output['data']=$data;
+            
+            $request=json_encode($output);
+            log_message('info',$this->varDump($output));
+            log_message('info',$this->varDump($request));
 
             $CI = & get_instance();
             switch ($tipoSeguridad) {
@@ -148,7 +161,7 @@ class AccionCallback extends Accion {
                     );
                 break;
             }
-            //obtenemos el Headers si lo hay
+            // obtenemos el Headers si lo hay
             if(isset($this->extra->header)){
                 $r=new Regla($this->extra->header);
                 $header=$r->getExpresionParaOutput($etapa->id);

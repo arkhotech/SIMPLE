@@ -343,13 +343,11 @@ class API extends MY_BackendController {
                             $dato = new DatoSeguimiento();
                         $dato->nombre = $c->nombre;
                         $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
-
                         if (!is_object($dato->valor) && !is_array($dato->valor)) {
                             if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
                                 $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
                         }
-
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
                     }
@@ -382,7 +380,7 @@ class API extends MY_BackendController {
      * 
      * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
      */
-    private function obtenerResultados($etapa){
+    private function obtenerResultados($etapa){ 
         $campos = array();
         foreach($etapa->Tarea->Pasos as $paso ){
             $campos = array_merge($campos, $this->getListaExportables($paso->Formulario->id));

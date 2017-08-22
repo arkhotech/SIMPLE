@@ -1,7 +1,6 @@
 <?php
 
 class Campo extends Doctrine_Record {
-    
     public $requiere_datos=true;    //Indica si requiere datos seleccionables. Como las opciones de un checkbox, select, etc.
     public $estatico=false; //Indica si es un campo estatico, es decir que no es un input con informacion. Ej: Parrafos, titulos, etc.
     public $etiqueta_tamano='large'; //Indica el tamaño default que tendra el campo de etiqueta. Puede ser large o xxlarge.
@@ -318,5 +317,63 @@ class Campo extends Doctrine_Record {
         }
 
         return $visible;
+    }
+
+    public function obtenerResultados($etapa){
+        $varProexp = $this->getVariablesExportables($etapa);
+        $varexp = $this->getListaExportables($etapa);
+        $retval = array_merge($varexp,$varProexp);
+        return $retval; 
+    }
+
+    public function getListaExportables($etapa){
+        $sql ="select tramite_id from etapa where id=".$etapa->id.";";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)->fetchAll(PDO::FETCH_COLUMN);
+        $sql2 ="select id as etapa_id from etapa where tramite_id=".$result[0].";";
+        $result2 = $stmn->execute($sql2)->fetchAll(PDO::FETCH_COLUMN);
+        $etapa_id = implode(",",$result2);
+        $sql3 ="select d.nombre, d.valor from dato_seguimiento d, campo c where d.nombre=c.nombre and etapa_id in (".$etapa_id.") and c.exponer_campo=1 group by d.nombre, d.valor;";
+        $salida = $stmn->execute($sql3)->fetchAll();
+        $return=array();
+        foreach ($salida as $value) {
+            $key= $value['nombre'];
+            $value= $value['valor'];
+            $return[$key]=$value; 
+            $return[$key]=str_replace('"', '', $value); 
+        }
+        return $return;
+    }
+
+    public function getVariablesExportables($etapa){
+        $retval = array();
+        $proceso_id = $etapa->Tarea->proceso_id;
+        $sql = "select a.id as variable_id, a.nombre as nombre_variable, a.extra, a.exponer_variable, p.nombre as nombre_proceso from accion a, proceso p, tarea t where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and a.proceso_id=".$proceso_id." and p.id=t.proceso_id group by a.id, a.nombre, a.extra, a.exponer_variable, p.nombre;";
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)->fetchAll();
+        $return=array();
+        foreach ($result as $value) {
+            $key= $value['nombre_variable'];
+            $return[$key]=str_replace('"', '',$this->getVariableValor($value['nombre_variable'],$etapa));
+        }
+        return $return;
+    }
+
+    public function getVariableValor($nombre,$etapa){
+        $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($nombre, $etapa->id);
+        if($var != NULL){
+            return $var->valor;
+        }else{
+            return "N/D";
+        }
+    }
+    
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
     }
 }
