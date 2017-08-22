@@ -238,7 +238,7 @@ class API extends MY_BackendController {
                 exit;
             }
 
-            $swagger_file = $integrador->generar_swagger($formulario);
+            $swagger_file = $integrador->generar_swagger($formulario, $id_tramite, $id_tarea);
 
             force_download("start_simple.json", $swagger_file);
             exit;

@@ -116,7 +116,7 @@ class FormNormalizer{
      * @param $formulario array con campos del formulario de entrada para iniciar el proceso
      * @return string
      */
-    function generar_swagger($formulario){
+    function generar_swagger($formulario, $id_tramite, $id_tarea){
 
         log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
 
@@ -167,6 +167,8 @@ class FormNormalizer{
                 $line = fgets($file);
                 $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
                 $line = str_replace("-HOST-", $nombre_host, $line);
+                $line = str_replace("-id_tramite-", $id_tramite, $line);
+                $line = str_replace("-id_tarea-", $id_tarea, $line);
                 $swagger .= $line;
             }
             fclose($file);
