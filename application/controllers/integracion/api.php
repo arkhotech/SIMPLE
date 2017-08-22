@@ -505,29 +505,32 @@ class API extends MY_BackendController {
             $etapa->avanzar();
             log_message("INFO", "Id etapa despues de avanzar: ".$etapa->id, FALSE);
 
-            //Obtener la siguiente tarea
-            $next = $etapa->getTareasProximas();
-            //FIX verificar que pasa cunado es mas de un formulario
+            $etapa_prox = $this->obtenerProximaEtapa($etapa, $id_proceso);
+            if(isset($etapa_prox) && count($etapa_prox) == 1){
+                $next_step = $etapa_prox[0]->getPasoEjecutable(0);
+                while($next_step == null){
+                    //Finlaizar etapa
+                    $etapa_prox[0]->avanzar();
 
-            //Si no existe la proxima etapa entonces se ha terminado
+                    $etapa_prox = $this->obtenerProximaEtapa($etapa_prox[0], $id_proceso);
 
-            if(isset($next->tareas)){
-                if(count($next->tareas) > 1){
-                    foreach($next->tareas as $tarea ){
-                        $idf = $tarea->Pasos[0]->Formulario->id;
-                        $form_norm = $integrador->obtenerFormulario($idf);
-                        $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
-                        $etapa_id = $etapa_prox->id;
-                        $secuencia = 0;
-                    }
-                }else{
-                    $form_norm = $integrador->obtenerFormulario($next->tareas[0]->Pasos[0]->Formulario->id);
-                    $tarea_id = $next->tareas[0]->id;
-                    $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
-                    $etapa_id = $etapa_prox->id;
-                    $secuencia = 0;
+                    if(!isset($etapa_prox))
+                        break;
+
+                    $next_step = $etapa_prox[0]->getPasoEjecutable(0);
                 }
+
+                $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
+
+                $etapa_id = $etapa_prox[0]->id;
+                $secuencia = 1;
+
+            }else if(isset($etapa_prox) && count($etapa_prox) > 1){
+                //TODO tareas en paralelo
+                $secuencia = null;
             }else{
+                //No existen mas etapas
+                //Pendiente definir comportamiento standby
                 $secuencia = null;
             }
 
@@ -543,6 +546,42 @@ class API extends MY_BackendController {
 
 
         return $result;
+    }
+
+    private function obtenerProximaEtapa($etapa, $id_proceso){
+        //Obtener la siguiente tarea
+        $next = $etapa->getTareasProximas();
+
+        $etapas = array();
+
+        if(isset($next)){
+            if($next->estado != 'completado'){
+                if ($next->tipo == 'paralelo' || $next->tipo == 'paralelo_evaluacion') {
+                    //etapas en paralelo
+                    foreach($next->tareas as $tarea ){
+                        $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
+                        $etapas[] = $etapa_prox;
+                    }
+                }else if ($next->tipo == 'union') {
+                    if ($next->estado == 'standby') {
+                        //Esperar, enviar respuesta informando que se debe esperar
+                        $etapas = null;
+                    }
+                }else{
+
+                    $tarea_id = $next->tareas[0]->id;
+                    $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
+
+                    $etapas[] = $etapa_prox;
+
+                }
+            }else{
+                $etapas = null;
+            }
+        }else{
+            $etapas = null;
+        }
+        return $etapas;
     }
 
     private function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
