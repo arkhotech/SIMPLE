@@ -343,10 +343,38 @@ class API extends MY_BackendController {
                             $dato = new DatoSeguimiento();
                         $dato->nombre = $c->nombre;
                         $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
-                        if (!is_object($dato->valor) && !is_array($dato->valor)) {
+                        // log_message('info',"#####################################################");
+                        // log_message('info',$this->varDump($dato->nombre));
+                        // log_message('info',$this->varDump($dato->valor));
+                        // log_message('info',"#####################################################");
+                        if (!is_object($dato->valor) && !is_array($dato->valor)){
                             if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
                                 $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
+                        } 
+                        if(is_array($dato->valor)){
+                            log_message('info','#############################################');
+                            log_message('info','Es un objeto');
+                            log_message('info','#############################################');
+                            log_message('info',$this->varDump($dato->valor));
+                            $array = json_decode(json_encode($dato->valor));
+                            
+                            $titulos='';
+                            $i=0;
+                            foreach($dato->valor as $res){
+                                foreach ($res as $key => $value) {
+                                    log_message('info',$this->varDump($key));
+                                    $titulos[$i]= $key;
+                                    $i++;
+                                }
+                                
+                            }
+                            $titulos = array_unique($titulos);
+                            $titulos = implode(",", $titulos);
+                            $result= '['.$titulos.']';
+                            log_message('info',$this->varDump($result));
+
+
                         }
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
