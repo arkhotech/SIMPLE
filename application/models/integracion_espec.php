@@ -119,6 +119,8 @@ class FormNormalizer{
     function generar_swagger($formulario, $id_tramite, $id_tarea){
 
         log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
+        log_message("info", "Id trámite: ".$id_tramite, FALSE);
+        log_message("info", "Id tarea: ".$id_tarea, FALSE);
 
         if(isset($formulario) && count($formulario) > 0){
             log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
@@ -137,7 +139,29 @@ class FormNormalizer{
                     if($data_entrada != "") $data_entrada .= ",";
                     $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\",\"format\": \"date\"}";
                 }else if($campo["tipo"] == "grid"){
+
                     if($data_entrada != "") $data_entrada .= ",";
+
+                    $data_entrada .= "";
+
+                    $columnas = array();
+                    $columnas = $campo["dominio_valores"];
+
+                    $nombres_columnas = "";
+                    foreach ($columnas["columns"] as $column){
+                        if($nombres_columnas != "") $nombres_columnas .= ",";
+                        $nombres_columnas .= "'".$column["header"]."'";
+                    }
+
+                    $data_entrada .= "\"".$campo["nombre"]."\": {
+                    \"description\": \"Formato de arreglo\n\nPrimera fila corresponde a nombres de columnas, los cuales son: [".$nombres_columnas."]\n\nFilas siguientes corresponden a los valores\nEjemplo:\n[\n  [nombre_columna_1, nombre_columna_2, .., nombre_columna_N],\n  [valor_1, valor_2, .., valor_N], .., [valor_1, valor_2, .., valor_N]\n]\n\",
+                    \"type\": \"array\",\"items\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}},
+                    \"default\": \"[[".$nombres_columnas."]]\",";
+
+                    $data_entrada .= "\"minItems\": 1,";
+                    $data_entrada .= "\"maxItems\": ".count($columnas["columns"])."}";
+
+                    /*if($data_entrada != "") $data_entrada .= ",";
 
                     $columnas = array();
                     $columnas = $campo["dominio_valores"];
@@ -150,7 +174,7 @@ class FormNormalizer{
                         $data_entrada .= "\"".$column["header"]."\": {\"type\": \"".$column["type"]."\"}";
                     }
 
-                    $data_entrada .= "}}}";
+                    $data_entrada .= "}}}";*/
                 }
             }
         }
