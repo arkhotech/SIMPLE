@@ -28,7 +28,7 @@
             <select id="ambiente-prod" name="vinculo_produccion">
                 <option value="">Seleccionar ...</option>
                 <?php foreach($cuentas_productivas as $cp):?>
-                    <option value="<?=$cp->id?>" <?= ($cp->id == $cuenta->vinculo_produccion) ? 'selected' : '' ?>><?=$cp->nombre?></option>
+                    <option value="<?=$cp[id]?>" <?= ($cp[id] == $cuenta->vinculo_produccion) ? 'selected' : '' ?>><?=$cp[nombre]?></option>
                 <?php endforeach ?>
             </select>
         </div>
