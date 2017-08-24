@@ -3,24 +3,6 @@ os: linux
 files:
   - source: /   
     destination: /home/simple/SIMPLE
-  - source: /assets
-    destination: /home/simple/SIMPLE
-  - source: /docs
-    destination: /home/simple/SIMPLE
-  - source: /sphinx
-    destination: /home/simple/SIMPLE
-  - source: /sql
-    destination: /home/simple/SIMPLE
-  - source: /sphinx
-    destination: /home/simple/SIMPLE
-  - source: /system
-    destination: /home/simple/SIMPLE
-  - source: /uploads
-    destination: /home/simple/SIMPLE
-  - source: composer.json
-    destination: /home/simple/SIMPLE
-  - source: core
-    destination: /home/simple/SIMPLE
     
 permissions:
   - object: /home/simple/SIMPLE

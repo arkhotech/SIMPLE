@@ -35,5 +35,6 @@ cd $INSTALL_HOME/$DOCKER_DIR
 aws lambda invoke \
     --invocation-type RequestResponse \
     --function-name simpleSlackMessage \
-    --region us-east-2 --payload '{  "message": "prueba","payload": "test ", "status": "SUCCEEDED"}'  output.txt
+    --region us-east-2 --payload \
+'{  "message": "prueba","payload": "La aplicación SIMPLE ha sido desplegada en el servidor", "status": "SUCCEEDED"}'  output.txt
 
