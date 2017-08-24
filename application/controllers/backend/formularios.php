@@ -239,6 +239,9 @@ class Formularios extends MY_BackendController {
     }
     
     public function ajax_agregar_campo($formulario_id, $tipo){
+
+       log_message('info', 'ajax_agregar_campo ($formulario_id [' . $formulario_id . '], $tipo [' . $tipo . '])');
+
         $formulario=Doctrine::getTable('Formulario')->find($formulario_id);
         
         if($formulario->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){

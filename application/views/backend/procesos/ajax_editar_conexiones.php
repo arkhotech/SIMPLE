@@ -2,7 +2,7 @@
     $(document).ready(function(){
         $("[title]").tooltip();
         
-        //Funcionalidad del llenado de nombre usando el boton de asistencia
+        // Funcionalidad del llenado de nombre usando el boton de asistencia
         $("#formEditarConexion").on("click",".asistencia .dropdown-menu a",function(){
             var nombre=$(this).text();
             $(this).closest("td").find(":input").val(nombre);
@@ -34,7 +34,25 @@
     <form id="formEditarConexion" class="ajaxForm" method="POST" action="<?= site_url('backend/procesos/editar_conexiones_form/' . $conexiones[0]->TareaOrigen->id) ?>">
         <div class="validacion"></div>
 
-        <label>Tipo</label>
+        <label>Tipo
+            <?php if ($conexiones[0]->tipo == 'evaluacion') { ?>
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#evaluacion" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            <?php } if ($conexiones[0]->tipo == 'paralelo') { ?>
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#paralelo" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            <?php } if ($conexiones[0]->tipo == 'paralelo_evaluacion') { ?>
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#paralelo_evaluacion" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+            <?php } if ($conexiones[0]->tipo == 'union') { ?>
+                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#pestana_union" target="_blank">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                </a>
+             <?php } ?>
+        </label>
         <input type="text" value="<?= $conexiones[0]->tipo ?>" disabled />
         
         <br /><br />

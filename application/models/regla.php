@@ -43,7 +43,7 @@ class Regla {
                             $campo = Doctrine_Query::create()
                                                     ->select('c.tipo')
                                                     ->from('Campo c, c.Formulario f, f.Proceso p')
-                                                    ->where('c.nombre=? AND p.id=?',array($nombre_dato,$etapa->Tarea->Proceso->id))
+                                                    ->where('c.nombre=? AND p.activo=1 AND p.id=?',array($nombre_dato,$etapa->Tarea->Proceso->id))
                                                     ->execute();
                             
                             if($campo[0]->tipo=='documento' or $campo[0]->tipo=='file'){
@@ -135,7 +135,7 @@ class Regla {
                                 $result = Doctrine_Query::create()
                                                     ->select('c.tipo')
                                                     ->from('Campo c, c.Formulario f, f.Proceso p')
-                                                    ->where('c.nombre=? AND p.id=?',array($nombre_dato,$etapa->Tarea->Proceso->id))
+                                                    ->where('c.nombre=? AND p.activo=1 AND p.id=?',array($nombre_dato,$etapa->Tarea->Proceso->id))
                                                     ->execute();
                                 if($result[0]->tipo == 'grid'){
                                     $valor_dato = json_decode($valor_dato);

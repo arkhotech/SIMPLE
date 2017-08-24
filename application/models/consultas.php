@@ -32,6 +32,7 @@ class Consultas extends CI_Model {
                        e.id as etapa_id
                     from etapa e,tarea ta,tramite t, usuario u, proceso p, cuenta c
                     where e.tarea_id=ta.id 
+                      and p.activo=1 
                       and e.tramite_id= t.id 
                       and e.usuario_id=u.id    
                       and t.proceso_id=p.id

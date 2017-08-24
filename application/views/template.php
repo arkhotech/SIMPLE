@@ -38,7 +38,10 @@
                                                     <input name="usuario" id="usuario" type="text" class="input-xlarge">
                                                     <label for="password">Contraseña</label>
                                                     <input name="password" id="password" type="password" class="input-xlarge">
-                                                    <p class="olvido"><a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a> - <a href="<?= site_url('autenticacion/registrar') ?>">Registrate aquí</a></p>
+                                                    <div id="login_captcha"></div>
+                                                    <p class="olvido">
+                                                        <a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a> - <a href="<?= site_url('autenticacion/registrar') ?>">Registrate aquí</a>
+                                                    </p>
                                                     <button class="btn btn-primary pull-right" type="submit">Ingresar</button>
                                                 </fieldset>
                                             </form>
@@ -49,7 +52,7 @@
                                                 <div class="wrapper">
                                                 <?php //if(!$claveunicaOnly):?><p>O utilice ClaveÚnica</p><?php //endif ?> <a href="<?= site_url('autenticacion/login_openid?redirect=' . current_url()) ?>"><img src="<?= base_url() ?>assets/img/claveunica-medium.png" alt="OpenID"/></a>
                                                 </div>
-                                                </div>
+                                            </div>
                                         </li>
                                     </ul>
                                 </li>
@@ -133,11 +136,6 @@
                     <a href="http://www.gob.cl" target="_blank"><img class="footerGob" src="<?= base_url() ?>assets/img/gobierno_chile.png" alt="Gobierno de Chile" /></a>
                 </div>
             </div>
-
         </footer>
-
-
-
-
     </body>
 </html>

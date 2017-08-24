@@ -46,7 +46,7 @@ class DatoSeguimientoTable extends Doctrine_Table{
         $datos= Doctrine_Query::create()
                 ->from('DatoSeguimiento d, d.Etapa.Tramite t,t.Proceso p')
                 ->where('d.nombre = ?',$nombre)
-                ->andWhere('p.id = ?',$tramite->proceso_id)
+                ->andWhere('p.activo=1 AND p.id = ?',$tramite->proceso_id)
                 ->andWhere('t.id != ?',$tramite->id)
                 ->having('d.id = MAX(d.id)')
                 ->groupBy('t.id')

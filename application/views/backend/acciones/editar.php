@@ -12,10 +12,23 @@
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
 </ul>
 
-
 <form class="ajaxForm" method="POST" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">
     <fieldset>
-        <legend>Crear Acción</legend>
+        <legend>Crear Acción
+        <?php if ($tipo == "enviar_correo") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#enviar_correo" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "webservice") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "variable") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#variable" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } ?>
+        </legend>
         <div class="validacion"></div>
         <?php if(!$edit):?>
         <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" />
@@ -34,8 +47,4 @@
         </div>
     </fieldset>
 </form>
-
-
-
-
 </div>
