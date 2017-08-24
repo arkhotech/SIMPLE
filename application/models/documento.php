@@ -57,12 +57,12 @@ class Documento extends Doctrine_Record {
 
         $this->_set('hsm_configuracion_id', $hsm_configuracion_id);
     }
-
+    
+    
     public function generar($etapa_id) {
-        $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
+        $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
         $filename_uniqid = uniqid();
-        
         //Generamos el file
         $file = new File();
         $file->tramite_id = $etapa->tramite_id;
@@ -76,7 +76,6 @@ class Documento extends Doctrine_Record {
         }
         $file->filename = $filename_uniqid . '.pdf';
         $file->save();
-
         //Renderizamos     
         $this->render($file->id, $file->llave_copia, $etapa->id, $file->filename, false);
         $filename_copia = $filename_uniqid . '.copia.pdf';
@@ -95,7 +94,6 @@ class Documento extends Doctrine_Record {
         $uploadDirectory = 'uploads/documentos/';
 
         $CI = &get_instance();
-
         if ($this->tipo == 'certificado') {
             $CI->load->library('certificadopdf');
             $obj = new $CI->certificadopdf($this->tamano);
@@ -178,9 +176,6 @@ class Documento extends Doctrine_Record {
         } else {
             $obj->Output($filename);
         }
-
-
-
         return;
     }
     
@@ -215,4 +210,13 @@ class Documento extends Doctrine_Record {
         return $documento;
     }
 
+    
+     function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 }

@@ -125,6 +125,20 @@ class Campo extends Doctrine_Record {
         if($this->readonly)$modo='visualizacion';
         return $this->display($modo,$dato,$etapa_id);
     }
+    /**
+     * Muestra el valor de este campo pero sin rendering HTML, solo el valor.
+     * @param type $etapa_id
+     * @return type
+     */
+    public function displayDatoSeguimiento($etapa_id){
+       
+       $dato =  Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($this->nombre,$etapa_id);
+       $regla=new Regla($this->valor_default);
+       $valor_default=$regla->getExpresionParaOutput($etapa_id);
+       //echo "$this->nombre :  $valor_default, ";
+       return $valor_default;
+    }
+    
     
     public function displaySinDato($modo = 'edicion'){   
         if($this->readonly)$modo='visualizacion';
@@ -146,14 +160,16 @@ class Campo extends Doctrine_Record {
     }
     
     //Funcion que retorna si este campo debiera poderse editar de acuerdo al input POST del usuario
-    
+    /**
+     * 
+     * @param type $etapa_id
+     * @param type $body  Este parametro es opcional y debe contener una lista de 
+     *                    varibales que llegan por POST JSON. Es usado por  la API REST
+     * @return type
+     */
     
     public function isEditableWithCurrentPOST($etapa_id, $body = NULL){
         $CI = & get_instance();
-        if($body!=NULL){
-            $CI = $body;
-        }
-
 
         $resultado=true;
 
@@ -161,8 +177,9 @@ class Campo extends Doctrine_Record {
            $resultado=false;
         }else if($this->dependiente_campo){
             $nombre_campo=preg_replace('/\[\w*\]$/', '', $this->dependiente_campo);
-            $variable=  $this->extractVariable($CI,$nombre_campo,($body==NULL)); //$CI->input->post($nombre_campo);
             
+            $variable= ($body==NULL) ? $this->extractVariable($CI,$nombre_campo,TRUE) : //$CI->input->post($nombre_campo);
+                                        $this->extractVariable($body,$nombre_campo,FALSE);
             //Parche para el caso de campos dependientes con accesores. Ej: ubicacion[comuna]!='Las Condes|Santiago'
             if(preg_match('/\[(\w+)\]$/',$this->dependiente_campo,$matches))
                 $variable=$variable[$matches[1]];
@@ -318,29 +335,50 @@ class Campo extends Doctrine_Record {
 
         return $visible;
     }
-
+    
     public function obtenerResultados($etapa){
         $varProexp = $this->getVariablesExportables($etapa);
         $varexp = $this->getListaExportables($etapa);
         $retval = array_merge($varexp,$varProexp);
         return $retval; 
     }
-
+    /**
+     * Obtiene la lista de variables de formulario que se pueden exportar
+     * @param type $etapa
+     * @return type
+     */
     public function getListaExportables($etapa){
-        $sql ="select tramite_id from etapa where id=".$etapa->id.";";
-        $stmn = Doctrine_Manager::getInstance()->connection();
-        $result = $stmn->execute($sql)->fetchAll(PDO::FETCH_COLUMN);
-        $sql2 ="select id as etapa_id from etapa where tramite_id=".$result[0].";";
-        $result2 = $stmn->execute($sql2)->fetchAll(PDO::FETCH_COLUMN);
-        $etapa_id = implode(",",$result2);
-        $sql3 ="select d.nombre, d.valor from dato_seguimiento d, campo c where d.nombre=c.nombre and etapa_id in (".$etapa_id.") and c.exponer_campo=1 group by d.nombre, d.valor;";
-        $salida = $stmn->execute($sql3)->fetchAll();
+        
+        $tramite = $etapa->Tramite;
+        $dato_seguimiento = null;
+        $campos = null;
+        foreach($etapa->Tarea->Pasos as $paso){
+            foreach($paso->Formulario->Campos as $campo){
+                if($campo->exponer_campo){
+                    $campos[] = $campo;
+                }
+            }
+            
+        }
+       
         $return=array();
-        foreach ($salida as $value) {
-            $key= $value['nombre'];
-            $value= $value['valor'];
-            $return[$key]=$value; 
-            $return[$key]=str_replace('"', '', $value); 
+        foreach ($campos as $campo) {
+            
+            $key= $campo->nombre;//$value['nombre'];
+
+            if($campo->tipo == 'file'){
+                $filename = 'uploads/datos/'.str_replace('"','',$value['valor']);
+                $data = file_get_contents($filename);
+                $return[$key]=base64_encode($data); 
+            }else if($campo->tipo == 'documento'){
+                $documento = Doctrine::getTable('Documento')->findOneByProcesoId($etapa->Tarea->proceso_id);              
+                $file = $documento->generar($etapa->id);
+                $data = file_get_contents('uploads/documentos/'.$file->filename);
+                $return[$key]= base64_encode($data);
+            }else{
+                $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa));
+            }
+
         }
         return $return;
     }
@@ -348,7 +386,11 @@ class Campo extends Doctrine_Record {
     public function getVariablesExportables($etapa){
         $retval = array();
         $proceso_id = $etapa->Tarea->proceso_id;
-        $sql = "select a.id as variable_id, a.nombre as nombre_variable, a.extra, a.exponer_variable, p.nombre as nombre_proceso from accion a, proceso p, tarea t where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and a.proceso_id=".$proceso_id." and p.id=t.proceso_id group by a.id, a.nombre, a.extra, a.exponer_variable, p.nombre;";
+        $sql = "select a.id as variable_id, a.nombre as nombre_variable, a.extra, "
+                . "a.exponer_variable, p.nombre as nombre_proceso from accion a, proceso p, "
+                . "tarea t where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and "
+                . "a.proceso_id=".$proceso_id." and p.id=t.proceso_id group by a.id, a.nombre,"
+                . " a.extra, a.exponer_variable, p.nombre;";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)->fetchAll();
         $return=array();
@@ -358,10 +400,11 @@ class Campo extends Doctrine_Record {
         }
         return $return;
     }
-
+    
     public function getVariableValor($nombre,$etapa){
         $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($nombre, $etapa->id);
         if($var != NULL){
+
             return $var->valor;
         }else{
             return "N/D";

@@ -16,10 +16,6 @@ class DatoSeguimiento extends Doctrine_Record {
             'local'=>'etapa_id',
             'foreign'=>'id'
         ));
-
-      
-        
-
     }
     
     public function setValor($valor){
