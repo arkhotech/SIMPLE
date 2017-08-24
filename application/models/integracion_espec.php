@@ -26,19 +26,20 @@ class FormNormalizer{
         return "0";
     }
             
-    function normalizarFormulario($json,$id){
+    function normalizarFormulario($json,$value_list,$id){
         
         if($id==NULL){
             throw new Exception("El formulario viene sin ID");
         }
        
         $retval['form'] = array('id' => $id, 'campos' => array() );
-        //print_r($json);
+        //print_r($json);die;
         
         foreach( $json['Campos'] as $campo){
             if($campo['tipo'] == "subtitle"){
                 continue;  //se ignoran los campos de tipo subtitle
             }
+            //echo $campo->nombre." ".$value_list[$campo['nombre']].". ";
             array_push($retval['form']['campos'], 
             
                   array( 
@@ -46,10 +47,14 @@ class FormNormalizer{
                     "tipo_control" => $campo['tipo'],
                     "tipo" => $this->mapType($campo),  //$campo['dependiente_tipo'],
                     "obligatorio" => ($campo['readonly']==0) ? false : true,
-                    "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'])
+                    "solo_lectura" => ($campo['readonly']==0) ? false : true,
+                    "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'],
+                    "valor" => $value_list[$campo['nombre']])//($campo['valor'] == NULL) ? $campo['valor_default'] : $campo['valor'])
+               
                     );
                 
         }
+       
         return $retval;
     }
     /**
@@ -70,8 +75,8 @@ class FormNormalizer{
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
 
             foreach($tramite->Formularios as $form){
-                $formSimple = Doctrine::getTable('Formulario')->find($form->id)->exportComplete();
-                $json = json_decode($formSimple,true);
+                $formSimple = Doctrine::getTable('Formulario')->find($form->id);
+                $json = json_decode($formSimple->exportComplete(),true);
                 array_push($result,$this->normalizarFormulario($json,$form->id));
 
             }
@@ -103,13 +108,25 @@ class FormNormalizer{
      * Obtiene directamente un formulario
      * @param type $form_id
      */
-    function obtenerFormulario($form_id){
-        $formSimple = Doctrine::getTable('Formulario') ->find($form_id)->exportComplete();
+    function obtenerFormulario($form_id,$etapa_id){
+        
+        $formSimple = Doctrine::getTable('Formulario') ->find($form_id);
+        if($etapa_id == NULL){
+            throw new Exception("El identificador de etapa no puede ser nulo");
+        } 
         if($formSimple == NULL){
             throw new Exception("Fomrulario $form_id no existe");
         }
-        $data = json_decode($formSimple,true);
-        return $this->normalizarFormulario($data,$form_id);
+        $value_list = array();
+        foreach( $formSimple->Campos as $campo ){
+            $value_list[$campo->nombre] = $campo->displayDatoSeguimiento($etapa_id);
+            
+            //echo $campo->displayDatoSeguimiento($etapa_id);
+            //echo $campo->nombre.":".$campo->dato.",";
+        }
+ 
+        $data = json_decode($formSimple->exportComplete(),true);
+        return $this->normalizarFormulario($data,$value_list,$form_id);
     }
 
     /**

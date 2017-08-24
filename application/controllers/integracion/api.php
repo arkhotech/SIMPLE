@@ -1,7 +1,11 @@
 <?php
 
 class API extends MY_BackendController {
-
+    
+    public function __construct() {
+        parent::__construct();
+    }
+    
     public function _auth(){
         UsuarioBackendSesion::force_login();
 
@@ -24,7 +28,7 @@ class API extends MY_BackendController {
         $this->load->view('backend/template',$data);
     }
     */
-    private function getBody(){
+    private function obtenerRequestBody(){
         return file_get_contents('php://input');
     }
 
@@ -86,7 +90,7 @@ class API extends MY_BackendController {
     }
 
     public function tramites($proceso_id, $etapa = null) {
-
+       
         //Tomar los segmentos desde el 3 para adelante
         //$urlSegment = $this->uri->segments;
         //print_r($urlSegment);
@@ -98,12 +102,12 @@ class API extends MY_BackendController {
                 break;
             case "PUT":
                 $this->checkJsonHeader();
-                $this->continuarProceso($proceso_id,$this->getBody());
+                $this->continuarProceso($proceso_id,$this->obtenerRequestBody());
                 break;
             case "POST":
                 log_message("INFO", "inicio proceso", FALSE);
                 $this->checkJsonHeader();
-                $this->iniciarProceso($proceso_id,$etapa,$this->getBody());
+                $this->iniciarProceso($proceso_id,$etapa,$this->obtenerRequestBody());
                 break;
             default:
                 header("HTTP/1.1 405 Metodo no permitido");
@@ -168,13 +172,15 @@ class API extends MY_BackendController {
             log_message("INFO", "inicia tramite", FALSE);
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
-
+             
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
 
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
             $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
-            echo ".";
-            $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
+            
+            if(array_key_exists('callback',$input)){
+                $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
+            }
 
             //validaciones etapa vencida, si existe o algo por el estilo
 
@@ -276,11 +282,25 @@ class API extends MY_BackendController {
         return $ret_val;
     }
 
-    private function extractVariable($body,$name){
-
-        if(isset($body['data'][$name])){
-            return (is_array($body['data'][$name])) ? json_encode($body['data'][$name]) : $body['data'][$name];
-        }
+    private function extractVariable($body,$campo,$tramite_id){
+       
+        if(isset($body['data'][$campo->nombre])){
+            //Guardar el nombre único
+            if($campo->tipo === 'file'){
+                
+                $parts = explode(".",$body['data'][$campo->nombre]['nombre']);
+                $filename = $this->random_string(10).".". $this->random_string(2).".".
+                    $this->random_string(4).".".$parts[1];
+                //$body['data'][$campo->nombre]['mime-type'];
+                //$body['data'][$campo->nombre]['content'];
+                $this->saveFile($filename, 
+                                $tramite_id, 
+                                $body['data'][$campo->nombre]['content']);
+                return $filename;//$body['data'][$campo->nombre]['nombre'];
+            }else{
+                return (is_array($body['data'][$name])) ? json_encode($body['data'][$name]) : $body['data'][$name];
+            }
+          }
         return "NE";
     }
     /**
@@ -294,7 +314,7 @@ class API extends MY_BackendController {
         log_message("INFO", "Ejecutar Entrada", FALSE);
 
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
-
+        
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
@@ -343,38 +363,24 @@ class API extends MY_BackendController {
 
                 foreach ($formulario->Campos as $c) {
                     // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
-
+                    
                     if ($c->isEditableWithCurrentPOST($etapa_id,$body)) {
                         $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
                         if (!$dato)
                             $dato = new DatoSeguimiento();
                         $dato->nombre = $c->nombre;
-                        $dato->valor = $this->extractVariable($body,$c->nombre)=== false?'' :  $this->extractVariable($body,$c->nombre);
+                        
+                        $dato->valor = $this->extractVariable($body,$c,$etapa->tramite_id)=== false?'' :  $this->extractVariable($body,$c,$etapa->tramite_id);
                         if (!is_object($dato->valor) && !is_array($dato->valor)){
                             if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
                                 $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
                         }
-                        // if(is_array($dato->valor)){
-                        //     $titulos='';
-                        //     $data='';
-                        //     $i=0;
-                        //     foreach($dato->valor as $res){
-                        //         foreach ($res as $key => $value){
-                        //             $titulos[$i]= $key;
-                        //             $data[$i]= $value;
-                        //             $i++;
-                        //         }
-                        //     }
-                        //     $titulos = array_unique($titulos);
-                        //     $count = count($titulos);
-                        //     $export=array_chunk($data, $count);
-                        //     array_unshift($export,$titulos);
-                        //     $dato->valor=$export;
-                        // }
+                        
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
                     }
+             
                 }
                 $etapa->save();
                 $etapa->finalizarPaso($paso);
@@ -393,94 +399,21 @@ class API extends MY_BackendController {
         return $result;
 
     }
-    /**
-     *
-     * @param type $etapa Objeto de tipo Etapa
-     * @return type retorna un JSON con un array JSON clave-valor
-     *
-     * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
-     */
-    private function obtenerResultados($etapa){
-        $campos = array();
-        foreach($etapa->Tarea->Pasos as $paso ){
-            $campos = array_merge($campos, $this->getListaExportables($paso->Formulario->id));
-        }
-        //ahora que estan los campos, retronar los valores de los campos
-        $output=array();
-        $datos = Doctrine::getTable('DatoSeguimiento')->findByEtapaId($etapa->id);  //$etapa->DatosSeguimiento
-        foreach( $datos as $var ){
-            if(in_array($var->nombre, $campos)){
-                $output[$var->nombre] = $var->valor;
-            }
-        }
-
-        $varexp = $this->getVariablesExportables($etapa);
-
-        $retval = array_merge($varexp,$output);
-        return $retval;
-
-    }
-    /**
-     *
-     * @param type $etapa Pbjeto de tipo etapa
-     * @return type Array de clave valor con las variables que son exportables.
-     */
-    private function getVariablesExportables($etapa){
-        $retval = array();
-        $id_proceso = $etapa->Tarea->proceso_id;
-        $accion = Doctrine::getTable("Accion")->findOneByProcesoId($id_proceso);
-
-        if(isset($accion) && $accion->exponer_variable){
-            $retval[$accion->extra->variable]= $this->getVariableValor($accion->nombre,$etapa);
-        }
-        return $retval;
-    }
-
-    /**
-     * Recupera los valores de las variables de tipo Campo que son exportables
-     * @param type $nombre nombre de la variable
-     * @param type $etapa objeto de tipo etapa
-     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso
-     * que deberóia ser excepcional, entonces retorna N/D
-     */
-    private function getVariableValor($nombre,$etapa){
-        $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId( $nombre, $etapa->id);
-        if($var != NULL){
-            return $var->valor;
-        }else{
-            return "N/D";
-        }
-    }
-
-    /**
-     * Pbtiene las variblaes exportables de un formulario
-     *
-     * @param type $form_id
-     * @return array
-     */
-    private function getListaExportables($form_id){
-        $lista= array();
-        $campos = Doctrine::getTable('Campo')->findByFormularioId($form_id);
-        foreach($campos as $campo ){
-            if($campo->exponer_campo){
-                array_push($lista,$campo->nombre);
-            }
-        }
-        return $lista;
-    }
 
     private function registrarCallbackURL($callback,$callback_id,$etapa){
-        $dato = new DatoSeguimiento();
-        $dato->nombre = "callback";
-        $dato->valor = $callback; //"{ url:".$url."}";
-        $dato->etapa_id = $etapa;
-        $dato->save();
+        if($callback != NULL ){
+            $dato = new DatoSeguimiento();
+            $dato->nombre = "callback";
+            $dato->valor = $callback; //"{ url:".$url."}";
+            $dato->etapa_id = $etapa;
+            $dato->save();
 
-        $dato2 = new DatoSeguimiento();
-        $dato2->nombre = "callback_id";
-        $dato2->valor = $callback_id;
-        $dato2->etapa_id = $etapa;
-        $dato2->save();
+            $dato2 = new DatoSeguimiento();
+            $dato2->nombre = "callback_id";
+            $dato2->valor = $callback_id;
+            $dato2->etapa_id = $etapa;
+            $dato2->save();
+        }
     }
 
     public function asignar($etapa_id) {
@@ -513,7 +446,7 @@ class API extends MY_BackendController {
         $result['result']=array();
         $result['result']['proximoForlulario']=array();
         $form_norm=array();
-
+        
         $etapa_id = $etapa->id;
 
         $integrador = new FormNormalizer();
@@ -538,7 +471,7 @@ class API extends MY_BackendController {
                     $next_step = $etapa_prox[0]->getPasoEjecutable(0);
                 }
 
-                $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
+                $form_norm = $integrador->obtenerFormulario($next_step->formulario_id,$etapa->id);
 
                 $etapa_id = $etapa_prox[0]->id;
                 $secuencia = 1;
@@ -553,16 +486,19 @@ class API extends MY_BackendController {
             }
 
         }else{
-            $form_norm = $integrador->obtenerFormulario($next_step->formulario_id);
+            
+            $paso = $etapa->getPasoEjecutable($secuencia);
+            $form_norm = $integrador->obtenerFormulario($paso->formulario_id,$etapa->id);
         }
-
+        
+        $campos = new Campo();
         log_message("INFO", "Id etapa asignado: ".$etapa_id, FALSE);
         $result['result']['proximoForlulario'] = $form_norm;
         $result['result']['idEtapa'] = $etapa_id;
-        $result['result']['secuencia'] = $secuencia;
-        $result['result']['output']= $this->obtenerResultados($etapa);
+        $result['result']['secuencia'] = $secuencia;      
+        $result['result']['output']= $campos->obtenerResultados($etapa,$this);
 
-
+        
         return $result;
     }
 
@@ -679,11 +615,73 @@ class API extends MY_BackendController {
 
         $data['headers'] = $new_headers;
         $data['input'] = $body['data'];
-        $data['response_data'] =
+        
+        if(array_key_exists('callback', $body)){
+            $data['response_data'] = 
                 array("Callback url" => $body['callback'],
                      "Callback id" => $body['callback-id']);
+        }
+
         $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
                 $tipo.': Auditoría de llamados API',  json_encode($data));
     }
+    function random_string($length) {
+        $key = '';
+        $keys = array_merge(range(0, 9));   //, range('a', 'z')
 
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $keys[array_rand($keys)];
+        }
+
+        return $key;
+    }
+    
+    /**
+     * 
+     * @param type $tramite_id
+     * @param type $archivo
+     */
+    private function saveFile($filename,$tramite_id,$data){
+        
+        
+        $filename = mb_strtolower($filename);   //Lo convertimos a minusculas
+        $filename=  preg_replace('/\s+/', ' ', $filename);  //Le hacemos un trim
+        $filename = trim($filename);
+        $parts= explode(".",$filename);
+        
+        
+
+        $myfile = fopen("uploads/datos/".$filename, "w");
+        fwrite($myfile,  base64_decode($data));
+        fclose($myfile);
+        
+        // max file size in bytes
+        //$sizeLimit = 20 * 1024 * 1024;
+        //$uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
+        //$result = $uploader->handleUpload('uploads/datos/');
+        log_message("info","Guardando archivo " + $filename);
+        $file=new File();
+        $file->tramite_id=$tramite_id;
+        $archivo=$filename;
+        $archivo = trim($archivo);
+        $archivo = str_replace(array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'), array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),$archivo);
+        $archivo = str_replace(array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'), array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),$archivo);
+        $archivo = str_replace(array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'), array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),$archivo);
+        $archivo = str_replace(array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'), array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'), $archivo);
+        $archivo = str_replace(array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),$archivo);
+        $archivo = str_replace(array('ñ', 'Ñ', 'ç', 'Ç'),array('n', 'N', 'c', 'C',), $archivo);
+        $archivo = str_replace(array("\\","¨","º","-","~","#","@","|","!","\"","·","$","%","&","/","(", ")","?","'","¡","¿","[","^","`","]","+","}","{","¨","´",">","< ",";", ",",":"," "),'',$archivo);  
+        //$file->filename=$result['file_name'];
+        $file->filename= $archivo;
+        $result['file_name']= $archivo;
+        $file->tipo='dato';
+        $file->llave=strtolower(random_string('alnum', 12));
+        $file->save();
+
+        $result['id']=$file->id;
+        $result['llave']=$file->llave;
+
+      
+    }
+    
 }
