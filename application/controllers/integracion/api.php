@@ -369,23 +369,7 @@ class API extends MY_BackendController {
                                 $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
                         }
-                        // if(is_array($dato->valor)){
-                        //     $titulos='';
-                        //     $data='';
-                        //     $i=0;
-                        //     foreach($dato->valor as $res){
-                        //         foreach ($res as $key => $value){
-                        //             $titulos[$i]= $key;
-                        //             $data[$i]= $value;
-                        //             $i++;
-                        //         }
-                        //     }
-                        //     $titulos = array_unique($titulos);
-                        //     $count = count($titulos);
-                        //     $export=array_chunk($data, $count);
-                        //     array_unshift($export,$titulos);
-                        //     $dato->valor=$export;
-                        // }
+                        
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
                     }
@@ -408,82 +392,6 @@ class API extends MY_BackendController {
         return $result;
 
     }
-    /**
-     *
-     * @param type $etapa Objeto de tipo Etapa
-     * @return type retorna un JSON con un array JSON clave-valor
-     *
-     * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
-     */
-   /* private function obtenerResultados($etapa){ 
-        $campos = array();
-        foreach($etapa->Tarea->Pasos as $paso ){
-            $campos = array_merge($campos, $this->getListaExportables($paso->Formulario->id));
-        }
-        //ahora que estan los campos, retronar los valores de los campos
-        $output=array();
-        $datos = Doctrine::getTable('DatoSeguimiento')->findByEtapaId($etapa->id);  //$etapa->DatosSeguimiento
-        foreach( $datos as $var ){
-            if(in_array($var->nombre, $campos)){
-                $output[$var->nombre] = $var->valor;
-            }
-        }
-
-        $varexp = $this->getVariablesExportables($etapa);
-
-        $retval = array_merge($varexp,$output);
-        return $retval;
-
-    }
-    * */
-    /**
-     *
-     * @param type $etapa Pbjeto de tipo etapa
-     * @return type Array de clave valor con las variables que son exportables.
-     */
-//    private function getVariablesExportables($etapa){
-//        $retval = array();
-//        $id_proceso = $etapa->Tarea->proceso_id;
-//        $accion = Doctrine::getTable("Accion")->findOneByProcesoId($id_proceso);
-//        
-//        if(isset($accion) && $accion->exponer_variable){
-//            $retval[$accion->extra->variable]= $this->getVariableValor($accion->nombre,$etapa);
-//        }
-//        return $retval;
-//    }
-
-    /**
-     * Recupera los valores de las variables de tipo Campo que son exportables
-     * @param type $nombre nombre de la variable
-     * @param type $etapa objeto de tipo etapa
-     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso
-     * que deberóia ser excepcional, entonces retorna N/D
-     */
-//    private function getVariableValor($nombre,$etapa){
-//        $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId( $nombre, $etapa->id);
-//        if($var != NULL){
-//            return $var->valor;
-//        }else{
-//            return "N/D";
-//        }
-//    }
-
-    /**
-     * Pbtiene las variblaes exportables de un formulario
-     *
-     * @param type $form_id
-     * @return array
-     */
-//    private function getListaExportables($form_id){
-//        $lista= array();
-//        $campos = Doctrine::getTable('Campo')->findByFormularioId($form_id);
-//        foreach($campos as $campo ){
-//            if($campo->exponer_campo){
-//                array_push($lista,$campo->nombre);
-//            }
-//        }  
-//        return $lista;
-//    }
 
     private function registrarCallbackURL($callback,$callback_id,$etapa){
         if($callback != NULL ){
