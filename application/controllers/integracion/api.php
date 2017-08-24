@@ -8,21 +8,21 @@ class API extends MY_BackendController {
     
     public function _auth(){
         UsuarioBackendSesion::force_login();
-        
+
 //        if(UsuarioBackendSesion::usuario()->rol!='super' && UsuarioBackendSesion::usuario()->rol!='desarrollo'){
         if( !in_array('super', explode(',',UsuarioBackendSesion::usuario()->rol) ) && !in_array( 'desarrollo',explode(',',UsuarioBackendSesion::usuario()->rol))){
             echo 'No tiene permisos para acceder a esta seccion.';
             exit;
         }
     }
-    
+
     /*
      * Documentacion de la API
      */
     /*
     public function index(){
         $this->_auth();
-        
+
         $data['title']='API';
         $data['content']='backend/api/index';
         $this->load->view('backend/template',$data);
@@ -31,56 +31,56 @@ class API extends MY_BackendController {
     private function obtenerRequestBody(){
         return file_get_contents('php://input');
     }
-    
+
     /*
      * Llamadas de la API
      * Tramote id es el identificador del proceso
      */
-    
+
     public function especificacion($operacion ,$id_tramite,$id_tarea = NULL,$id_paso = NULL){
-        
+
         //Cheque que la URL se complete correctamente
         if($operacion!= "servicio" && $operacion!= "form"){
             echo "$operacion";die;
             show_error("404 No encontrado",404, "La operación no existe" );
             exit;
         }
-         
+
         switch($this->input->server('REQUEST_METHOD')){
-            case "GET": 
+            case "GET":
                 $this->generarEspecificacion($operacion,$id_tramite,$id_tarea,$id_paso);
                 break;
             default:
                 show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
         }
-        
+
     }
     /**
-     * 
-     * @param type $tipo 
+     *
+     * @param type $tipo
      * @param type $id_tramite
      * @param type $id_paso
      */
     public function status($tipo,$id_tramite, $rut ){
-        
+
         if($tipo!= "tramite" ){
             show_error("404 No encontrado",404, "No se encuentra la operacion" );
             exit;
         }
-        
+
         if($rut == NULL || $id_tramite == NULL ){
             show_error("400 Bad Request",400, "Uno de los parametros de entrada no ha sido especificado" );
         }
-        
+
         switch($this->input->server('REQUEST_METHOD')){
-            case "GET": 
+            case "GET":
                 $this->obtenerStatus($id_tramite,$rut);
                 break;
             default:
                 header("HTTP/1.1 405 Metodo no permitido.");
         }
     }
-    
+
     private function checkJsonHeader(){
         $headers = $this->input->request_headers();
         if($headers['Content-Type']==NULL || $headers['Content-Type']!="application/json"){
@@ -88,14 +88,14 @@ class API extends MY_BackendController {
             header("HTTP/1.1 415 Unsupported Media Type. Solo se permite application/json");
         }
     }
-    
+
     public function tramites($proceso_id, $etapa = null) {
        
         //Tomar los segmentos desde el 3 para adelante
         //$urlSegment = $this->uri->segments;
         //print_r($urlSegment);
         //$cuenta = Cuenta::cuentaSegunDominio();
-   
+
         switch($method = $this->input->server('REQUEST_METHOD')){
             case "GET":
                 $this->listarCatalogo();
@@ -112,10 +112,10 @@ class API extends MY_BackendController {
             default:
                 header("HTTP/1.1 405 Metodo no permitido");
         }
-        
+
     }
 
-    
+
     private function listarCatalogo(){
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();
@@ -130,23 +130,23 @@ class API extends MY_BackendController {
                 "institucion" => "N/I",
                 "descripcion" => $res['previsualizacion'],
                 "URL" => $protocol.$nombre_host.'/integracion/api/especificacion/servicio/'.$res['id'].'/'.$res['id_tarea']
-            )); 
-        }   
-       $retval["catalogo"] = $result; 
+            ));
+        }
+       $retval["catalogo"] = $result;
        header('Content-type: application/json');
        echo json_indent(json_encode($retval));
        exit;
     }
-    
+
     private function iniciarProceso($proceso_id, $id_tarea, $body){
         //validar la entrada
-        
+
         if($proceso_id == NULL || $id_tarea == NULL){
             header("HTTP/1.1 400 Bad Request");
             return;
         }
-        
-        try{ 
+
+        try{
             $input = json_decode($body,true);
             log_message("INFO", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
@@ -154,9 +154,9 @@ class API extends MY_BackendController {
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
-            
+
             log_message("INFO", "inicio proceso", FALSE);
-            
+
             UsuarioSesion::login('admin@admin.com', '123456');
 
             log_message("INFO", "carga libreria", FALSE);
@@ -167,7 +167,7 @@ class API extends MY_BackendController {
             $tramite->iniciar($proceso_id);
              
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
-            
+
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
             $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
             
@@ -188,9 +188,9 @@ class API extends MY_BackendController {
         }catch(Exception $e){
            $e->getTrace();
         }
-      
+
     }
-    
+
     private function continuarProceso($id_proceso, $body){
 
         log_message("INFO", "En continuar proceso, input data: ".$body);
@@ -225,9 +225,9 @@ class API extends MY_BackendController {
         }
 
     }
-    
+
     private function generarEspecificacion($operacion,$id_tramite=NULL,$id_tarea=NULL,$id_paso = NULL){
-        
+
         if($operacion === "form"){
             $integrador = new FormNormalizer();
             $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
@@ -238,7 +238,7 @@ class API extends MY_BackendController {
             $integrador = new FormNormalizer();
             /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
             $formulario = $integrador->obtenerFormularios($id_tramite, $id_tarea, 0);
-            
+
             if($id_tramite == NULL || $id_tarea == NULL ){
                 header("HTTP/1.1 400 Bad Request");
                 exit;
@@ -251,16 +251,16 @@ class API extends MY_BackendController {
         }
     }
 
-    
+
     private function obtenerStatus($id_tramite, $rut ){
-        
+
         $response = array("idTramite" => $id_tramite,
             "nombreTramite" => "Hardcoded Dummy",
             "rutUsuario" => $rut,
             "nombreEtapaActual" => "Eetapa Cero");
         $this->responseJson($response);
     }
-    
+
      private function responseJson($response){
          header('Content-type: application/json');
        echo json_indent(json_encode($response));
@@ -274,7 +274,7 @@ class API extends MY_BackendController {
         ob_end_clean();
         return $ret_val;
     }
-    
+
     private function extractVariable($body,$campo,$tramite_id){
        
         if(isset($body['data'][$campo->nombre])){
@@ -297,7 +297,7 @@ class API extends MY_BackendController {
         return "NE";
     }
     /**
-     * 
+     *
      * @param type $etapa_id
      * @param type $body
      * @return type
@@ -305,13 +305,13 @@ class API extends MY_BackendController {
     public function ejecutarEntrada($etapa_id,$body, $secuencia = 0, $id_proceso){
 
         log_message("INFO", "Ejecutar Entrada", FALSE);
-      
+
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
         
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
-         
+
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
         if (!$etapa) {
@@ -335,8 +335,8 @@ class API extends MY_BackendController {
             exit;
         }
 
-        $this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body); 
-   
+        $this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body);
+
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
             $paso = $etapa->getPasoEjecutable($secuencia);
@@ -364,24 +364,37 @@ class API extends MY_BackendController {
                         $dato->nombre = $c->nombre;
                         
                         $dato->valor = $this->extractVariable($body,$c,$etapa->tramite_id)=== false?'' :  $this->extractVariable($body,$c,$etapa->tramite_id);
-                        if (!is_object($dato->valor) && !is_array($dato->valor)) {
+                        if (!is_object($dato->valor) && !is_array($dato->valor)){
                             if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
                                 $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i", "$3-$2-$1", $dato->valor);
                             }
                         }
+                        // if(is_array($dato->valor)){
+                        //     $titulos='';
+                        //     $data='';
+                        //     $i=0;
+                        //     foreach($dato->valor as $res){
+                        //         foreach ($res as $key => $value){
+                        //             $titulos[$i]= $key;
+                        //             $data[$i]= $value;
+                        //             $i++;
+                        //         }
+                        //     }
+                        //     $titulos = array_unique($titulos);
+                        //     $count = count($titulos);
+                        //     $export=array_chunk($data, $count);
+                        //     array_unshift($export,$titulos);
+                        //     $dato->valor=$export;
+                        // }
                         $dato->etapa_id = $etapa->id;
                         $dato->save();
                     }
              
                 }
-
                 $etapa->save();
-
                 $etapa->finalizarPaso($paso);
-
                 //Obtiene el siguiete paso
                 $next_step = $etapa->getPasoEjecutable($secuencia+1);
-
             }
 
             $result = $this->procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso);
@@ -396,10 +409,10 @@ class API extends MY_BackendController {
 
     }
     /**
-     * 
+     *
      * @param type $etapa Objeto de tipo Etapa
      * @return type retorna un JSON con un array JSON clave-valor
-     * 
+     *
      * { "key1": "valor1" , "key2": "valor2" , "key3": "valor3" }
      */
    /* private function obtenerResultados($etapa){ 
@@ -415,17 +428,17 @@ class API extends MY_BackendController {
                 $output[$var->nombre] = $var->valor;
             }
         }
-      
+
         $varexp = $this->getVariablesExportables($etapa);
 
         $retval = array_merge($varexp,$output);
         return $retval;
-      
+
     }
     * */
     /**
-     * 
-     * @param type $etapa Pbjeto de tipo etapa 
+     *
+     * @param type $etapa Pbjeto de tipo etapa
      * @return type Array de clave valor con las variables que son exportables.
      */
 //    private function getVariablesExportables($etapa){
@@ -438,13 +451,13 @@ class API extends MY_BackendController {
 //        }
 //        return $retval;
 //    }
-    
+
     /**
      * Recupera los valores de las variables de tipo Campo que son exportables
      * @param type $nombre nombre de la variable
      * @param type $etapa objeto de tipo etapa
-     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso 
-     * que deberóia ser excepcional, entonces retorna N/D 
+     * @return string Retorna rl valor.  En caso de no existir la coincidencia (no existe la variable) caso
+     * que deberóia ser excepcional, entonces retorna N/D
      */
 //    private function getVariableValor($nombre,$etapa){
 //        $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId( $nombre, $etapa->id);
@@ -454,10 +467,10 @@ class API extends MY_BackendController {
 //            return "N/D";
 //        }
 //    }
-    
+
     /**
      * Pbtiene las variblaes exportables de un formulario
-     * 
+     *
      * @param type $form_id
      * @return array
      */
@@ -471,7 +484,7 @@ class API extends MY_BackendController {
 //        }  
 //        return $lista;
 //    }
-    
+
     private function registrarCallbackURL($callback,$callback_id,$etapa){
         if($callback != NULL ){
             $dato = new DatoSeguimiento();
@@ -616,20 +629,20 @@ class API extends MY_BackendController {
          $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
          $registro_auditoria->operacion = $operacion;
          $usuario = UsuarioBackendSesion::usuario ();
-            // Se necesita cambiar el usuario al usuario público. 
+            // Se necesita cambiar el usuario al usuario público.
          $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
          $registro_auditoria->proceso = $proceso_nombre;
          $registro_auditoria->cuenta_id = 1;
          $registro_auditoria->motivo = $motivo;
-            
+
          //unset($accion_array['accion']['proceso_id']);
          $registro_auditoria->detalles= 'Detalles';
          $registro_auditoria->detalles=  $detalles;//json_encode($accion_array);
-         $registro_auditoria->save();  
+         $registro_auditoria->save();
     }
 
     function throwError($numero,$mensaje,$nombre_proceso,$body){
-        
+
         $errorcodes = array(
 							200	=> 'OK',
 							201	=> 'Created',
@@ -671,20 +684,20 @@ class API extends MY_BackendController {
 							504	=> 'Gateway Timeout',
 							505	=> 'HTTP Version Not Supported'
 						);
-        
+
         $this->crearRegistroAuditoria($nombre_proceso, $body, "ERROR");
         header("HTTP/1.1 ".$numero." ".$errorcodes[$numero]);
     }
-    
-    
+
+
     private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
-        
+
         $headers = $this->input->request_headers();
         $new_headers = array('host' => $headers['Host'],
               'Origin' => $headers['Origin'],
             'largo-mensaje' => $headers['Content-Length'],
             'Content-type' => $headers['Content-type']);
-      
+
         $data['headers'] = $new_headers;
         $data['input'] = $body['data'];
         
@@ -697,7 +710,6 @@ class API extends MY_BackendController {
         $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
                 $tipo.': Auditoría de llamados API',  json_encode($data));
     }
-    
     function random_string($length) {
         $key = '';
         $keys = array_merge(range(0, 9));   //, range('a', 'z')
