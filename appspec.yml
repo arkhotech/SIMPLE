@@ -6,8 +6,10 @@ files:
 
 permisions:
   - object: /home/simple/SIMPLE
+    pattern: "**"
     owner: simple
     group: simple
+    mode: 765
     type:
      - file
 
@@ -17,8 +19,10 @@ permisions:
      - file
 
   - object: /home/simple/SIMPLE
+    pattern: "**"
     owner: simple
     group: simple
+    mode: 755
     type:
      - directory
 

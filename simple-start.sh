@@ -29,3 +29,11 @@ echo "Instalando servidor SIMPLE"
 cd $INSTALL_HOME/$DOCKER_DIR
 
 ./install.sh $INSTALL_HOME
+
+#Comunicar que se ha instalado correctamente
+
+aws lambda invoke \
+    --invocation-type RequestResponse \
+    --function-name simpleSlackMessage \
+    --region us-east-2 --payload '{  "message": "prueba","payload": "test ", "status": "SUCCEEDED"}'  output.txt
+

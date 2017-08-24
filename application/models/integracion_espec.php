@@ -25,8 +25,15 @@ class FormNormalizer{
         
         return "0";
     }
-            
-    function normalizarFormulario($json,$value_list,$id){
+    /**
+     * 
+     * @param type $json
+     * @param type $id
+     * @param type $value_list Valores de los campos a exportar
+     * @return type
+     * @throws Exception
+     */        
+    function normalizarFormulario($json,$id,$value_list=NULL){
         
         if($id==NULL){
             throw new Exception("El formulario viene sin ID");
@@ -49,7 +56,7 @@ class FormNormalizer{
                     "obligatorio" => ($campo['readonly']==0) ? false : true,
                     "solo_lectura" => ($campo['readonly']==0) ? false : true,
                     "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'],
-                    "valor" => $value_list[$campo['nombre']])//($campo['valor'] == NULL) ? $campo['valor_default'] : $campo['valor'])
+                    "valor" => ($value_list!=NULL) ? $value_list[$campo['nombre']] : "")//($campo['valor'] == NULL) ? $campo['valor_default'] : $campo['valor'])
                
                     );
                 
@@ -126,7 +133,7 @@ class FormNormalizer{
         }
  
         $data = json_decode($formSimple->exportComplete(),true);
-        return $this->normalizarFormulario($data,$value_list,$form_id);
+        return $this->normalizarFormulario($data,$form_id,$value_list);
     }
 
     /**
