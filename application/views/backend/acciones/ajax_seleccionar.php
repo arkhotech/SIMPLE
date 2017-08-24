@@ -11,11 +11,12 @@
         <div class="validacion"></div>
         <label>Tipo de acción</label>
         <select name="tipo">
-            <option value="enviar_correo">Enviar correo</option>
+            <option value="enviar_correo">Enviar Correo</option>
             <option value="variable">Generar Variable</option>
             <option value="rest">Consultar Rest</option>
             <option value="soap">Consultar Soap</option>
             <option value="callback">Generar Callback</option>
+            <option value="tramite_simple">Iniciar o Continuar Trámite</option>
         </select>
     </form>
 </div>

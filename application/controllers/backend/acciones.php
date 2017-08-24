@@ -76,6 +76,8 @@ class Acciones extends MY_BackendController {
             exit;
         }
 
+        log_message("INFO", "Creando formulario para trámite", FALSE);
+
         if($tipo=='enviar_correo')
             $accion=new AccionEnviarCorreo();
         else if($tipo=='webservice')
@@ -88,6 +90,8 @@ class Acciones extends MY_BackendController {
             $accion=new AccionSoap();
         else if($tipo=='callback')
             $accion=new AccionCallback();
+        else if($tipo=='tramite_simple')
+            $accion=new AccionTramiteSimple();
 
 
         $data['edit']=FALSE;
@@ -95,12 +99,17 @@ class Acciones extends MY_BackendController {
         $data['tipo']=$tipo;
         $data['accion']=$accion;
 
+        log_message("INFO", "Creando formulario para trámite, tipo: ".$data['tipo'], FALSE);
+
         $data['content']='backend/acciones/editar';
         $data['title']='Crear Acción';
         $this->load->view('backend/template',$data);
     }
 
     public function editar($accion_id){
+
+        log_message("INFO", "####En Editar, id: ".$accion_id, FALSE);
+
         $accion = Doctrine::getTable('Accion')->find($accion_id);
         if ($accion->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
@@ -131,6 +140,8 @@ class Acciones extends MY_BackendController {
                 $accion=new AccionSoap();
             else if($this->input->post('tipo')=='callback')
                 $accion=new AccionCallback();
+            else if($this->input->post('tipo')=='tramite_simple')
+                $accion=new AccionTramiteSimple();
             $accion->proceso_id=$this->input->post('proceso_id');
             $accion->tipo=$this->input->post('tipo');
         }
@@ -371,6 +382,28 @@ class Acciones extends MY_BackendController {
         }
         $json=json_encode($array2);
         print_r($json);
+        exit;
+    }
+
+    public function getTareasCallback(){
+        log_message('info','En getTareasCallback', FALSE);
+        $id_proceso = $this->input->post('idProceso');
+        log_message('info','Input: '.$id_proceso, FALSE);
+        $tareas_con_callback = Doctrine::getTable('Proceso')->findCallbackProceso($id_proceso);
+
+        //log_message("INFO", "####tareas_con_callback: ".$this->varDump($tareas_con_callback), FALSE);
+        foreach ($tareas_con_callback as $tarea) {
+            log_message("INFO", "Id tarea: ".$tarea["id_tarea"], FALSE);
+            log_message("INFO", "Nombre tarea: ".$tarea["nombre"], FALSE);
+        }
+
+        $json=json_encode($tareas_con_callback);
+
+        $respuesta = "{\"data\": ".$json."}";
+
+        log_message("INFO", "Respuesta json: ".$respuesta, FALSE);
+
+        echo $respuesta;
         exit;
     }
 }

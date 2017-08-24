@@ -112,6 +112,13 @@ class API extends MY_BackendController {
     }
 
 
+    public function inicioProcesoSimple($proceso_id, $etapa, $body) {
+
+                log_message("INFO", "inicio proceso", FALSE);
+                $this->iniciarProceso($proceso_id,$etapa,$body);
+
+    }
+
     private function listarCatalogo(){
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();

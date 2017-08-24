@@ -17,7 +17,8 @@ class Accion extends Doctrine_Record     {
                 'AccionVariable'  => array('tipo' => 'variable'),
                 'AccionRest'  => array('tipo' => 'rest'),
                 'AccionSoap'  => array('tipo' => 'soap'),
-                'AccionCallback'  => array('tipo' => 'callback')
+                'AccionCallback'  => array('tipo' => 'callback'),
+                'AccionTramiteSimple'  => array('tipo' => 'tramite_simple')
             )
         );
     }

@@ -55,9 +55,11 @@
         <input type="text" readonly value="<?=$edit?$accion->tipo:$tipo?>" />
 
         <?php
+        log_message("INFO", "En view editar, tipo: ".$tipo, FALSE);
         $key='';
         ($tipo ? $key = $tipo : $key = $accion->tipo);
-        if($tipo == "rest" || $tipo == "soap" || $tipo == "callback" || $accion->tipo == "rest" || $accion->tipo == "soap" || $accion->tipo == "callback"){
+        log_message("INFO", "En view editar, $key: ".$key, FALSE);
+        if($tipo == "rest" || $tipo == "soap" || $tipo == "callback" || $accion->tipo == "rest" || $accion->tipo == "soap" || $accion->tipo == "callback" || $accion->tipo == "tramite_simple" || $tipo == "tramite_simple"){
             echo $accion->displaySecurityForm($proceso->id);
         }else{
             echo $accion->displayForm();
@@ -81,6 +83,9 @@
             break;
         case "callback":
             ?><script src="<?= base_url() ?>assets/js/accion_callback.js"></script><?
+            break;
+        case "tramite_simple":
+            ?><script src="<?= base_url() ?>assets/js/accion_tramite_simple.js"></script><?
             break;
         default:
             ?><script src="<?= base_url() ?>assets/js/accion_otras.js"></script><?

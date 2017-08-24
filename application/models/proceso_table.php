@@ -129,6 +129,19 @@ class ProcesoTable extends Doctrine_Table {
         return $result;
     }
 
+    public function findCallbackProceso($id_proceso){
+        log_message('info','En findCallbackProceso con id: '.$id_proceso, FALSE);
+        $sql = "select t.id as id_tarea, t.nombre from accion a, tarea t, evento e where a.proceso_id = ".$id_proceso." and a.tipo = 'callback' and a.id = e.accion_id and e.tarea_id = t.id";
+        log_message('info','SQL: '.$sql, FALSE);
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)->fetchAll();
+
+        log_message('info','Result: '.$this->varDump($result), FALSE);
+
+        return $result;
+    }
+
     function varDump($data){
         ob_start();
         //var_dump($data);
