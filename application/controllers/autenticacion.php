@@ -201,11 +201,19 @@ class Autenticacion extends MY_Controller {
         $this->load->view('autenticacion/login', $data);
     }
 
+    /**
+     * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
+     * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar() {
+
         $data['title'] = 'Registro';
         $this->load->view('autenticacion/registrar', $data);
     }
+    **/
 
+    /**
+     * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
+     * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar_form() {
         $this->form_validation->set_rules('usuario', 'Nombre de Usuario', 'required|alpha_dash|callback_check_usuario');
         $this->form_validation->set_rules('nombres', 'Nombres', 'required');
@@ -247,6 +255,7 @@ class Autenticacion extends MY_Controller {
 
         echo json_encode($respuesta);
     }
+    */
 
     public function olvido() {        
         $data['title']='Olvide mi contraseña';
