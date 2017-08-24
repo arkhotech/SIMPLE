@@ -201,7 +201,7 @@ class Autenticacion extends MY_Controller {
         $this->load->view('autenticacion/login', $data);
     }
 
-    /**
+    /*
      * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
      * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar() {
@@ -209,9 +209,9 @@ class Autenticacion extends MY_Controller {
         $data['title'] = 'Registro';
         $this->load->view('autenticacion/registrar', $data);
     }
-    **/
+    */
 
-    /**
+    /*
      * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
      * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar_form() {
