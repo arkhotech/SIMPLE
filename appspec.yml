@@ -13,11 +13,6 @@ permissions:
     type:
      - file
 
-  - object: /home/simple/SIMPLE/simple-start.sh
-    mode: 775
-    type:
-     - file
-
   - object: /home/simple/SIMPLE
     pattern: "**"
     owner: simple
