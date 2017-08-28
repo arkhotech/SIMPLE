@@ -603,8 +603,7 @@ class API extends MY_BackendController {
         $this->crearRegistroAuditoria($nombre_proceso, $body, "ERROR");
         header("HTTP/1.1 ".$numero." ".$errorcodes[$numero]);
     }
-
-
+    
     private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
 
         $headers = $this->input->request_headers();
