@@ -3,18 +3,13 @@ os: linux
 files:
   - source: /   
     destination: /home/simple/SIMPLE
-
-permisions:
+    
+permissions:
   - object: /home/simple/SIMPLE
     pattern: "**"
     owner: simple
     group: simple
     mode: 765
-    type:
-     - file
-
-  - object: /home/simple/SIMPLE/simple-start.sh
-    mode: 775
     type:
      - file
 
