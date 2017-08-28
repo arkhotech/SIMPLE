@@ -298,7 +298,7 @@ class API extends MY_BackendController {
                                 $body['data'][$campo->nombre]['content']);
                 return $filename;//$body['data'][$campo->nombre]['nombre'];
             }else{
-                return (is_array($body['data'][$name])) ? json_encode($body['data'][$name]) : $body['data'][$name];
+                return (is_array($body['data'][$campo->nombre])) ? json_encode($body['data'][$campo->nombre]) : $body['data'][$campo->nombre];
             }
           }
         return "NE";
