@@ -90,8 +90,10 @@ class Acciones extends MY_BackendController {
             $accion=new AccionSoap();
         else if($tipo=='callback')
             $accion=new AccionCallback();
-        else if($tipo=='tramite_simple')
-            $accion=new AccionTramiteSimple();
+        else if($tipo=='iniciar_tramite')
+            $accion=new AccionIniciarTramite();
+        else if($tipo=='continuar_tramite')
+            $accion=new AccionContinuarTramite();
 
 
         $data['edit']=FALSE;
@@ -140,8 +142,10 @@ class Acciones extends MY_BackendController {
                 $accion=new AccionSoap();
             else if($this->input->post('tipo')=='callback')
                 $accion=new AccionCallback();
-            else if($this->input->post('tipo')=='tramite_simple')
-                $accion=new AccionTramiteSimple();
+            else if($this->input->post('tipo')=='iniciar_tramite')
+                $accion=new AccionIniciarTramite();
+            else if($this->input->post('tipo')=='continuar_tramite')
+                $accion=new AccionContinuarTramite();
             $accion->proceso_id=$this->input->post('proceso_id');
             $accion->tipo=$this->input->post('tipo');
         }
@@ -398,6 +402,27 @@ class Acciones extends MY_BackendController {
         }
 
         $json=json_encode($tareas_con_callback);
+
+        $respuesta = "{\"data\": ".$json."}";
+
+        log_message("INFO", "Respuesta json: ".$respuesta, FALSE);
+
+        echo $respuesta;
+        exit;
+    }
+
+    public function getTareasProceso(){
+        log_message('info','En getTareasProceso', FALSE);
+        $id_proceso = $this->input->post('idProceso');
+        log_message('info','Input: '.$id_proceso, FALSE);
+        $tareas = Doctrine::getTable('Proceso')->findTareasProceso($id_proceso);
+
+        foreach ($tareas as $tarea) {
+            log_message("INFO", "Id tarea: ".$tarea["id_tarea"], FALSE);
+            log_message("INFO", "Nombre tarea: ".$tarea["nombre"], FALSE);
+        }
+
+        $json=json_encode($tareas);
 
         $respuesta = "{\"data\": ".$json."}";
 

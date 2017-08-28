@@ -362,23 +362,26 @@ class Campo extends Doctrine_Record {
         }
        
         $return=array();
-        foreach ($campos as $campo) {
-            
-            $key= $campo->nombre;//$value['nombre'];
+        if(isset($campos)){
+            foreach ($campos as $campo) {
 
-            if($campo->tipo == 'file'){
-                $filename = 'uploads/datos/'.str_replace('"','',$value['valor']);
-                $data = file_get_contents($filename);
-                $return[$key]=base64_encode($data); 
-            }else if($campo->tipo == 'documento'){
-                $documento = Doctrine::getTable('Documento')->findOneByProcesoId($etapa->Tarea->proceso_id);              
-                $file = $documento->generar($etapa->id);
-                $data = file_get_contents('uploads/documentos/'.$file->filename);
-                $return[$key]= base64_encode($data);
-            }else{
-                $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa));
+                $key= $campo->nombre;//$value['nombre'];
+
+                if($campo->tipo == 'file'){
+                    //FIX valor
+                    $filename = 'uploads/datos/'.str_replace('"','',$value['valor']);
+                    $data = file_get_contents($filename);
+                    $return[$key]=base64_encode($data);
+                }else if($campo->tipo == 'documento'){
+                    $documento = Doctrine::getTable('Documento')->findOneByProcesoId($etapa->Tarea->proceso_id);
+                    $file = $documento->generar($etapa->id);
+                    $data = file_get_contents('uploads/documentos/'.$file->filename);
+                    $return[$key]= base64_encode($data);
+                }else{
+                    $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa));
+                }
+
             }
-
         }
         return $return;
     }

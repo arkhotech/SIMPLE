@@ -102,16 +102,15 @@ class AccionCallback extends Accion {
             }
             $uri = str_replace('"', '', $uri);
             
-
-            log_message('info',$this->varDump($output));
-
             $campo = new Campo();
             $data=$campo->obtenerResultados($etapa,$etapa['Tarea']['proceso_id']);
             $output['idInstancia']=$etapa['tramite_id'];
             $output['idTarea']=$etapa['Tarea']['id'];
             $output['callback-id']=$callback_id;
             $output['data']=$data;
-            
+
+            log_message('info',$this->varDump($output));
+
             $request=json_encode($output);
             log_message('info',$this->varDump($output));
             log_message('info',$this->varDump($request));

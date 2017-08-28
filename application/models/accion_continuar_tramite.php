@@ -1,17 +1,19 @@
 <?php
 require_once('accion.php');
 
-class AccionTramiteSimple extends Accion {
+class AccionContinuarTramite extends Accion {
 
     public function displaySecurityForm($proceso_id) {
 
-        log_message("INFO", "En accion trámite", FALSE);
+        log_message("INFO", "En accion continuar trámite", FALSE);
 
         $tramites_disponibles = Doctrine::getTable('Proceso')->findProcesosExpuestos("");
 
+        $tareas_proceso = Doctrine::getTable('Proceso')->findTareasProceso($proceso_id);
+
         $data = Doctrine::getTable('Proceso')->find($proceso_id);
         $conf_seguridad = $data->Admseguridad;
-        $display ='
+        /*$display ='
                 <label>Trámites disponibles</label>
                 <select id="tramiteSel" name="extra[tramiteSel]">
                     <option value="">Seleccione...</option>';
@@ -20,20 +22,24 @@ class AccionTramiteSimple extends Accion {
                     $display.='<option value="'.$tramite["id"].'">'.$tramite["nombre"].'</option>';
                 }
 
-        $display.='</select>';
+        $display.='</select>';*/
 
-        $display.= '
-            <p>
-                Si desea esperar la respuesta en alguna tarea con Callback, favor seleccionela del siguiente listado.
-            </p>
-        ';
+        /*$display.='
+                <label>Tareas disponibles del trámite para retorno</label>
+                <select id="tareaRetornoSel" name="extra[tareaRetornoSel]">';
+        $display.='</select>';*/
 
-        $display.='
-                <label>Tareas con Callback disponibles</label>
-                <select id="callbackSel" name="extra[callbackSel]">';
-        $display.='</select>';
+        /*$display.='
+                <label>Tarea desde la cual desea continuar el proceso</label>
+                <select id="tareaContinuarSel" name="extra[tareaContinuarSel]">
+                    <option value="">Seleccione...</option>';
 
-        $display.='
+                foreach ($tareas_proceso as $tarea) {
+                    $display.='<option value="'.$tarea["id"].'">'.$tarea["nombre"].'</option>';
+                }
+        $display.='</select>';*/
+
+        $display ='
             <div class="col-md-12" id="divObject">
                 <label>Request</label>
                 <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ form }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
@@ -48,10 +54,12 @@ class AccionTramiteSimple extends Accion {
 
     public function validateForm() {
         $CI = & get_instance();
-        $CI->form_validation->set_rules('extra[tramiteSel]', 'Trámite', 'required');
+        //$CI->form_validation->set_rules('extra[tramiteSel]', 'Trámite', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
+
+        log_message("INFO", "En ejecución continuar trámite", FALSE);
 
         $CI = & get_instance();
         // Se declara el tipo de seguridad segun sea el caso
@@ -59,6 +67,9 @@ class AccionTramiteSimple extends Accion {
             $r=new Regla($this->extra->request);
             $request=$r->getExpresionParaOutput($etapa->id);
         }
+
+        log_message("INFO", "Request: ".$request, FALSE);
+        //log_message("INFO", "Id trámite: ".$this->extra->tramiteSel, FALSE);
 
         //obtenemos el Headers si lo hay
         /*if(isset($this->extra->header)){
@@ -72,9 +83,22 @@ class AccionTramiteSimple extends Accion {
         try{
 
             $integracion = new FormNormalizer();
-            $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, 0, $request);
 
-            $response = "{\"respuesta_inicio\": ".$info_inicio."}";
+            log_message("INFO", "Continuar desde etapa_id: ".$etapa->id, FALSE);
+
+            $tramite_id=Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa("tramite_retorno",$etapa->id);
+            $tarea_id=Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa("tarea_retorno",$etapa->id);
+
+            log_message("INFO", "Continuar tramite_id: ".$tramite_id->valor, FALSE);
+            log_message("INFO", "Continuar tarea_id: ".$tarea_id->valor, FALSE);
+
+            $info_continuar = $integracion->continuarProceso($etapa->tramite_id, $tramite_id->valor, $tarea_id->valor, $request);
+
+            $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
+
+            log_message("INFO", "Response: ".$response_continuar, FALSE);
+
+            $response["respuesta_continuar"]=$response_continuar;
 
             foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);

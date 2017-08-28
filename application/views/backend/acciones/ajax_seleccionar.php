@@ -16,7 +16,8 @@
             <option value="rest">Consultar Rest</option>
             <option value="soap">Consultar Soap</option>
             <option value="callback">Generar Callback</option>
-            <option value="tramite_simple">Iniciar o Continuar Trámite</option>
+            <option value="iniciar_tramite">Iniciar Trámite</option>
+            <option value="continuar_tramite">Continuar Trámite</option>
         </select>
     </form>
 </div>
