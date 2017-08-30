@@ -21,6 +21,9 @@ if [ ! -d $INSTALL_HOME/docker-simple ]; then
     echo "Descargando codigo de simple"
     git clone $DOCKER_SIMPLE_URL
     chown -R simple:simple $INSTALL_HOME/docker-simple
+else
+    cd $INSTALL_HOME/docker-simple
+    git pull origin master	
 	
 fi
 

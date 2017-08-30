@@ -68,6 +68,49 @@ class UsuarioSesion {
 
         return FALSE;
     }
+    
+    /**
+     * Esta operación solo es usada por la API REST
+     * @param type $usuario_o_email
+     * @param type $password
+     * @return boolean
+     */
+    public static function registrarUsuario($usuario) {
+        
+        if($usuario == NULL){
+            return NULL;
+        }
+
+        $CI = & get_instance();
+        //No se valida el usuario por que se supone validado por la API
+        $users = Doctrine::getTable('Usuario')->findByUsuarioAndOpenId($usuario, 0);
+
+        if ($users->count()==0) {
+            $users = Doctrine::getTable('Usuario')->findByEmailAndOpenId($usuario, 0);
+        }
+echo "1";
+        if ($users->count()==0) {
+            return FALSE;
+        }
+
+        $u_input = FALSE;
+        foreach ($users as $u) {    //Se debe chequear en varias cuentas, ya que en las cuentas del legado (antiguas) podian haber usuarios con el mismo correo.
+            // this mutates (encrypts) the input password
+            $u_input = new Usuario();
+        }
+
+        if ($u_input) {
+            echo ".";
+            //Logueamos al usuario
+            $CI->session->set_userdata('usuario_id', $u_input->id);
+            self::$user = $u_input;
+
+            return TRUE;
+        }
+
+        return FALSE;
+    }
+    
 
     public static function validar_acceso($usuario_o_email, $password) {
         $users = Doctrine::getTable('Usuario')->findByUsuarioAndOpenId($usuario_o_email, 0);

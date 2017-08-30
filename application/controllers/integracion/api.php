@@ -2,6 +2,8 @@
 
 class API extends MY_BackendController {
     
+    private $userHeadersKeys = array('Rut','Nombres','Apellido-Paterno','Apellido-Materno','Email');
+    
     public function __construct() {
         parent::__construct();
     }
@@ -17,15 +19,7 @@ class API extends MY_BackendController {
     }
 
     /*
-     * Documentacion de la API
-     */
-    /*
-    public function index(){
-        $this->_auth();
 
-        $data['title']='API';
-        $data['content']='backend/api/index';
-        $this->load->view('backend/template',$data);
     }
     */
     private function obtenerRequestBody(){
@@ -89,24 +83,120 @@ class API extends MY_BackendController {
         }
     }
 
-    public function tramites($proceso_id, $etapa = null) {
+       
+   
+    /**
+     * Chequea los headers con los datos de identificación segun el tipo:
+     * 1.- Para clave unica
+     * 2.- Pâra usuario backend
+     * 
+     * @param type $tipo valor entre 1 y 2
+     */
+    private function checkIdentificationHeaders($id_etapa,$id_tarea){
+        
+        $etapa = Doctrine::getTable('Tarea')->findOneById($id_tarea);
+
+        if($etapa == NULL){
+            echo "Error";
+        }
+ 
+        $headers = $this->input->request_headers();
+        $method =  $this->router->fetch_method();
+        $restrict_ops = $this->config->item('restrictred_rest_ops');
+        $cu_keys = $this->userHeadersKeys;
+        
+        switch($etapa->acceso_modo){
+        case 'claveunica':
+            //print_r($headers);
+            foreach($cu_keys as $key){
+                
+                if(!key_exists($key,$headers)){
+                    header("HTTP/1.1 403 Forbiden. Headers Clave Unica no enviados");
+                    exit;
+                }
+            }
+            
+            $this->registerUserFromHeadersClaveUnica($headers);
+            if(UsuarioSesion::usuario()==NULL){
+                log_message('ERROR','No se pudo registrar el usuario Open ID',FALSE);
+                header("HTTP/1.1 500 Internal Server Error");
+                exit;     
+            };
+            break;
+        case 'registrados':
+        case 'grupos_usuarios':
+            if( $headers['User']==NULL || !UsuarioSesion::registrarusuario($headers['User'])){
+                header("HTTP/1.1 403 Forbiden");
+                exit;
+            }
+            
+            if( $etapa->acceso_modo==='grupos_usuarios'){
+                $usuarios = $etapa->getUsuariosFromGruposDeUsuarioDeCuenta();
+                foreach($usuarios as $user){
+                    if($headers['User']===$user->usuario){
+                        log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
+                        return TRUE;
+                    }
+                }      
+                //si no 
+            }else{
+                return TRUE;
+            }
+            
+            header("HTTP/1.1 403 Forbiden");
+            exit;
+        case 'publico':
+            break;
+        }
+          
+    }
+    
+    private function registerUserFromHeadersClaveUnica($headers){
+        log_message('INFO','Registrando cuenta clave unica ',FALSE);
+        $user =Doctrine::getTable('Usuario')->findOneByRut($headers['Rut']);
+        
+        if($user == NULL){  //Registrar el usuario
+            log_message('INFO','Registrando usuario: '.$headers['Rut'],FALSE);
+            $user = new Usuario();
+            $user->usuario = random_string('unique');
+            $user->setPasswordWithSalt(random_string('alnum', 32));
+            $user->rut = $headers['Rut'];
+            $user->nombres = $headers['Nombres'];
+            $user->apellido_paterno = $headers['Apellido-Paterno'];
+            $user->apellido_materno = $headers['Apellido-Materno'];
+            $user->email = $headers['Email'];
+            $user->open_id = TRUE;
+            $user->save();
+        }
+        $CI = & get_instance();
+        $CI->session->set_userdata('usuario_id', $user->id);
+         
+    }
+   
+    public function tramites($proceso_id=null, $etapa = null) {
        
         //Tomar los segmentos desde el 3 para adelante
         //$urlSegment = $this->uri->segments;
         //print_r($urlSegment);
         //$cuenta = Cuenta::cuentaSegunDominio();
-
+        
         switch($method = $this->input->server('REQUEST_METHOD')){
             case "GET":
                 $this->listarCatalogo();
                 break;
             case "PUT":
                 $this->checkJsonHeader();
+                $this->checkIdentificationHeaders($proceso_id,$etapa);
                 $this->continuarProceso($proceso_id,$this->obtenerRequestBody());
                 break;
             case "POST":
                 log_message("INFO", "inicio proceso", FALSE);
                 $this->checkJsonHeader();
+                $this->checkIdentificationHeaders($proceso_id,$etapa);
+                $this->iniciarProceso($proceso_id,$etapa,$this->obtenerRequestBody());
+                break;
+            default:
+                header("HTTP/1.1 405 Metodo no permitido");
                 $this->iniciarProceso($proceso_id,$etapa,$this->obtenerRequestBody());
                 break;
             default:
@@ -155,21 +245,22 @@ class API extends MY_BackendController {
 
         try{
             $input = json_decode($body,true);
-            log_message("INFO", "Input: ".$this->varDump($input), FALSE);
+            log_message("DEBUG", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
             if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
 
-            log_message("INFO", "inicio proceso", FALSE);
+            log_message("DEBUG", "inicio proceso", FALSE);
 
             UsuarioSesion::login('admin@admin.com', '123456');
 
-            log_message("INFO", "carga libreria", FALSE);
+            log_message("DEBUG", "carga libreria", FALSE);
             $this->load->library('SaferEval');
 
-            log_message("INFO", "inicia tramite", FALSE);
+            log_message("DEBUG", "inicia tramite", FALSE);
+            
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
              
@@ -181,7 +272,7 @@ class API extends MY_BackendController {
             if(array_key_exists('callback',$input)){
                 $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
             }
-
+            log_message("INFO", "Preparando respuesta: ".$proceso_id, FALSE);
             //validaciones etapa vencida, si existe o algo por el estilo
 
              $response = array(
@@ -289,11 +380,11 @@ class API extends MY_BackendController {
             if($campo->tipo === 'file'){
                 
                 $parts = explode(".",$body['data'][$campo->nombre]['nombre']);
-                $filename = $this->random_string(10).".". $this->random_string(2).".".
-                    $this->random_string(4).".".$parts[1];
+                $filename = random_string('alnum',10).".". random_string('alnum',2).".".
+                    random_string('alnum',4).".".$parts[1];
                 //$body['data'][$campo->nombre]['mime-type'];
                 //$body['data'][$campo->nombre]['content'];
-                $this->saveFile($filename, 
+                File::saveFile($filename, 
                                 $tramite_id, 
                                 $body['data'][$campo->nombre]['content']);
                 return $filename;//$body['data'][$campo->nombre]['nombre'];
@@ -556,54 +647,7 @@ class API extends MY_BackendController {
          $registro_auditoria->save();
     }
 
-    function throwError($numero,$mensaje,$nombre_proceso,$body){
-
-        $errorcodes = array(
-							200	=> 'OK',
-							201	=> 'Created',
-							202	=> 'Accepted',
-							203	=> 'Non-Authoritative Information',
-							204	=> 'No Content',
-							205	=> 'Reset Content',
-							206	=> 'Partial Content',
-
-							300	=> 'Multiple Choices',
-							301	=> 'Moved Permanently',
-							302	=> 'Found',
-							304	=> 'Not Modified',
-							305	=> 'Use Proxy',
-							307	=> 'Temporary Redirect',
-
-							400	=> 'Bad Request',
-							401	=> 'Unauthorized',
-							403	=> 'Forbidden',
-							404	=> 'Not Found',
-							405	=> 'Method Not Allowed',
-							406	=> 'Not Acceptable',
-							407	=> 'Proxy Authentication Required',
-							408	=> 'Request Timeout',
-							409	=> 'Conflict',
-							410	=> 'Gone',
-							411	=> 'Length Required',
-							412	=> 'Precondition Failed',
-							413	=> 'Request Entity Too Large',
-							414	=> 'Request-URI Too Long',
-							415	=> 'Unsupported Media Type',
-							416	=> 'Requested Range Not Satisfiable',
-							417	=> 'Expectation Failed',
-
-							500	=> 'Internal Server Error',
-							501	=> 'Not Implemented',
-							502	=> 'Bad Gateway',
-							503	=> 'Service Unavailable',
-							504	=> 'Gateway Timeout',
-							505	=> 'HTTP Version Not Supported'
-						);
-
-        $this->crearRegistroAuditoria($nombre_proceso, $body, "ERROR");
-        header("HTTP/1.1 ".$numero." ".$errorcodes[$numero]);
-    }
-    
+  
     private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
 
         $headers = $this->input->request_headers();
@@ -623,64 +667,5 @@ class API extends MY_BackendController {
 
         $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
                 $tipo.': Auditoría de llamados API',  json_encode($data));
-    }
-    function random_string($length) {
-        $key = '';
-        $keys = array_merge(range(0, 9));   //, range('a', 'z')
-
-        for ($i = 0; $i < $length; $i++) {
-            $key .= $keys[array_rand($keys)];
-        }
-
-        return $key;
-    }
-    
-    /**
-     * 
-     * @param type $tramite_id
-     * @param type $archivo
-     */
-    private function saveFile($filename,$tramite_id,$data){
-        
-        
-        $filename = mb_strtolower($filename);   //Lo convertimos a minusculas
-        $filename=  preg_replace('/\s+/', ' ', $filename);  //Le hacemos un trim
-        $filename = trim($filename);
-        $parts= explode(".",$filename);
-        
-        
-
-        $myfile = fopen("uploads/datos/".$filename, "w");
-        fwrite($myfile,  base64_decode($data));
-        fclose($myfile);
-        
-        // max file size in bytes
-        //$sizeLimit = 20 * 1024 * 1024;
-        //$uploader = new qqFileUploader($allowedExtensions, $sizeLimit);
-        //$result = $uploader->handleUpload('uploads/datos/');
-        log_message("info","Guardando archivo " + $filename);
-        $file=new File();
-        $file->tramite_id=$tramite_id;
-        $archivo=$filename;
-        $archivo = trim($archivo);
-        $archivo = str_replace(array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'), array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),$archivo);
-        $archivo = str_replace(array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'), array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),$archivo);
-        $archivo = str_replace(array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'), array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),$archivo);
-        $archivo = str_replace(array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'), array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'), $archivo);
-        $archivo = str_replace(array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),$archivo);
-        $archivo = str_replace(array('ñ', 'Ñ', 'ç', 'Ç'),array('n', 'N', 'c', 'C',), $archivo);
-        $archivo = str_replace(array("\\","¨","º","-","~","#","@","|","!","\"","·","$","%","&","/","(", ")","?","'","¡","¿","[","^","`","]","+","}","{","¨","´",">","< ",";", ",",":"," "),'',$archivo);  
-        //$file->filename=$result['file_name'];
-        $file->filename= $archivo;
-        $result['file_name']= $archivo;
-        $file->tipo='dato';
-        $file->llave=strtolower(random_string('alnum', 12));
-        $file->save();
-
-        $result['id']=$file->id;
-        $result['llave']=$file->llave;
-
-      
-    }
-    
+    }    
 }

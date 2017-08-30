@@ -127,7 +127,6 @@ class qqFileUploader {
         $pathinfo = pathinfo($this->file->getName());
         $filename = mb_strtolower($pathinfo['filename']);   //Lo convertimos a minusculas
         $filename=  preg_replace('/\s+/', ' ', $filename);  //Le hacemos un trim
-        
         $filename = trim($filename);
         $filename = str_replace(array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),$filename);
         $filename = str_replace(array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'), array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),$filename);
