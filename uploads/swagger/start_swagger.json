@@ -86,30 +86,46 @@
       }
     }
   },
-  "output": {
+  "response": {
     "type": "object",
     "properties": {
-      "codigo_retorno": {
-        "type": "integer"
-      },
-      "descripcion_retorno": {
+      "idInstancia": {
         "type": "string"
       },
-      "resultado": {
-        "type": "array",
+      "output": {
+        "type": "object",
         "items": {
-          "$ref": "#/definitions/obj_generico"
+          "$ref": "#/definitions/output"
         }
       },
-      "formularios": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/formulario"
+      "idEtapa": {
+        "type": "string"
+      },
+      "secuencia": {
+        "type": "integer"
+      },
+      "proximoFormulario": {
+        "type": "object",
+        "properties": {
+          "form": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "campos": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/campo"
+                }
+              }
+            }
+          }
         }
       }
     }
   },
-  "obj_generico": {
+  "output": {
     "type": "object",
     "properties": {
       "clave": {
@@ -117,20 +133,6 @@
       },
       "valor": {
         "type": "string"
-      }
-    }
-  },
-  "formulario": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "string"
-      },
-      "campos": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/campo"
-        }
       }
     }
   },
@@ -146,10 +148,10 @@
       "tipo": {
         "type": "string"
       },
-      "valor": {
-        "type": "string"
-      },
       "obligatorio": {
+        "type": "boolean"
+      },
+      "solo_lectura": {
         "type": "boolean"
       },
       "dominio_valores": {
@@ -157,6 +159,9 @@
         "items": {
           "$ref": "#/definitions/valores_control"
         }
+      },
+      "valor": {
+        "type": "string"
       }
     }
   },

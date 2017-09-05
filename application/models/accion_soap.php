@@ -212,5 +212,5 @@ class AccionSoap extends Accion {
         }
         return $d;
     }
-    
+
 }
