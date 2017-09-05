@@ -2,7 +2,7 @@
 
 class API extends MY_BackendController {
     
-    private $userHeadersKeys = array('Rut','Nombres','Apellido-Paterno','Apellido-Materno','Email');
+    private $userHeadersKeys = array('Rut','Nombres','Email');
     
     public function __construct() {
         parent::__construct();
@@ -26,23 +26,28 @@ class API extends MY_BackendController {
         return file_get_contents('php://input');
     }
 
-    /*
+    /**
      * Llamadas de la API
      * Tramote id es el identificador del proceso
+     *
+     * 
+     * @param type $operacion Operación que se ejecutara. Corresponde al tercer segmebto de la URL
+     * @param type $id_proceso
+     * @param type $id_tarea
+     * @param type $id_paso
      */
 
-    public function especificacion($operacion ,$id_tramite,$id_tarea = NULL,$id_paso = NULL){
+    public function especificacion($operacion ,$id_proceso,$id_tarea = NULL,$id_paso = NULL){
 
         //Cheque que la URL se complete correctamente
         if($operacion!= "servicio" && $operacion!= "form"){
-            echo "$operacion";die;
             show_error("404 No encontrado",404, "La operación no existe" );
             exit;
         }
 
         switch($this->input->server('REQUEST_METHOD')){
             case "GET":
-                $this->generarEspecificacion($operacion,$id_tramite,$id_tarea,$id_paso);
+                $this->generarEspecificacion($operacion,$id_proceso,$id_tarea,$id_paso);
                 break;
             default:
                 show_error("405 Metodo no permitido",405, "El metodo no esta implementado" );
@@ -83,31 +88,30 @@ class API extends MY_BackendController {
         }
     }
 
-       
-   
     /**
-     * Chequea los headers con los datos de identificación segun el tipo:
-     * 1.- Para clave unica
-     * 2.- Pâra usuario backend
+     * Realiza un check de los headers para degerminar a quien están asignados
      * 
-     * @param type $tipo valor entre 1 y 2
+     * @param type $etapa
+     * @param type $id_tarea
+     * @return boolean
      */
-    private function checkIdentificationHeaders($id_etapa,$id_tarea){
+    private function checkIdentificationHeaders($id_tarea){
+        log_message('INFO','checkIdentificationHeaders',FALSE);
+        $tarea = Doctrine::getTable('Tarea')->findOneById($id_tarea);
         
-        $etapa = Doctrine::getTable('Tarea')->findOneById($id_tarea);
-
-        if($etapa == NULL){
-            echo "Error";
+        if($tarea == NULL ){
+            error_log("etapa debe ser una instancia de Etapa");
+            header("HTTP/1.1 500 Internal servel error. Etapa no existe");
+           exit;
         }
  
         $headers = $this->input->request_headers();
         $method =  $this->router->fetch_method();
         $restrict_ops = $this->config->item('restrictred_rest_ops');
         $cu_keys = $this->userHeadersKeys;
-        
-        switch($etapa->acceso_modo){
+        log_message('DEBUG','Check modo',FALSE);
+        switch($tarea->acceso_modo){
         case 'claveunica':
-            //print_r($headers);
             foreach($cu_keys as $key){
                 
                 if(!key_exists($key,$headers)){
@@ -125,13 +129,17 @@ class API extends MY_BackendController {
             break;
         case 'registrados':
         case 'grupos_usuarios':
-            if( $headers['User']==NULL || !UsuarioSesion::registrarusuario($headers['User'])){
+            
+            if( !key_exists('User', $headers) || !UsuarioSesion::registrarUsuario($headers['User'])){
+                error_log("No existe el usuario o no viene el header");
                 header("HTTP/1.1 403 Forbiden");
                 exit;
             }
-            
-            if( $etapa->acceso_modo==='grupos_usuarios'){
-                $usuarios = $etapa->getUsuariosFromGruposDeUsuarioDeCuenta();
+            log_message('DEBUG','recuperando usuarios',FALSE);
+            if( $tarea->acceso_modo==='grupos_usuarios'){
+                log_message('DEBUG',$tarea->id);
+                $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
+                
                 foreach($usuarios as $user){
                     if($headers['User']===$user->usuario){
                         log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
@@ -161,9 +169,14 @@ class API extends MY_BackendController {
             $user->usuario = random_string('unique');
             $user->setPasswordWithSalt(random_string('alnum', 32));
             $user->rut = $headers['Rut'];
-            $user->nombres = $headers['Nombres'];
-            $user->apellido_paterno = $headers['Apellido-Paterno'];
-            $user->apellido_materno = $headers['Apellido-Materno'];
+            $nombres = explode(";",$headers['Nombres']);
+            if(count($nombres)< 3 ){
+                header("HTTP/1.1 403 Forbiden. Credenciales incompletas");
+                exit;
+            }
+            $user->nombres = $nombres[0];//$headers['Nombres'];
+            $user->apellido_paterno = $nombres[1]; //$headers['Apellido-Paterno'];
+            $user->apellido_materno = $nombres[2];//$headers['Apellido-Materno'];
             $user->email = $headers['Email'];
             $user->open_id = TRUE;
             $user->save();
@@ -172,47 +185,91 @@ class API extends MY_BackendController {
         $CI->session->set_userdata('usuario_id', $user->id);
          
     }
-   
-    public function tramites($proceso_id=null, $etapa = null) {
-       
-        //Tomar los segmentos desde el 3 para adelante
-        //$urlSegment = $this->uri->segments;
-        //print_r($urlSegment);
-        //$cuenta = Cuenta::cuentaSegunDominio();
-        
+    
+    public function procesos(){
         switch($method = $this->input->server('REQUEST_METHOD')){
             case "GET":
+                $this->registrarAuditoria(null, 'Obtener Catalogo',"Catalogo");
                 $this->listarCatalogo();
                 break;
+            default:
+                header("HTTP/1.1 405 Metodo no permitido");
+                exit;
+        }
+    }
+   
+    /**
+     * 
+     * @param type $etapa_id
+     * @param type $operacion
+     * @param type $nombre_proceso
+     */
+    public function registrarAuditoria($etapa_id,$operacion,$nombre_proceso = NULL){
+        $nombre_etapa = $nombre_proceso;
+        $etapa = NULL;
+        if($etapa_id != NULL){
+            $etapa = Doctrine::getTable('Tarea')->findOneById($etapa_id);
+            $nombre_etapa = ($etapa!= NULL) ? $etapa->nombre : "Catalogo";
+            
+        }
+        $headers = $this->input->request_headers();
+        $new_headers = array('host' => $headers['Host'],
+            'Origin' => $headers['Origin'],
+            'largo-mensaje' => $headers['Content-Length'],
+            'Content-type' => $headers['Content-type'],
+            'http-Method' =>  $this->input->server('REQUEST_METHOD')) ;
+
+        $data['headers'] = $new_headers;
+        
+        if(isset($headers['User']) && $nombre_etapa != NULL ){ //Comprobar que exista el header y etapa
+                   
+            $data['Credenciales'] = 
+                    array("Metodo de acceso" => $etapa->acceso_modo,
+                          "Username" =>
+                        ($etapa->acceso_modo == 'claveunica') 
+                        ? $headers['Rut']:$headers['User']);
+        }
+        //Recuperar el nombre para el regisrto
+        log_message('DEBUG',"Recuperando credencial de identificación para auditoría");
+
+        AuditoriaOperaciones::registrarAuditoria($nombre_etapa,$operacion, 
+                "Auditoria de llamados a API REST", json_encode($data));
+    }
+    
+    
+    
+    public function tramites($proceso_tramite_id=null, $etapa_tarea_id = null,$secuencia=null) {
+        /*
+         * Auditar entradas
+         */
+        //
+        
+        switch($method = $this->input->server('REQUEST_METHOD')){
             case "PUT":
                 $this->checkJsonHeader();
-                $this->checkIdentificationHeaders($proceso_id,$etapa);
-                $this->continuarProceso($proceso_id,$this->obtenerRequestBody());
+                $etapa = Doctrine::getTable('Etapa')->findOneById($etapa_tarea_id);
+                $this->checkIdentificationHeaders($etapa->tarea_id);
+                //$etapa_id,$operacion,$nombre_proceso = NULL
+                $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites");
+                $this->continuarProceso($proceso_tramite_id,$etapa_tarea_id,$secuencia,$this->obtenerRequestBody());
                 break;
             case "POST":
                 log_message("INFO", "inicio proceso", FALSE);
                 $this->checkJsonHeader();
-                $this->checkIdentificationHeaders($proceso_id,$etapa);
-                $this->iniciarProceso($proceso_id,$etapa,$this->obtenerRequestBody());
+                log_message("INFO", "Call check headers", FALSE);
+                $this->checkIdentificationHeaders($etapa_tarea_id);
+                $this->registrarAuditoria($etapa_tarea_id,"Iniciar Tramite","Tramites");
+                $this->iniciarProceso($proceso_tramite_id,$etapa_tarea_id,$this->obtenerRequestBody());
                 break;
             default:
                 header("HTTP/1.1 405 Metodo no permitido");
-                $this->iniciarProceso($proceso_id,$etapa,$this->obtenerRequestBody());
                 break;
-            default:
-                header("HTTP/1.1 405 Metodo no permitido");
         }
 
     }
-
-
-    public function inicioProcesoSimple($proceso_id, $etapa, $body) {
-
-                log_message("INFO", "inicio proceso", FALSE);
-                $this->iniciarProceso($proceso_id,$etapa,$body);
-
-    }
-
+    /**
+     * Operación que despliega lista de servicios.
+     */
     private function listarCatalogo(){
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(UsuarioBackendSesion::usuario()->cuenta_id);
         $result = array();
@@ -230,14 +287,22 @@ class API extends MY_BackendController {
             ));
         }
        $retval["catalogo"] = $result;
+       
        header('Content-type: application/json');
        echo json_indent(json_encode($retval));
        exit;
     }
-
+    /**
+     * Inicia un proceso simple
+     * 
+     * @param type $proceso_id
+     * @param type $id_tarea
+     * @param type $body
+     * @return type
+     */
     private function iniciarProceso($proceso_id, $id_tarea, $body){
         //validar la entrada
-
+        
         if($proceso_id == NULL || $id_tarea == NULL){
             header("HTTP/1.1 400 Bad Request");
             return;
@@ -253,17 +318,10 @@ class API extends MY_BackendController {
             }
 
             log_message("DEBUG", "inicio proceso", FALSE);
-
-            UsuarioSesion::login('admin@admin.com', '123456');
-
-            log_message("DEBUG", "carga libreria", FALSE);
-            $this->load->library('SaferEval');
-
-            log_message("DEBUG", "inicia tramite", FALSE);
             
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
-             
+            
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
 
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
@@ -289,21 +347,18 @@ class API extends MY_BackendController {
 
     }
 
-    private function continuarProceso($id_proceso, $body){
+    private function continuarProceso($id_proceso,$id_etapa,$secuencia, $body){
 
         log_message("INFO", "En continuar proceso, input data: ".$body);
 
         try{
             $input = json_decode($body,true);
 
-            if(!isset($input["idEtapa"]) || !isset($input["secuencia"])){
+            if($id_etapa == NULL || $id_secuencia=NULL ){
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
             //Obtener el nombre del proceso
-            //$this->crearRegistroAuditoria($nombre_proceso, $body);
-            $id_etapa = $input["idEtapa"];
-            $secuencia = $input["secuencia"];
 
             log_message("INFO", "id_etapa: ".$id_etapa);
             log_message("INFO", "secuencia: ".$secuencia);
@@ -433,7 +488,7 @@ class API extends MY_BackendController {
             exit;
         }
 
-        $this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body);
+        //$this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body);
 
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
@@ -629,43 +684,25 @@ class API extends MY_BackendController {
         return $etapas;
     }
 
-    private function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
-         $fecha = new DateTime();
-         $registro_auditoria = new AuditoriaOperaciones ();
-         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-         $registro_auditoria->operacion = $operacion;
-         $usuario = UsuarioBackendSesion::usuario ();
-            // Se necesita cambiar el usuario al usuario público.
-         $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
-         $registro_auditoria->proceso = $proceso_nombre;
-         $registro_auditoria->cuenta_id = 1;
-         $registro_auditoria->motivo = $motivo;
-
-         //unset($accion_array['accion']['proceso_id']);
-         $registro_auditoria->detalles= 'Detalles';
-         $registro_auditoria->detalles=  $detalles;//json_encode($accion_array);
-         $registro_auditoria->save();
-    }
-
   
-    private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
-
-        $headers = $this->input->request_headers();
-        $new_headers = array('host' => $headers['Host'],
-              'Origin' => $headers['Origin'],
-            'largo-mensaje' => $headers['Content-Length'],
-            'Content-type' => $headers['Content-type']);
-
-        $data['headers'] = $new_headers;
-        $data['input'] = $body['data'];
-        
-        if(array_key_exists('callback', $body)){
-            $data['response_data'] = 
-                array("Callback url" => $body['callback'],
-                     "Callback id" => $body['callback-id']);
-        }
-
-        $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
-                $tipo.': Auditoría de llamados API',  json_encode($data));
-    }    
+//    private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
+//
+//        $headers = $this->input->request_headers();
+//        $new_headers = array('host' => $headers['Host'],
+//              'Origin' => $headers['Origin'],
+//            'largo-mensaje' => $headers['Content-Length'],
+//            'Content-type' => $headers['Content-type']);
+//
+//        $data['headers'] = $new_headers;
+//        $data['input'] = $body['data'];
+//        
+//        if(array_key_exists('callback', $body)){
+//            $data['response_data'] = 
+//                array("Callback url" => $body['callback'],
+//                     "Callback id" => $body['callback-id']);
+//        }
+//
+//        AuditoriaOperaciones::registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
+//                $tipo.': Auditoría de llamados API',  json_encode($data));
+//    }    
 }

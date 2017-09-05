@@ -34,7 +34,6 @@ class Tramite extends Doctrine_Record {
     }
 
     public function iniciar($proceso_id) {
-    	
     	// Aumentar el contador de Proceso
     	Doctrine_Query::create()
     	->update('Proceso p')

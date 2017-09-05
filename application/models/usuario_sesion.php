@@ -13,7 +13,7 @@ class UsuarioSesion {
         if (!isset(self::$user)) {
 
             $CI = & get_instance();
-
+            
             if (!$user_id = $CI->session->userdata('usuario_id')) {
                 return FALSE;
             }
@@ -76,7 +76,7 @@ class UsuarioSesion {
      * @return boolean
      */
     public static function registrarUsuario($usuario) {
-        
+        log_message('INFO',"UsuarioSesion - Registrando usuario ".$usuario);
         if($usuario == NULL){
             return NULL;
         }
@@ -88,19 +88,20 @@ class UsuarioSesion {
         if ($users->count()==0) {
             $users = Doctrine::getTable('Usuario')->findByEmailAndOpenId($usuario, 0);
         }
-echo "1";
         if ($users->count()==0) {
             return FALSE;
         }
-
+        //Usuarios validados en cuanto a existencia de la cuenta
+        
         $u_input = FALSE;
-        foreach ($users as $u) {    //Se debe chequear en varias cuentas, ya que en las cuentas del legado (antiguas) podian haber usuarios con el mismo correo.
-            // this mutates (encrypts) the input password
-            $u_input = new Usuario();
+        foreach ($users as $u) { 
+            if( $u->usuario == $usuario || $u->email == $usuario){
+                $u_input = $u;
+                break;
+            }
         }
 
         if ($u_input) {
-            echo ".";
             //Logueamos al usuario
             $CI->session->set_userdata('usuario_id', $u_input->id);
             self::$user = $u_input;
