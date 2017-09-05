@@ -43,7 +43,20 @@ class AccionRest extends Accion {
         $display.= '<label>Timeout</label>';
         $display.='<input type="text" placeholder="Tiempo en segundos..." name="extra[timeout]" value="' . ($this->extra ? $this->extra->timeout : '') . '" />';
 
-        $display.='
+        $display.= '<label>N&uacute;mero reintentos</label>';
+        $display.='<input type="text" name="extra[timeout_reintentos]" value="' . ($this->extra ? $this->extra->timeout_reintentos : '3') . '" />';
+
+        if ($this->extra->tipoMetodo && ($this->extra->tipoMetodo == "PUT" || $this->extra->tipoMetodo == "POST")){
+            $display.='
+            <div class="col-md-12" id="divObject">
+                <label>Request</label>
+                <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
+                <br />
+                <span id="resultRequest" class="spanError"></span>
+                <br /><br />
+            </div>';
+        }else{
+            $display.='
             <div class="col-md-12" id="divObject" style="display:none;">
                 <label>Request</label>
                 <textarea id="request" name="extra[request]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge">' . ($this->extra ? $this->extra->request : '') . '</textarea>
@@ -51,6 +64,7 @@ class AccionRest extends Accion {
                 <span id="resultRequest" class="spanError"></span>
                 <br /><br />
             </div>';
+        }
         $display.='
             <div class="col-md-12">
                 <label>Header</label>
@@ -208,6 +222,32 @@ class AccionRest extends Accion {
             }
             //Se obtiene la codigo de la cabecera HTTP
             $debug = $CI->rest->debug();
+            log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
+            //se verifica si existe numero de reintentos
+            if(isset($this->extra->timeout_reintentos) && $debug['error_code'] == '28'){
+                log_message("INFO", "Reintentando ".$this->extra->timeout_reintentos." veces.", FALSE);
+                $intentos = 1;
+                while($intentos < $this->extra->timeout_reintentos && $debug['error_code'] == '28'){
+                    log_message("INFO", "Reintento Nro: ".$intentos, FALSE);
+                    if($this->extra->tipoMetodo == "GET"){
+                        $CI->rest->initialize($config);
+                        $result = $CI->rest->get($uri, array() , 'json');
+                    }else if($this->extra->tipoMetodo == "POST"){
+                        $CI->rest->initialize($config);
+                        $result = $CI->rest->post($uri, $request, 'json');
+                    }else if($this->extra->tipoMetodo == "PUT"){
+                        $CI->rest->initialize($config);
+                        $result = $CI->rest->put($uri, $request, 'json');
+                    }else if($this->extra->tipoMetodo == "DELETE"){
+                        $CI->rest->initialize($config);
+                        $result = $CI->rest->delete($uri, $request, 'json');
+                    }
+                    $debug = $CI->rest->debug();
+                    log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
+                    $intentos++;
+                }
+            }
+
             if($debug['info']['http_code']=='204'){
                 $result2['code']= '204';
                 $result2['des_code']= 'No Content';
@@ -233,6 +273,7 @@ class AccionRest extends Accion {
                 $dato->save();
             }
         }catch (Exception $e){
+            log_message("INFO", "Error: ".$this->varDump($e), FALSE);
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();

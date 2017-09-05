@@ -111,6 +111,13 @@ class AccionContinuarTramite extends Accion {
             }
         }catch (Exception $e){
             log_message("ERROR", $e->getCode().": ".$e->getMessage(), true);
+            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_continuar_simple",$etapa->id);
+            if(!$dato)
+                $dato=new DatoSeguimiento();
+            $dato->nombre="error_continuar_simple";
+            $dato->valor=$e->getCode().": ".$e->getMessage();
+            $dato->etapa_id=$etapa->id;
+            $dato->save();
         }
     }
 

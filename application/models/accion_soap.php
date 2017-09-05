@@ -16,8 +16,13 @@ class AccionSoap extends Accion {
                     <a class="btn btn-default" id="btn-consultar" ><i class="icon-search icon"></i> Consultar</a>
                     <a class="btn btn-default" href="#modalImportarWsdl" data-toggle="modal" ><i class="icon-upload icon"></i> Importar</a>
                 </div>';
+
         $display.= '<label>Timeout</label>';
         $display.='<input type="text" placeholder="Tiempo en segundos..." name="extra[timeout]" value="' . ($this->extra ? $this->extra->timeout : '') . '" />';
+
+        $display.= '<label>N&uacute;mero reintentos</label>';
+        $display.='<input type="text" name="extra[timeout_reintentos]" value="' . ($this->extra ? $this->extra->timeout_reintentos : '3') . '" />';
+
         $display.='
                 <div id="divMetodos" class="col-md-12">
                     <label>Métodos</label>
@@ -130,7 +135,22 @@ class AccionSoap extends Accion {
             
             //Se EJECUTA el llamado Soap
             $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
-            $error = $client->getError(); 
+            $error = $client->getError();
+            log_message("INFO", "Error SOAP ".$this->varDump($error), FALSE);
+
+            //se verifica si existe numero de reintentos
+            if(isset($error) && strpos($error, 'timed out') !== false){
+                log_message("INFO", "Reintentando ".$this->extra->timeout_reintentos." veces.", FALSE);
+                $intentos = 1;
+                while($intentos < $this->extra->timeout_reintentos && strpos($error, 'timed out') !== false){
+                    log_message("INFO", "Reintento Nro: ".$intentos, FALSE);
+                    $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
+                    $error = $client->getError();
+                    log_message("INFO", "Error SOAP ".$error, FALSE);
+                    $intentos++;
+                }
+            }
+
             if ($error){
                 $result['response_soap']= $error;   
             }else{
@@ -157,6 +177,7 @@ class AccionSoap extends Accion {
                     $dato->save();
             }
         }catch (Exception $e){
+            log_message("INFO", "Exception: ".$this->varDump($e), FALSE);
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
