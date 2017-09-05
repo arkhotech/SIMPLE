@@ -135,6 +135,7 @@ class AccionSoap extends Accion {
             
             //Se EJECUTA el llamado Soap
             $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
+
             $error = $client->getError();
             log_message("INFO", "Error SOAP ".$this->varDump($error), FALSE);
 
@@ -151,42 +152,42 @@ class AccionSoap extends Accion {
                 }
             }
 
+            log_message('info', 'Result: '.$this->varDump($result), FALSE);
+            log_message('info', 'Client data: '.$this->varDump($client->document), FALSE);
+
             if ($error){
                 $result['response_soap']= $error;   
             }else{
-                $result['response_soap']= $client->response; 
+                $result['response_soap']= $this->utf8ize($result);
+                //$result['response_soap']= $client->response;
             }
 
 
             foreach($result as $key=>$value){
-                //$xml=simplexml_load_string($value);
-                /*if($xml){
-                    log_message('info', 'ES UN XML ::::::::::::::::::::::::::::: '.$this->varDump(" ::::::::::::: ES XML "), FALSE);                    
-                    $valor = get_object_vars($xml);
-                }else{
-                    log_message('info', 'NO ES XML ::::::::::::::::::::::::::::: '.$this->varDump(" :::::::::::::::: NO ES XML"), FALSE); 
-                    $valor = json_encode($value);
-                    log_message('info', 'object: '.$this->varDump($valor), FALSE); 
-                }*/
+
+                log_message('info', 'key '.$key.': '.$this->varDump($value), FALSE);
+
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+
                 if(!$dato)
                     $dato=new DatoSeguimiento();
-                    $dato->nombre=$key;
-                    $dato->valor=$value;
-                    $dato->etapa_id=$etapa->id;
-                    $dato->save();
+                $dato->nombre=$key;
+                $dato->valor=$value;
+                $dato->etapa_id=$etapa->id;
+                $dato->save();
             }
         }catch (Exception $e){
             log_message("INFO", "Exception: ".$this->varDump($e), FALSE);
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
-                $dato->nombre="error_soap";
-                $dato->valor=$e;
-                $dato->etapa_id=$etapa->id;
-                $dato->save();
+            $dato->nombre="error_soap";
+            $dato->valor=$e;
+            $dato->etapa_id=$etapa->id;
+            $dato->save();
         }
     }
+
     function varDump($data){
         ob_start();
         //var_dump($data);
@@ -195,4 +196,21 @@ class AccionSoap extends Accion {
         ob_end_clean();
         return $ret_val;
     }
+
+    private function utf8ize($d) {
+        try{
+            if (is_array($d))
+                foreach ($d as $k => $v)
+                    $d[$k] = $this->utf8ize($v);
+            else if(is_object($d))
+                foreach ($d as $k => $v)
+                    $d->$k = $this->utf8ize($v);
+            else
+                return utf8_encode($d);
+        }catch (Exception $e){
+            log_message('info', 'Exception utf8ize: '.$this->varDump($e), FALSE);
+        }
+        return $d;
+    }
+    
 }
