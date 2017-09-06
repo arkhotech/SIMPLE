@@ -42,6 +42,10 @@
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webservice-soap" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
+        <?php } else if ($tipo == "callback") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#callback" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
         <?php } ?>
         </legend>
         <div class="validacion"></div>

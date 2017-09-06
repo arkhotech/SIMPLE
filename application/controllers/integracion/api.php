@@ -460,10 +460,6 @@ class API extends MY_BackendController {
 
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
         
-        $respuesta = new stdClass();
-        $validar_formulario = FALSE;
-        // Almacenamos los campos
-
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
         if (!$etapa) {
@@ -487,8 +483,6 @@ class API extends MY_BackendController {
             exit;
         }
 
-        //$this->crearRegistroAuditoria($etapa->Tarea->Proceso->nombre,$body);
-
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
             $paso = $etapa->getPasoEjecutable($secuencia);
@@ -501,10 +495,35 @@ class API extends MY_BackendController {
                 $formulario = $paso->Formulario;
                 $modo = $paso->modo;
 
-                //TODO validar campos de formulario
-                $respuesta = new stdClass();
-                $validar_formulario = FALSE;
-                // Almacenamos los campos
+                log_message("INFO", "Validando campos del formulario", FALSE);
+                $valida_formulario = TRUE;
+                if ($modo == 'edicion') {
+                    log_message("INFO", "Entra en modo edición", FALSE);
+                    foreach ($formulario->Campos as $c) {
+                        // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+                        log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
+                        log_message("INFO", "Campo validacion: ".$this->varDump($c->validacion), FALSE);
+
+                        if(count($c->validacion) > 0){
+                            foreach ($c->validacion as $validacion) {
+                                log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
+                                if($validacion == "required"){
+                                    $valor = $this->extractVariable($body,$c,$etapa->tramite_id);
+                                    log_message("INFO", "Valor para campo: " . $valor, FALSE);
+                                    if($valor == "NE"){
+                                        $valida_formulario = FALSE;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!$valida_formulario) {
+                    header("HTTP/1.1 400 Favor verificar parametros requeridos.");
+                    exit;
+                }
 
                 foreach ($formulario->Campos as $c) {
                     // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
