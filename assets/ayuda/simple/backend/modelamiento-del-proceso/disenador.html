@@ -103,18 +103,20 @@
 <p> </p>
 <p><strong>Forma de configuración y parametrización:</strong></p>
 <p>Haga doble clic sobre la tarea que desea configurar existente en hoja de trabajo. Al hacer esto se abrirá una pantalla que permitirá Editar la Tarea, tal como se ve en la siguiente imagen:</p>
-<p> <img style="display: block; margin-left: auto; margin-right: auto;" src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/Editar Tarea-Definicion.png" alt="" width="481" height="196" /></p>
+<p> <img style="display: block; margin-left: auto; margin-right: auto;" src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/editar_tarea.png" alt="" width="481" height="196" /></p>
 <p> La edición de tareas se encuentra subdividida en 6 pestañas, explicadas a continuación:</p>
 <p> </p>
 <h4 id="pestana_definicion">Pestaña Definición</h4>
 <p style="padding-left: 30px;">1. Pestaña Definición: en esta pestaña podrá definir el nombre de la tarea, y si corresponde a una tarea inicial y/o final. Considere que siempre debe existir una tarea inicial en su modelo de procesos siendo única, mientras que pude definir una o múltiples tareas de fin, una vez realizado los cambios haga clic en Guardar. A continuación un ejemplo de la visualización de la Pestaña Definición:</p>
-<p style="text-align: center;"><img src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/Editar Tarea-Definicion.png" alt="" width="481" height="196" /> </p>
+<p style="text-align: center;"><img src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/editar_tarea.png" alt="" width="481" height="196" /> </p>
 <p class="justifyleft">Existen 3 formas de activar o desactivar tareas, siendo las siguiente:</p>
 <ul>
 <li>Tarea activada: permite tener activa la tarea perdiendo su ejecución.</li>
 <li>Tarea activa entre fechas: Permite activar la tarea en periodos de tiempo seleccionados, fecha inicial y fecha final.</li>
 <li>Tarea desactivada: Permite tener desactivada la tarea impidiendo su ejecución, las tareas que están desactivadas no son visibles en el tramitador.</li>
 </ul>
+<p class="justifyleft">Adicionalmente, existe también la posibilidad de exponer el trámite para que sea accesible por otros BPMS o sistemas externos, esto solo se puede realizar en una tarea que es marcada como tarea de inicio, lo cual se muestra en la siguiente imagen:</p>
+<p style="text-align: center;"><img src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/editar_tarea_tramite.png" alt="" width="481" height="196" /> </p>
 <h4 id="pestana_asignacion">Pestana Asignación</h4>
 <p style="padding-left: 30px;">2. Pestaña Asignación: en esta pestaña, podrá definir la forma de asignar responsables a la tarea e indicar si requiere notificar mediante correo electrónico al o los responsables asignados, pudiendo ser un usuario en particular o un grupo de usuarios.</p>
 <p> </p>
@@ -164,6 +166,11 @@
 <p style="padding-left: 30px;">7. Pestaña Otros: la funcionalidad de la pestaña otros, permite almacenar con un identificador único al usuario que inició la tarea en una variable, esta opción es útil cuando al finalizar el proceso se debe contactar y/o entregar algún certificado al usuario que solicito la información.</p>
 <p> <img style="display: block; margin-left: auto; margin-right: auto;" src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/diseñadorf11.png" alt="" width="419" height="127" /></p>
 <p>  </p>
+
+	<h4 id="pestana_datos">Pestaña Datos</h4>
+	<p style="padding-left: 30px;">8. Pestaña Datos: la funcionalidad de la pestaña datos, permite especificar los datos que serán entregados como resultado de la ejecución de la tarea a través del API REST de SIMPLE.</p>
+	<p> <img style="display: block; margin-left: auto; margin-right: auto;" src="../../../assets/img/BackEnd/Modelamiento de Proceso/Diseñador/tab_datos.png" alt="" width="419" height="127" /></p>
+	<p>  </p>
 </td>
 </tr>
 <tr>

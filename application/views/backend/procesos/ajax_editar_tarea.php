@@ -604,7 +604,10 @@
                     </script>
 
                     <div class="row-fluid">
-                        <div class="span6"><h5>Variables de formulario</h5></div>
+                        <div class="span6"><h5>Variables de formulario
+                            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#pestana_datos" target="_blank">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                            </a></h5></div>
                         <div class="span6"><h5>Variables de proceso</h5></div>
                     </div>
                     <div class="row-fluid">
