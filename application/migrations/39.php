@@ -23,16 +23,19 @@ class Migration_39 extends Doctrine_Migration_Base {
             )
         );
 
-        $this->createTable('seguridad', $columns, array('primary' => array('id'))); 
-        $this->createForeignKey( 'fk_trigger_proceso1_idx', 'fk_trigger_proceso2', array(
+        $this->createTable('seguridad', $columns, array('primary' => array('id')));
+    }
+
+    public function postUp() {
+        $this->createForeignKey( 'seguridad', 'fk_trigger_proceso2', array(
                 'local'        => 'proceso_id',
                 'foreign'      => 'id',
                 'foreignTable' => 'proceso',
                 'onUpdate'     => 'CASCADE',
-                'onDelete'     => 'CASCADE',
+                'onDelete'     => 'CASCADE'
             )
         );
-    }  
+    }
 
     public function down() {
         $this->dropTable('seguridad');
