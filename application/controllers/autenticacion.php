@@ -59,12 +59,23 @@ class Autenticacion extends MY_Controller {
         $flow = new Basic($this->authConfig);
         $token = $flow->getAccessToken($_GET['code']);
         $infoPersonal = $flow->getUserInfo($token);
-        $rut = $infoPersonal['RUT'];
-        $rut = str_replace(".", "", $rut);
+        log_message('debug', 'infoPersonal: ' . json_encode($infoPersonal));
+        $infoPer = json_encode($flow->getUserInfo($token));
+        $rut = $infoPersonal['RolUnico']['numero'] . '-' . $infoPersonal['RolUnico']['DV'];
+        log_message('debug','rut: ' . $rut);
+        $nombres = implode(" ", $infoPersonal['name']['nombres']);
+        $apellidoPaterno = $infoPersonal['name']['apellidos'][0];
+        $apellidoMaterno = $infoPersonal['name']['apellidos'][1];
+
         $CI = & get_instance();
         $CI->session->set_flashdata('openidcallback',1);
         $CI->session->set_flashdata('rut',$rut);
+        $CI->session->set_flashdata('nombres', $nombres);
+        $CI->session->set_flashdata('apellidoPaterno', $apellidoPaterno);
+        $CI->session->set_flashdata('apellidoMaterno', $apellidoMaterno);
         $redirectlogin = $_COOKIE['redirectlogin'];
+
+        log_message('debug', 'flow: ' . json_encode($flow));
         redirect($redirectlogin);
     }
 
