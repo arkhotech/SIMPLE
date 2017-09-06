@@ -33,13 +33,21 @@ class FormNormalizer{
      * @return type
      * @throws Exception
      */        
-    function normalizarFormulario($json,$id,$value_list=NULL){
+    function normalizarFormulario($json,$form,$value_list=NULL){
         
-        if($id==NULL){
+        if($form==NULL){
             throw new Exception("El formulario viene sin ID");
         }
+        $pasos = array();
+        $form->Proceso->id;
+//        getEtapaPorTareaId($id_tarea, $id_proceso)
+        
+//         $conexiones=  Doctrine_Query::create()
+//                ->from('Conexion c, c.TareaOrigen.Proceso p')
+//                ->where('p.activo=1 AND p.id = ?',$this->id)
+//                ->execute();
        
-        $retval['form'] = array('id' => $id, 'campos' => array() );
+        $retval['form'] = array('id' => $form->id, 'campos' => array() );
         //print_r($json);die;
         
         foreach( $json['Campos'] as $campo){
@@ -78,13 +86,14 @@ class FormNormalizer{
         //Trae todos los formularios del proceso, si no se especifica tarea ni paso
         $result = array();
         log_message("INFO", "Busqueda de siguiente formulario", FALSE);
-        if($id_tarea== NULL && $id_paso == NULL){
+        if($id_tarea== NULL && $id_paso == NULL){  //traer todos los formularios
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
 
             foreach($tramite->Formularios as $form){
-                $formSimple = Doctrine::getTable('Formulario')->find($form->id);
-                $json = json_decode($formSimple->exportComplete(),true);
-                array_push($result,$this->normalizarFormulario($json,$form->id));
+                
+                //$formSimple = $form;//Doctrine::getTable('Formulario')->find($form->id);
+                $json = json_decode($form->exportComplete(),true);
+                array_push($result,$this->normalizarFormulario($json,$form));
 
             }
             return $result;
