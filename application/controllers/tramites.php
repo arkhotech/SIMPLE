@@ -142,7 +142,6 @@ class Tramites extends MY_Controller {
     }
 
     public function iniciar($proceso_id) {
-
         log_message('Info', 'Iniciando proceso '.$proceso_id, FALSE);
 
         $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
@@ -152,7 +151,7 @@ class Tramites extends MY_Controller {
             echo 'Usuario no puede iniciar este proceso';
             exit;
         }
-        
+   
         //Vemos si es que usuario ya tiene un tramite de proceso_id ya iniciado, y que se encuentre en su primera etapa.
         //Si es asi, hacemos que lo continue. Si no, creamos uno nuevo
         $tramite=Doctrine_Query::create()
