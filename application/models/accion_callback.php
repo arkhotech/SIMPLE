@@ -63,10 +63,13 @@ class AccionCallback extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
+
+        log_message("INFO", "Ejecutando Callback", FALSE);
         $accion=Doctrine::getTable('Accion')->find($this->id);
         $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
         $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
         $callback = Doctrine::getTable('Proceso')->findVaribleCallback($etapa->id);
+        log_message("INFO", "Callback: ".$callback['valor'], FALSE);
         if ($callback['valor']>0){
 
             $tipoSeguridad=$data->extra->tipoSeguridad;
@@ -170,6 +173,9 @@ class AccionCallback extends Accion {
                 }
             }
             try{
+                log_message("INFO", "Llamando a callback URL: ".$uri, FALSE);
+                log_message("INFO", "Llamando a callback Request: ".$request, FALSE);
+                log_message("INFO", "Llamando a callback Metodo: ".$this->extra->tipoMetodoC, FALSE);
                 // Se ejecuta la llamada segun el metodo
                 if($this->extra->tipoMetodoC == "POST"){
                     $CI->rest->initialize($config);
@@ -183,6 +189,7 @@ class AccionCallback extends Accion {
                 }
                 //Se obtiene la codigo de la cabecera HTTP
                 $debug = $CI->rest->debug();
+                log_message("INFO", "Llamando a callback debug: ".$this->varDump($debug), FALSE);
                 $parseInt=intval($debug['info']['http_code']);
                 if ($parseInt<200 || $parseInt>204){
                     // Ocurio un error en el server del Callback ## Error en el servidor externo ##
