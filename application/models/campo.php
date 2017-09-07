@@ -131,12 +131,24 @@ class Campo extends Doctrine_Record {
      * @return type
      */
     public function displayDatoSeguimiento($etapa_id){
+
+        log_message("INFO", "Obteniendo valor de campo para etapa: ".$etapa_id, FALSE);
+        log_message("INFO", "Nombre campo: ".$this->nombre, FALSE);
        
        $dato =  Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($this->nombre,$etapa_id);
-       $regla=new Regla($this->valor_default);
-       $valor_default=$regla->getExpresionParaOutput($etapa_id);
-       //echo "$this->nombre :  $valor_default, ";
-       return $valor_default;
+        log_message("INFO", "Nombre dato: ".$dato->nombre, FALSE);
+        log_message("INFO", "Valor dato: ".$dato->valor, FALSE);
+        log_message("INFO", "this->valor_default: ".$this->valor_default, FALSE);
+        if(isset($this->valor_default) && strlen($this->valor_default) > 0 ){
+            $regla=new Regla($this->valor_default);
+            $valor_dato=$regla->getExpresionParaOutput($etapa_id);
+        }else{
+            $valor_dato = $dato->valor;
+        }
+
+        log_message("INFO", "valor_default: ".$valor_dato, FALSE);
+
+       return $valor_dato;
     }
     
     
@@ -348,7 +360,9 @@ class Campo extends Doctrine_Record {
      * @return type
      */
     public function getListaExportables($etapa){
-        
+
+        log_message("INFO", "getListaExportables", FALSE);
+
         $tramite = $etapa->Tramite;
         $dato_seguimiento = null;
         $campos = null;
@@ -367,9 +381,11 @@ class Campo extends Doctrine_Record {
 
                 $key= $campo->nombre;//$value['nombre'];
 
+                log_message("INFO", "Nombre variable a retornar: ".$key, FALSE);
+                log_message("INFO", "Tipo variable a retornar: ".$campo->tipo, FALSE);
                 if($campo->tipo == 'file'){
                     //FIX valor
-                    $filename = 'uploads/datos/'.str_replace('"','',$value['valor']);
+                    $filename = 'uploads/datos/'.str_replace('"','',$campo->nombre);
                     $data = file_get_contents($filename);
                     $return[$key]=base64_encode($data);
                 }else if($campo->tipo == 'documento'){
@@ -378,11 +394,13 @@ class Campo extends Doctrine_Record {
                     $data = file_get_contents('uploads/documentos/'.$file->filename);
                     $return[$key]= base64_encode($data);
                 }else{
-                    $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa));
+                    log_message("INFO", "Obteniendo valor para etapa: ".$etapa->id, FALSE);
+                    $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa->id));
                 }
 
             }
         }
+        log_message("INFO", "Variables a retornar: ".$this->varDump($return), FALSE);
         return $return;
     }
 
@@ -394,13 +412,17 @@ class Campo extends Doctrine_Record {
                 . "tarea t where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and "
                 . "a.proceso_id=".$proceso_id." and p.id=t.proceso_id group by a.id, a.nombre,"
                 . " a.extra, a.exponer_variable, p.nombre;";
+        log_message("INFO", "SQL: ".$sql, FALSE);
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)->fetchAll();
         $return=array();
+        log_message("INFO", "Recorriendo resultados", FALSE);
         foreach ($result as $value) {
+            log_message("INFO", "key: ".$value['nombre_variable'], FALSE);
             $key= $value['nombre_variable'];
             $return[$key]=str_replace('"', '',$this->getVariableValor($value['nombre_variable'],$etapa));
         }
+        log_message("INFO", "Variables exportables a retornar: ".$this->varDump($return), FALSE);
         return $return;
     }
     
