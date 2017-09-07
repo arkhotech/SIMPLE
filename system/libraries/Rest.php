@@ -327,6 +327,10 @@ class REST
 
         // Execute and return the response from the REST server
         $response = $this->_ci->curl->execute($this->timeout);
+        if($this->_ci->curl->error_code){
+            throw new Exception($this->_ci->curl->error_string);
+        }
+        log_message('debug',$this->_ci->curl->error_code." ".$this->_ci->curl->error_string);
         log_message('info', 'response desde el  REST CLIENT: '.$this->varDump($response), FALSE);         
         // Format and return
         return $this->_format_response($response);

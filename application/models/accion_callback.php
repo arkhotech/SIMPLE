@@ -191,8 +191,10 @@ class AccionCallback extends Accion {
                     $response['des_code']=$debug['response_string'];
                     $response=json_encode($response);
                     $operacion = 'Error en llamada Callback';
-                    $user = 'Admin Admin <admin@admin.com>';
-                    $this->saveAuditoria($operacion,$user,$proceso->cuenta_id,$proceso,$accion,$response);
+               
+                    AuditoriaOperaciones::registrarAuditoria($proceso->nombre, 
+                            "Error en llamada Callback", $response, array());
+           
                     // Se genera la variable callback_error y se le asigna el codigo y la descripcion del error.
                     $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("callback_error",$etapa->id);
                     if(!$dato){
@@ -222,13 +224,16 @@ class AccionCallback extends Accion {
                         }
                 }
             }catch (Exception $e){
+                log_message('error',$e->getMessage());
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
                 if(!$dato)
                     $dato=new DatoSeguimiento();
                 $dato->nombre="error_rest";
-                $dato->valor=$e;
+                $dato->valor=$e->getMessage();
                 $dato->etapa_id=$etapa->id;
                 $dato->save();
+                
+                AuditoriaOperaciones::registrarAuditoria($proceso->nombre, "Ejecutar Callback", $e->getMessage(), array());
             }
         }else{
             /////////////////////////////////////////////////////////////////////////////////////
@@ -240,31 +245,9 @@ class AccionCallback extends Accion {
             log_message('info',$response);
             log_message('info','####################################################################################');
             // Auditoria
-            $operacion = 'Error en llamada Callback';
-            $user = 'Admin Admin <admin@admin.com>';
-            $cuenta_id=1;
-            $this->saveAuditoria($operacion,$user,$proceso->cuenta_id,$proceso,$accion,$response);
+   
+            AuditoriaOperaciones::registrarAuditoria($proceso->nombre, "Ejecutar Callback",$response);
         }
-    }
-
-    function saveAuditoria($operacion,$user,$cuenta_id,$proceso,$accion,$response){
-        $fecha = new DateTime();
-        $registro_auditoria = new AuditoriaOperaciones ();
-        $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-        $registro_auditoria->operacion = $operacion;
-
-        // Se necesita cambiar el usuario al usuario público.
-        $registro_auditoria->usuario = $user;
-        $registro_auditoria->proceso = $proceso->nombre;
-        $registro_auditoria->cuenta_id = $cuenta_id;
-        $registro_auditoria->motivo = $response;
-
-        //Detalles
-        $accion_array['proceso'] = $proceso;
-        $accion_array['accion'] = $accion->toArray(false);
-        unset($accion_array['accion']['proceso_id']);
-        $registro_auditoria->detalles=  json_encode($accion_array);
-        $registro_auditoria->save();
     }
 
     function varDump($data){

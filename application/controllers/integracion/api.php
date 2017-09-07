@@ -249,7 +249,6 @@ class API extends MY_BackendController {
                 $this->checkJsonHeader();
                 $etapa = Doctrine::getTable('Etapa')->findOneById($etapa_tarea_id);
                 $this->checkIdentificationHeaders($etapa->tarea_id);
-                //$etapa_id,$operacion,$nombre_proceso = NULL
                 $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites");
                 $this->continuarProceso($proceso_tramite_id,$etapa_tarea_id,$secuencia,$this->obtenerRequestBody());
                 break;
