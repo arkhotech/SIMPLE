@@ -154,6 +154,10 @@ class API extends MY_BackendController {
             header("HTTP/1.1 403 Forbiden");
             exit;
         case 'publico':
+            if( !UsuarioSesion::usuario() ) {
+                //crear un usuario para sesion anonima
+                UsuarioSesion::createAnonymousSession();
+            }
             break;
         }
           

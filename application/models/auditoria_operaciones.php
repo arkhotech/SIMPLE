@@ -22,14 +22,18 @@ class AuditoriaOperaciones extends Doctrine_Record {
      * @param type $detalles Detalles en JSON
      */
     static public function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
-         $fecha = new DateTime();
-         $registro_auditoria = new AuditoriaOperaciones ();
-         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-         $registro_auditoria->operacion = $operacion;
-          $user = UsuarioSesion::usuario();
+        $fecha = new DateTime();
+        $registro_auditoria = new AuditoriaOperaciones ();
+        $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+        $registro_auditoria->operacion = $operacion;
+        $user = UsuarioSesion::usuario();
         $datauser = "anonymous@no-domain.com";
         if($user){
-            $datauser = $user->nombres." ".$user->apellido_paterno." <".$user->email.">";
+            $datauser = trim($user->nombres)==0 ? 'Anonymous' : $user->nombres;
+            $datauser .= (trim($user->apellido_paterno)!= 0) ? " ".$user->apellido_paterno : "";
+            $datauser .= (trim($user->apellido_materno)!= 0) ? " ".$user->apellido_materno : "";        
+            $datauser .= (trim($user->email)!= 0) ? " <".$user->email.">" :" <anonymous@no-domain.com>";       
+                    
         }
         log_message('INFO','Usuario Registrado '.$datauser);
             // Se necesita cambiar el usuario al usuario público.

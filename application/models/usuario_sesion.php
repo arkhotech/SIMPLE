@@ -191,5 +191,18 @@ class UsuarioSesion {
     public function __clone() {
         trigger_error('Clone is not allowed.', E_USER_ERROR);
     }
+    
+    /**
+     * Crea un usuario anonimo para la capa de servicios 
+     */
+    public static function createAnonymousSession(){
+        $anonimo = new Usuario();
+        $anonimo->usuario = random_string('unique');
+        $anonimo->setPasswordWithSalt(random_string('alnum', 32));
+        $anonimo->save();
+        $CI = & get_instance();
+        $CI->session->set_userdata('usuario_id', $anonimo->id);
+        log_message('info','Usaurio no tiene registada un sesion');
+    }
 
 }
