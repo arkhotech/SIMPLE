@@ -92,22 +92,7 @@ class Tramites extends MY_Controller {
         $data['title'] = 'Bienvenido';
         
         $data['links'] = $this->pagination->create_links(); 
-        $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id); 
-        if($config){
-           $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-           $nombre = $config->nombre;
-           if ($nombre=='default'){
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-           } else {
-                $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-           }
-           
-        }else{
-           $data['template_path'] = 'uploads/themes/default/';
-           $this->load->view('themes/default/template', $data);
-        }
+        $this->load->view('template', $data);
     }
 
     public function disponibles() {
@@ -122,23 +107,7 @@ class Tramites extends MY_Controller {
         $data['sidebar']='disponibles';
         $data['content'] = 'tramites/disponibles';
         $data['title'] = 'Trámites disponibles a iniciar';
-
-        $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id); 
-        if($config){
-           $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-           $nombre = $config->nombre;
-           if ($nombre=='default'){
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-           } else {
-                $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-           }
-           
-        }else{
-           $data['template_path'] = 'uploads/themes/default/';
-           $this->load->view('themes/default/template', $data);
-        }
+        $this->load->view('template', $data);
     }
 
     public function iniciar($proceso_id) {

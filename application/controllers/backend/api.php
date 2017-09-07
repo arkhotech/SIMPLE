@@ -431,4 +431,25 @@ class API extends MY_BackendController {
         }
     }
 
+    public function completados() {
+        $desde=$this->input->get('desde');
+        $hasta=$this->input->get('hasta');
+        $respuesta = new stdClass();
+        $query = Doctrine_Query::create()
+                ->from('Proceso p, p.Tramites t')
+                ->select('p.nombre, COUNT(t.id) as ntramites')
+                ->where('t.pendiente=0');
+        if($desde)
+            $query = $query->andWhere('created_at >= '. "'".date('Y-m-d',strtotime($desde))."'");
+        if($hasta)
+            $query = $query->andWhere('ended_at <= '. "'".date('Y-m-d',strtotime($hasta))."'");
+
+        $tramites = $query->groupBy('p.id')->execute();
+        foreach($tramites as $p) {
+            $respuesta->tramites[] = (object)array('cuenta'=>$p->Cuenta->nombre,'proceso_id'=>$p->id,'proceso'=>$p->nombre,'completados'=>$p->ntramites);
+        }
+        header('Content-type: application/json');
+        echo json_indent(json_encode($respuesta));
+    }
+
 }

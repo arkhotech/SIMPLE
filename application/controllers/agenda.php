@@ -506,13 +506,13 @@ class Agenda extends MY_Controller {
             $data['title'] = 'Mi Agenda';
             $data['sidebar']='miagenda';
             $data['content'] = 'agenda/miagenda_funcionario';
-            $this->load->view('themes/default/template', $data);
+            $this->load->view('template', $data);
 
         }else{
             $data['title'] = 'Mi Agenda';
             $data['sidebar']='miagenda';
             $data['content'] = 'agenda/miagenda';
-            $this->load->view('themes/default/template', $data);
+            $this->load->view('template', $data);
         }
     }  
 

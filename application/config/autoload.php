@@ -65,7 +65,7 @@ $autoload['libraries'] = array('form_validation','session','email','rest','curl'
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','doctrine','date','string','html','json','file','text','money');
+$autoload['helper'] = array('url','doctrine','date','string','html','json','file','text','money','jwt');
 
 
 /*
