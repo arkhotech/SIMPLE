@@ -506,7 +506,6 @@ class API extends MY_BackendController {
                     foreach ($formulario->Campos as $c) {
                         // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
                         log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
-                        log_message("INFO", "Campo validacion: ".$this->varDump($c->validacion), FALSE);
 
                         if(count($c->validacion) > 0){
                             foreach ($c->validacion as $validacion) {

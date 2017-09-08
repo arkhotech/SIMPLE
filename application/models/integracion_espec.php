@@ -49,19 +49,53 @@ class FormNormalizer{
        
         $retval['form'] = array('id' => $form->id, 'campos' => array() );
         //print_r($json);die;
-        
+
+
+
+
+        foreach ($formulario->Campos as $c) {
+            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
+
+            if(count($c->validacion) > 0){
+                foreach ($c->validacion as $validacion) {
+                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
+                    if($validacion == "required"){
+                        $valor = $this->extractVariable($body,$c,$etapa->tramite_id);
+                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
+                        if($valor == "NE"){
+                            $valida_formulario = FALSE;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         foreach( $json['Campos'] as $campo){
             if($campo['tipo'] == "subtitle"){
                 continue;  //se ignoran los campos de tipo subtitle
             }
+
+            $obligatorio = false;
+            if(count($campo['validacion']) > 0){
+                foreach ($campo['validacion'] as $validacion) {
+                    if($validacion == "required"){
+                        $obligatorio = true;
+                    }
+                }
+            }
+
             //echo $campo->nombre." ".$value_list[$campo['nombre']].". ";
-            array_push($retval['form']['campos'], 
-            
-                  array( 
+            array_push($retval['form']['campos'],
+
+                  array(
                     "nombre" => $campo['nombre'],
                     "tipo_control" => $campo['tipo'],
                     "tipo" => $this->mapType($campo),  //$campo['dependiente_tipo'],
-                    "obligatorio" => ($campo['readonly']==0) ? false : true,
+                    "obligatorio" => $obligatorio,
                     "solo_lectura" => ($campo['readonly']==0) ? false : true,
                     "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'],
                     "valor" => ($value_list!=NULL) ? $value_list[$campo['nombre']] : "")//($campo['valor'] == NULL) ? $campo['valor_default'] : $campo['valor'])
