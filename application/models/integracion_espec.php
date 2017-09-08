@@ -39,7 +39,7 @@ class FormNormalizer{
             throw new Exception("El formulario viene sin ID");
         }
         $pasos = array();
-        $form->Proceso->id;
+        //$form->Proceso->id;
 //        getEtapaPorTareaId($id_tarea, $id_proceso)
         
 //         $conexiones=  Doctrine_Query::create()
@@ -110,7 +110,6 @@ class FormNormalizer{
                     $formSimple = 
                             Doctrine::getTable('Formulario') ->find($paso->Formulario->id)->exportComplete();
                     $json = json_decode($formSimple,true);
-                    log_message("INFO", "Json formulario: ".$json, FALSE);
                     array_push($result,$this->normalizarFormulario($json,$paso->Formulario->id));
                 }
                 
@@ -151,12 +150,11 @@ class FormNormalizer{
      */
     function generar_swagger($formulario, $id_tramite, $id_tarea){
 
-        log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
+        log_message("info", "Generando Swagger", FALSE);
         log_message("info", "Id trámite: ".$id_tramite, FALSE);
         log_message("info", "Id tarea: ".$id_tarea, FALSE);
 
         if(isset($formulario) && count($formulario) > 0){
-            log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
             $data_entrada = "";
             $form = $formulario[0];
             $campos = $form["form"];
@@ -194,20 +192,6 @@ class FormNormalizer{
                     $data_entrada .= "\"minItems\": 1,";
                     $data_entrada .= "\"maxItems\": ".count($columnas["columns"])."}";
 
-                    /*if($data_entrada != "") $data_entrada .= ",";
-
-                    $columnas = array();
-                    $columnas = $campo["dominio_valores"];
-
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"object\",\"properties\": {";
-                    foreach ($columnas["columns"] as $column){
-                        if (substr($data_entrada, -1) == '}') {
-                            $data_entrada .= ",";
-                        }
-                        $data_entrada .= "\"".$column["header"]."\": {\"type\": \"".$column["type"]."\"}";
-                    }
-
-                    $data_entrada .= "}}}";*/
                 }
             }
         }
