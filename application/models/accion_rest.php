@@ -78,7 +78,7 @@ class AccionRest extends Accion {
                 <select id="tipoSeguridad" name="extra[idSeguridad]">';
                 foreach($conf_seguridad as $seg){
                     $display.='
-                        <option value="">Sin seguridad</option>';
+                        <option value="-1">Sin seguridad</option>';
                         if ($this->extra->idSeguridad && $this->extra->idSeguridad == $seg->id){
                             $display.='<option value="'.$seg->id.'" selected>'.$seg->institucion.' - '.$seg->servicio.'</option>';
                         }else{
@@ -96,14 +96,20 @@ class AccionRest extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
-        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
-        $tipoSeguridad=$data->extra->tipoSeguridad;
-        $user = $data->extra->user;
-        $pass = $data->extra->pass;
-        $ApiKey = $data->extra->apikey;
-        ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
+        $data = null;
+        $tipoSeguridad = "NONE";
+        if(isset($this->extra->idSeguridad) && $this->extra->idSeguridad != -1){ //no hay ningun regustro configurado, osea esta cvacio
+            $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
+            $tipoSeguridad=$data->extra->tipoSeguridad;
+            $user = $data->extra->user;
+            $pass = $data->extra->pass;
+            $ApiKey = $data->extra->apikey;
+            ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
+        }
         ($this->extra->timeout ? $timeout = $this->extra->timeout : $timeout = 30);
-
+        
+        //que hace esto ?
+       
         $r=new Regla($this->extra->url);
         $url=$r->getExpresionParaOutput($etapa->id);
         $caracter="/";
@@ -118,19 +124,13 @@ class AccionRest extends Accion {
         if($caracter===$l){
             $uri = substr($uri, 1);
         }
-
-        $r=new Regla($data->extra->url_auth);
-        $url_auth=$r->getExpresionParaOutput($etapa->id);
-        $l = substr($url_auth, 0, 1);
-        if($caracter===$l){
-            $url_auth = substr($url_auth, 1);
-        }
-
-        $r=new Regla($data->extra->uri_auth);
-        $uri_auth=$r->getExpresionParaOutput($etapa->id);
-        $l = substr($uri_auth, 0, 1);
-        if($caracter===$l){
-            $uri_auth = substr($uri_auth, 1);
+        if($data !=  null ){
+            $r=new Regla($data->extra->url_auth);
+            $url_auth=$r->getExpresionParaOutput($etapa->id);
+            $l = substr($url_auth, 0, 1);
+            if($caracter===$l){
+                $url_auth = substr($url_auth, 1);
+            }
         }
 
         $CI = & get_instance();
@@ -201,8 +201,12 @@ class AccionRest extends Accion {
             $r=new Regla($this->extra->header);
             $header=$r->getExpresionParaOutput($etapa->id);
             $headers = json_decode($header);
-            foreach ($headers as $name => $value) {
-                $CI->rest->header($name.": ".$value);
+            
+            if( isset($header) && trim($header) != ''){
+            
+                foreach ($headers as $name => $value) {
+                    $CI->rest->header($name.": ".$value);
+                }
             }
         }
         try{
@@ -222,9 +226,9 @@ class AccionRest extends Accion {
             }
             //Se obtiene la codigo de la cabecera HTTP
             $debug = $CI->rest->debug();
-            log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
+            //log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
             //se verifica si existe numero de reintentos
-            if(isset($this->extra->timeout_reintentos) && $debug['error_code'] == '28'){
+            if(isset($this->extra->timeout_reintentos) && isset($debug['error_code']) && $debug['error_code'] == '28'){
                 log_message("INFO", "Reintentando ".$this->extra->timeout_reintentos." veces.", FALSE);
                 $intentos = 1;
                 while($intentos < $this->extra->timeout_reintentos && $debug['error_code'] == '28'){
@@ -243,7 +247,7 @@ class AccionRest extends Accion {
                         $result = $CI->rest->delete($uri, $request, 'json');
                     }
                     $debug = $CI->rest->debug();
-                    log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
+                    log_message("INFO", "Http response: ", FALSE);
                     $intentos++;
                 }
             }
@@ -255,11 +259,13 @@ class AccionRest extends Accion {
                 $result2['code']= $debug['error_code'];
                 $result2['des_code']= $debug['response_string'];
             }else{
-                if(!is_object($result)) {
+               
+                if(!is_array($result) && !is_object($result)) {
                     $result2['code']= '2';
                     $result2['des_code']= $debug['response_string'];
                 }else{
-                    $result2 = get_object_vars($result);
+                    
+                    $result2 = (is_array($result)) ? get_object_vars($result[0]):get_object_vars($result);
                 }
             }
             $response["response".$this->extra->tipoMetodo]=$result2;
@@ -273,12 +279,12 @@ class AccionRest extends Accion {
                 $dato->save();
             }
         }catch (Exception $e){
-            log_message("INFO", "Error: ".$this->varDump($e), FALSE);
+            log_message("INFO", "Error: ".$e->getMessage(), FALSE);
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
             $dato->nombre="error_rest";
-            $dato->valor=$e;
+            $dato->valor=$e->getMessage();
             $dato->etapa_id=$etapa->id;
             $dato->save();
         }
