@@ -12,14 +12,20 @@ class API extends REST_Controller{//MY_BackendController {
                 || !isset($this->get()['etapa'])){
             $this->response(array('message' => 'Parametros insuficientes'), 400);
         }
-        
-        $this->checkIdentificationHeaders($this->get()['etapa']);
-        
-        $mediator = new IntegracionMediator();
-        
-        $this->registrarAuditoria($this->get()['etapa'],"Iniciar Tramite","Tramites");
-        $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['etapa'],$this->request->body);
-        $this->response($data);  
+        try{
+            $this->checkIdentificationHeaders($this->get()['etapa']);
+
+            $mediator = new IntegracionMediator();
+
+            $this->registrarAuditoria($this->get()['etapa'],"Iniciar Tramite","Tramites");
+
+            $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['etapa'],$this->request->body);
+            $this->response($data);
+        }catch(Exception $e){
+            $this->response(
+                array("message" => $e->getMessage(),
+                "code" => $e->getCode()),$e->getCode());
+        }
     }
     
     public function tramites_put(){
@@ -43,7 +49,7 @@ class API extends REST_Controller{//MY_BackendController {
 
             $this->checkIdentificationHeaders($etapa->tarea_id);
             $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites");
-            echo "...";die;
+           
        
             $data = $mediator->continuarProceso($tramite_id,$etapa_id,$secuencia,$this->request->body);
         }catch(Exception $e){
@@ -94,8 +100,6 @@ class API extends REST_Controller{//MY_BackendController {
         }
  
         $headers = $this->input->request_headers();
-        $method =  $this->router->fetch_method();
-        $restrict_ops = $this->config->item('restrictred_rest_ops');
         $cu_keys = $this->userHeadersKeys;
         log_message('DEBUG','Check modo',FALSE);
 
@@ -126,14 +130,14 @@ class API extends REST_Controller{//MY_BackendController {
                 log_message('DEBUG',$tarea->id);
                 $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
                 foreach($usuarios as $user){
-                    echo "$user .";
+                    
                     if($headers['User']===$user->usuario){
                         log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
                         return TRUE;
                     }
                 }      
                 //si no
-                die;
+               
             }else{
                 return TRUE;
             }
@@ -189,14 +193,6 @@ class API extends REST_Controller{//MY_BackendController {
         AuditoriaOperaciones::registrarAuditoria($nombre_etapa,$operacion, 
                 "Auditoria de llamados a API REST", json_encode($data));
     }
-    
-    
-    
-    
-    
-    
-
-
 
     private function obtenerStatus($id_tramite, $rut ){
 

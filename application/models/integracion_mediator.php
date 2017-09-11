@@ -221,14 +221,6 @@ class IntegracionMediator{
         return $swagger;
 
     }
-
-
-
-
-
-
-
-
     /**
      * Inicia un proceso simple
      * 
@@ -317,20 +309,22 @@ class IntegracionMediator{
      * @return type
      */
     public function ejecutarEntrada($etapa_id,$body, $secuencia = 0, $id_proceso){
-        throw new Exception("Etapa no pertenece al proceso ingresado", 412);
+        //throw new Exception("Etapa no pertenece al proceso ingresado", 412);
         log_message("INFO", "Ejecutar Entrada", FALSE);
 
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
+        if (!$etapa) {
+            throw new Exception("Etapa no fue encontrada", 404);
+        }
+        
         $respuesta = new stdClass();
         $validar_formulario = FALSE;
         // Almacenamos los campos
 
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
-        if (!$etapa) {
-            throw new Exception("Etapa no fue encontrada", 404);
-        }
+        
         if ($etapa->tramite_id != $id_proceso) {
             throw new Exception("Etapa no pertenece al proceso ingresado", 412);
         }
