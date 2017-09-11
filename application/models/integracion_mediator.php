@@ -8,7 +8,7 @@
 
 //Esta funcion debería estar en modelo
 
-class FormNormalizer{
+class IntegracionMediator{
     
     private function mapType($campo){
         switch ($campo['tipo']){
@@ -151,12 +151,12 @@ class FormNormalizer{
      */
     function generar_swagger($formulario, $id_tramite, $id_tarea){
 
-        log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
+        //log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
         log_message("info", "Id trámite: ".$id_tramite, FALSE);
         log_message("info", "Id tarea: ".$id_tarea, FALSE);
 
         if(isset($formulario) && count($formulario) > 0){
-            log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
+            //log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
             $data_entrada = "";
             $form = $formulario[0];
             $campos = $form["form"];
@@ -194,20 +194,6 @@ class FormNormalizer{
                     $data_entrada .= "\"minItems\": 1,";
                     $data_entrada .= "\"maxItems\": ".count($columnas["columns"])."}";
 
-                    /*if($data_entrada != "") $data_entrada .= ",";
-
-                    $columnas = array();
-                    $columnas = $campo["dominio_valores"];
-
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"object\",\"properties\": {";
-                    foreach ($columnas["columns"] as $column){
-                        if (substr($data_entrada, -1) == '}') {
-                            $data_entrada .= ",";
-                        }
-                        $data_entrada .= "\"".$column["header"]."\": {\"type\": \"".$column["type"]."\"}";
-                    }
-
-                    $data_entrada .= "}}}";*/
                 }
             }
         }
@@ -220,6 +206,7 @@ class FormNormalizer{
         log_message("info", "HOST: ".$nombre_host, FALSE);
 
         if ($file = fopen("uploads/swagger/start_swagger.json", "r")) {
+            log_message("debug", "Formulario recuperado", FALSE);
             while(!feof($file)) {
                 $line = fgets($file);
                 $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
@@ -242,113 +229,58 @@ class FormNormalizer{
 
 
 
-    public function iniciarProceso($proceso_id, $tramite_id, $retorno_id, $body){
-
-        log_message("INFO", "idProcess: ".$proceso_id, FALSE);
-        log_message("INFO", "Body: ".$body, FALSE);
-
-        if($proceso_id == NULL){
-            throw new Exception("Bad Request", 400);
+    /**
+     * Inicia un proceso simple
+     * 
+     * @param type $proceso_id
+     * @param type $id_tarea
+     * @param type $body
+     * @return type
+     */
+    public function iniciarProceso($proceso_id, $id_tarea, $body){
+        //validar la entrada
+        
+        if($proceso_id == NULL || $id_tarea == NULL){
+            header("HTTP/1.1 400 Bad Request");
+            return;
         }
 
         try{
             $input = json_decode($body,true);
-            log_message("INFO", "Input: ".$this->varDump($input), FALSE);
+            log_message("DEBUG", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
-            /*if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
-                throw new Exception("Bad Request", 400);
-            }*/
+            if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
+                header("HTTP/1.1 400 Bad Request");
+                return;
+            }
 
-            log_message("INFO", "inicio proceso", FALSE);
-
-            UsuarioSesion::login('admin@admin.com', '123456');
-
-            log_message("INFO", "carga libreria", FALSE);
-            $CI = & get_instance();
-            $CI->load->library('SaferEval');
-
-            log_message("INFO", "inicia tramite", FALSE);
+            log_message("DEBUG", "inicio proceso", FALSE);
+            
             $tramite = new Tramite();
             $tramite->iniciar($proceso_id);
-
+            
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
 
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
             $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
-
-            log_message("INFO", "Terminando inicio proceso: ".$this->varDump($result));
-
-            log_message("INFO", "Registrando tramite: ".$tramite_id, FALSE);
-            log_message("INFO", "Registrando tarea: ".$retorno_id, FALSE);
-            $this->registrarRetorno($tramite_id, $retorno_id,$etapa_id);
-
-            /*if(array_key_exists('callback',$input)){
+            
+            if(array_key_exists('callback',$input)){
                 $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
-            }*/
+            }
+            log_message("INFO", "Preparando respuesta: ".$proceso_id, FALSE);
+            //validaciones etapa vencida, si existe o algo por el estilo
 
-            $response = array(
+             $response = array(
                 "idInstancia" => $tramite->id,
                 "output" => $result ['result']['output'],
-                "idEtapa" => $result ['result']['idEtapa'],
-                "secuencia" => $result ['result']['secuencia'],
+                 "idEtapa" => $result ['result']['idEtapa'],
+                 "secuencia" => $result ['result']['secuencia'],
                 "proximoFormulario" => $result['result']['proximoForlulario']
-            );
-
-            log_message("INFO", "Respuesta inicio proceso: ".$this->varDump($response));
-
-            $response = json_encode($response);
-
-            log_message("INFO", "Respuesta json inicio proceso: ".$response);
-
-            return $response;
-
+                );
+             //$this->responseJson($response);
+             return $response;
         }catch(Exception $e){
-            throw new Exception($e->getMessage(), $e->getCode());
-        }
-
-    }
-
-    public function continuarProceso($id_tramite_actual, $id_tramite_continuar, $id_tarea, $body){
-
-        log_message("INFO", "En continuar proceso, input data: ".$body);
-
-        try{
-            $input = json_decode($body,true);
-
-            /*if(!isset($input["idEtapa"]) || !isset($input["secuencia"])){
-                throw new Exception("Bad Request", 400);
-            }*/
-            //Obtener el nombre del proceso
-            //$this->crearRegistroAuditoria($nombre_proceso, $body);
-            //$id_etapa = $input["idEtapa"];
-            $secuencia = 0;//Se asume que siempre será el Paso 1
-
-            log_message("INFO", "id_tramite_actual: ".$id_tramite_actual);
-            log_message("INFO", "id_tramite_continuar: ".$id_tramite_continuar);
-            log_message("INFO", "id_tarea: ".$id_tarea);
-            log_message("INFO", "secuencia: ".$secuencia);
-
-            $etapa = new Etapa();
-            $etapa = $etapa->getEtapaPorTareaId($id_tarea, $id_tramite_continuar);
-            log_message("INFO", "id_etapa a continuar: ".$etapa->id);
-
-            $result = $this->ejecutarEntrada($etapa->id, $input, $secuencia, $id_tramite_continuar);
-
-            $response = array(
-                "idInstancia" => $id_tramite_actual,
-                "idEtapa" => $result ['result']['idEtapa'],
-                "output" => $result ['result']['output']
-            );
-
-            log_message("INFO", "Respuesta continuar proceso: ".$this->varDump($response));
-
-            $response = json_encode($response);
-
-            log_message("INFO", "Respuesta json continuar proceso: ".$response);
-
-            return $response;
-        }catch(Exception $e){
-            throw new Exception($e->getMessage(), $e->getCode());
+           $e->getTrace();
         }
 
     }
@@ -385,7 +317,7 @@ class FormNormalizer{
      * @return type
      */
     public function ejecutarEntrada($etapa_id,$body, $secuencia = 0, $id_proceso){
-
+        throw new Exception("Etapa no pertenece al proceso ingresado", 412);
         log_message("INFO", "Ejecutar Entrada", FALSE);
 
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
@@ -500,119 +432,7 @@ class FormNormalizer{
         $dato->save();
     }
 
-    /**
-     * @param $secuencia
-     * @param $next_step
-     * @param $etapa
-     * @param $id_proceso
-     * @return mixed
-     */
-    private function procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso) {
-
-        try{
-            $result['result']=array();
-            $result['result']['proximoForlulario']=array();
-            $form_norm=array();
-
-            $etapa_id = $etapa->id;
-
-            $integrador = new FormNormalizer();
-            $secuencia = $secuencia+1;
-            if($next_step == NULL){
-                //Finlaizar etapa
-                $etapa->avanzar();
-                log_message("INFO", "Id etapa despues de avanzar: ".$etapa->id, FALSE);
-
-                $etapa_prox = $this->obtenerProximaEtapa($etapa, $id_proceso);
-                if(isset($etapa_prox) && count($etapa_prox) == 1){
-                    $next_step = $etapa_prox[0]->getPasoEjecutable(0);
-                    while($next_step == null){
-                        //Finlaizar etapa
-                        $etapa_prox[0]->avanzar();
-
-                        $etapa_prox = $this->obtenerProximaEtapa($etapa_prox[0], $id_proceso);
-
-                        if(!isset($etapa_prox))
-                            break;
-
-                        $next_step = $etapa_prox[0]->getPasoEjecutable(0);
-                    }
-
-                    $form_norm = $integrador->obtenerFormulario($next_step->formulario_id,$etapa->id);
-
-                    $etapa_id = $etapa_prox[0]->id;
-                    $secuencia = 1;
-
-                }else if(isset($etapa_prox) && count($etapa_prox) > 1){
-                    //TODO tareas en paralelo
-                    $secuencia = null;
-                }else{
-                    //No existen mas etapas
-                    //Pendiente definir comportamiento standby
-                    $secuencia = null;
-                }
-
-            }else{
-
-                $paso = $etapa->getPasoEjecutable($secuencia);
-                $form_norm = $integrador->obtenerFormulario($paso->formulario_id,$etapa->id);
-            }
-
-            $campos = new Campo();
-            log_message("INFO", "Id etapa asignado: ".$etapa_id, FALSE);
-            $result['result']['proximoForlulario'] = $form_norm;
-            $result['result']['idEtapa'] = $etapa_id;
-            $result['result']['secuencia'] = $secuencia;
-            $result['result']['output']= $campos->obtenerResultados($etapa,$this);
-
-            log_message("INFO", "resultado: ".$this->varDump($result), FALSE);
-
-            return $result;
-        }catch(Exception $e){
-            throw new Exception($e->getMessage(), 500);
-        }
-    }
-
-    private function obtenerProximaEtapa($etapa, $id_proceso){
-
-        try{
-            //Obtener la siguiente tarea
-            $next = $etapa->getTareasProximas();
-
-            $etapas = array();
-
-            if(isset($next)){
-                if($next->estado != 'completado'){
-                    if ($next->tipo == 'paralelo' || $next->tipo == 'paralelo_evaluacion') {
-                        //etapas en paralelo
-                        foreach($next->tareas as $tarea ){
-                            $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
-                            $etapas[] = $etapa_prox;
-                        }
-                    }else if ($next->tipo == 'union') {
-                        if ($next->estado == 'standby') {
-                            //Esperar, enviar respuesta informando que se debe esperar
-                            $etapas = null;
-                        }
-                    }else{
-
-                        $tarea_id = $next->tareas[0]->id;
-                        $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
-
-                        $etapas[] = $etapa_prox;
-
-                    }
-                }else{
-                    $etapas = null;
-                }
-            }else{
-                $etapas = null;
-            }
-        }catch(Exception $e){
-            throw new Exception($e->getMessage(), 500);
-        }
-        return $etapas;
-    }
+ 
 
     private function crearRegistroAuditoria($nombre_proceso,$body,$tipo = "INFO"){
 
@@ -632,37 +452,40 @@ class FormNormalizer{
                     array("Callback url" => $body['callback'],
                         "Callback id" => $body['callback-id']);
             }*/
-
-            $this->registrarAuditoria($nombre_proceso,"Iniciar Proceso" ,
-                $tipo.': Auditoría de llamados desde otro proceso SIMPLE',  json_encode($data));
+         AuditoriaOperaciones::registrarAuditoria($nombre_proceso, 
+                 "Iniciar Proceso", 
+                 'Auditoría de llamados desde otro proceso SIMPLE', $data);
         }catch(Exception $e){
             throw new Exception($e->getMessage(), 500);
         }
     }
-
-    private function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
-        try{
-            $fecha = new DateTime();
-            $registro_auditoria = new AuditoriaOperaciones ();
-            $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-            $registro_auditoria->operacion = $operacion;
-            $usuario = UsuarioBackendSesion::usuario ();
-            // Se necesita cambiar el usuario al usuario público.
-            $registro_auditoria->usuario = 'Admin Admin <admin@admin.com>';
-            $registro_auditoria->proceso = $proceso_nombre;
-            $registro_auditoria->cuenta_id = 1;
-            $registro_auditoria->motivo = $motivo;
-
-            //unset($accion_array['accion']['proceso_id']);
-            $registro_auditoria->detalles= 'Detalles';
-            $registro_auditoria->detalles=  $detalles;//json_encode($accion_array);
-            $registro_auditoria->save();
-        }catch(Exception $e){
-            throw new Exception($e->getMessage(), 500);
+    
+    public function registerUserFromHeadersClaveUnica($headers){
+        log_message('INFO','Registrando cuenta clave unica ',FALSE);
+        $user =Doctrine::getTable('Usuario')->findOneByRut($headers['Rut']);
+        
+        if($user == NULL){  //Registrar el usuario
+            log_message('INFO','Registrando usuario: '.$headers['Rut'],FALSE);
+            $user = new Usuario();
+            $user->usuario = random_string('unique');
+            $user->setPasswordWithSalt(random_string('alnum', 32));
+            $user->rut = $headers['Rut'];
+            $nombres = explode(";",$headers['Nombres']);
+            if(count($nombres)< 3 ){
+                header("HTTP/1.1 403 Forbiden. Credenciales incompletas");
+                exit;
+            }
+            $user->nombres = $nombres[0];//$headers['Nombres'];
+            $user->apellido_paterno = $nombres[1]; //$headers['Apellido-Paterno'];
+            $user->apellido_materno = $nombres[2];//$headers['Apellido-Materno'];
+            $user->email = $headers['Email'];
+            $user->open_id = TRUE;
+            $user->save();
         }
+        $CI = & get_instance();
+        $CI->session->set_userdata('usuario_id', $user->id);
+         
     }
-
-
 
     private function varDump($data){
         ob_start();
@@ -672,6 +495,164 @@ class FormNormalizer{
         ob_end_clean();
         return $ret_val;
     }
+    
+    public function continuarProceso($id_proceso,$id_etapa,$secuencia, $body){
+
+        log_message("INFO", "En continuar proceso, input data: ".$body);
+
+        try{
+            $input = json_decode($body,true);
+
+            if($id_etapa == NULL || $id_secuencia=NULL ){
+                header("HTTP/1.1 400 Bad Request");
+                return;
+            }
+            //Obtener el nombre del proceso
+
+            log_message("INFO", "id_etapa: ".$id_etapa);
+            log_message("INFO", "secuencia: ".$secuencia);
+
+            $result = $this->ejecutarEntrada($id_etapa, $input, $secuencia, $id_proceso);
+
+            $response = array(
+                "idInstancia" => $id_proceso,
+                "output" => $result ['result']['output'],
+                "idEtapa" => $result ['result']['idEtapa'],
+                "secuencia" => $result ['result']['secuencia'],
+                "proximoFormulario" => $result['result']['proximoForlulario']
+            );
+            //$this->responseJson($response);
+            return $response;
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+            throw $e;
+        }
+
+    }
+    
+    public function asignar($etapa_id) {
+        $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
+
+        if ($etapa->usuario_id) {
+            echo 'Etapa ya fue asignada.';
+            exit;
+        }
+
+        if (!$etapa->canUsuarioAsignarsela(UsuarioSesion::usuario()->id)) {
+            echo 'Usuario no puede asignarse esta etapa.';
+            exit;
+        }
+
+        $etapa->asignar(UsuarioSesion::usuario()->id);
+
+        redirect('etapas/inbox');
+    }
+    
+    /**
+     * @param $secuencia
+     * @param $next_step
+     * @param $etapa
+     * @param $id_proceso
+     * @return mixed
+     */
+    private function procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso) {
+
+        $result['result']=array();
+        $result['result']['proximoForlulario']=array();
+        $form_norm=array();
+        
+        $etapa_id = $etapa->id;
+
+        
+        $secuencia = $secuencia+1;
+        if($next_step == NULL){
+            //Finlaizar etapa
+            $etapa->avanzar();
+            log_message("INFO", "Id etapa despues de avanzar: ".$etapa->id, FALSE);
+
+            $etapa_prox = $this->obtenerProximaEtapa($etapa, $id_proceso);
+            if(isset($etapa_prox) && count($etapa_prox) == 1){
+                $next_step = $etapa_prox[0]->getPasoEjecutable(0);
+                while($next_step == null){
+                    //Finlaizar etapa
+                    $etapa_prox[0]->avanzar();
+
+                    $etapa_prox = $this->obtenerProximaEtapa($etapa_prox[0], $id_proceso);
+
+                    if(!isset($etapa_prox))
+                        break;
+
+                    $next_step = $etapa_prox[0]->getPasoEjecutable(0);
+                }
+
+                $form_norm = $this->obtenerFormulario($next_step->formulario_id,$etapa->id);
+
+                $etapa_id = $etapa_prox[0]->id;
+                $secuencia = 1;
+
+            }else if(isset($etapa_prox) && count($etapa_prox) > 1){
+                //TODO tareas en paralelo
+                $secuencia = null;
+            }else{
+                //No existen mas etapas
+                //Pendiente definir comportamiento standby
+                $secuencia = null;
+            }
+
+        }else{
+            
+            $paso = $etapa->getPasoEjecutable($secuencia);
+            $form_norm = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
+        }
+        
+        $campos = new Campo();
+        log_message("INFO", "Id etapa asignado: ".$etapa_id, FALSE);
+        $result['result']['proximoForlulario'] = $form_norm;
+        $result['result']['idEtapa'] = $etapa_id;
+        $result['result']['secuencia'] = $secuencia;      
+        $result['result']['output']= $campos->obtenerResultados($etapa,$this);
+
+        
+        return $result;
+    }
+
+    private function obtenerProximaEtapa($etapa, $id_proceso){
+        //Obtener la siguiente tarea
+        $next = $etapa->getTareasProximas();
+
+        $etapas = array();
+
+        if(isset($next)){
+            if($next->estado != 'completado'){
+                if ($next->tipo == 'paralelo' || $next->tipo == 'paralelo_evaluacion') {
+                    //etapas en paralelo
+                    foreach($next->tareas as $tarea ){
+                        $etapa_prox = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
+                        $etapas[] = $etapa_prox;
+                    }
+                }else if ($next->tipo == 'union') {
+                    if ($next->estado == 'standby') {
+                        //Esperar, enviar respuesta informando que se debe esperar
+                        $etapas = null;
+                    }
+                }else{
+
+                    $tarea_id = $next->tareas[0]->id;
+                    $etapa_prox = $etapa->getEtapaPorTareaId($tarea_id, $id_proceso);
+
+                    $etapas[] = $etapa_prox;
+
+                }
+            }else{
+                $etapas = null;
+            }
+        }else{
+            $etapas = null;
+        }
+        return $etapas;
+    }
+
+    
 }
 
 ?>
