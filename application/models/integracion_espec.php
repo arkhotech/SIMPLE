@@ -33,13 +33,13 @@ class FormNormalizer{
      * @return type
      * @throws Exception
      */        
-    function normalizarFormulario($json,$form,$value_list=NULL){
+    function normalizarFormulario($json,$form_id,$value_list=NULL){
         
-        if($form==NULL){
+        if($form_id==NULL){
             throw new Exception("El formulario viene sin ID");
         }
         $pasos = array();
-        $form->Proceso->id;
+        //$form->Proceso->id;
 //        getEtapaPorTareaId($id_tarea, $id_proceso)
         
 //         $conexiones=  Doctrine_Query::create()
@@ -47,7 +47,7 @@ class FormNormalizer{
 //                ->where('p.activo=1 AND p.id = ?',$this->id)
 //                ->execute();
        
-        $retval['form'] = array('id' => $form->id, 'campos' => array() );
+        $retval['form'] = array('id' => $form_id, 'campos' => array() );
         //print_r($json);die;
         
         foreach( $json['Campos'] as $campo){
@@ -111,7 +111,7 @@ class FormNormalizer{
                             Doctrine::getTable('Formulario') ->find($paso->Formulario->id)->exportComplete();
                     $json = json_decode($formSimple,true);
                     log_message("INFO", "Json formulario: ".$json, FALSE);
-                    array_push($result,$this->normalizarFormulario($json,$paso->Formulario));
+                    array_push($result,$this->normalizarFormulario($json,$paso->Formulario->id));
                 }
                 
                 return $result;
