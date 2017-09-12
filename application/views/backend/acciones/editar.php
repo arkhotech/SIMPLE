@@ -11,6 +11,7 @@
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    <li><a href="<?= site_url('backend/Suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
   
 
