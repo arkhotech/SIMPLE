@@ -203,6 +203,7 @@ class Etapa extends Doctrine_Record {
                 }
                 //Si son en paralelo, vamos juntando el grupo de tareas proximas.
                 else if ($c->tipo == 'paralelo' || $c->tipo == 'paralelo_evaluacion') {
+                    
                     $resultado->tareas[] = $c->TareaDestino;
                     $resultado->estado = 'pendiente';
                     $resultado->conexion=$c->tipo;
@@ -358,7 +359,6 @@ class Etapa extends Doctrine_Record {
     //Es decir, tomando en cuenta las condiciones para que se ejecute cada paso.
     public function getPasoEjecutable($secuencia) {
         $pasos = $this->getPasosEjecutables($this->tramite_id);
-
         log_message("INFO", "Cantidad de pasos: ".count($pasos), FALSE);
 
         if (isset($pasos[$secuencia]))

@@ -66,17 +66,22 @@ class Especificacion extends REST_Controller{//MY_BackendController {
     public function formularios_get(){
         $param = $this->get();
         
-        if(!isset($param['tramite'])){
-            $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
+        if(!isset($param['proceso'])){
+            $this->response(
+                    array('codigo' => 400, 
+                        'message' => 'Parametros obligatorios no enviados'), 400);
         }
         
-        $id_tramite = $param['tramite'];
-        $id_tarea = $param['tarea'];
-        $id_paso = $param['paso'];
-        
-        $integrador = new IntegracionMediator();
-        $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
-        $this->response($response);
+        $id_proceso = $param['proceso'];
+        $id_tarea = isset($param['tarea']) ? $param['tarea'] : null;
+        $id_paso = isset($param['paso']) ? $param['paso'] : null; 
+        try{
+            $integrador = new IntegracionMediator();
+            $response = $integrador->obtenerFormularios($id_proceso, $id_tarea, $id_paso);
+            $this->response($response);
+        }catch(Exception $e){
+            $this->response(array("code"=> $e->getCode(),"message"=>$e->getMessage()),$e->getCode());
+        }
     }
     
 }
