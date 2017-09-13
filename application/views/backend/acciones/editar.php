@@ -48,6 +48,10 @@
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#callback" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
+        <?php } else if ($tipo == "webhook") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webhook" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
         <?php } ?>
         </legend>
         <div class="validacion"></div>

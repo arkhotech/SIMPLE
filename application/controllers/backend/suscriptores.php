@@ -16,15 +16,16 @@ class Suscriptores extends MY_BackendController {
     }
 
     public function listar($proceso_id) {
+        log_message("INFO", "Listando suscriptores para proceso id: ".$proceso_id);
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
         if ($proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
         $data['proceso'] = $proceso;
-        $data['seguridad'] = $data['proceso']->Admseguridad;
+        $data['suscriptores'] = $data['proceso']->Suscriptores;
         $data['title'] = 'Triggers';
-        $data['content'] = 'backend/seguridad/index';
+        $data['content'] = 'backend/suscriptores/index';
         $this->load->view('backend/template', $data);
     }
     
@@ -37,72 +38,58 @@ class Suscriptores extends MY_BackendController {
 
         $data['edit'] = FALSE;
         $data['proceso'] = $proceso;
-        $data['seguridad'] = new Seguridad();
-        $data['content']='backend/seguridad/editar';
+        $data['suscriptor'] = new Suscriptor();
+        $data['content']='backend/suscriptores/editar';
         $data['title']='Registrar metodo';
         $this->load->view('backend/template',$data);
     }
-    
-    public function editar($seguridad_id){
-        $seguridad = Doctrine::getTable('Seguridad')->find($seguridad_id);
-        if ($seguridad->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
+
+    public function editar($suscriptor_id){
+        $suscriptor = Doctrine::getTable('Suscriptor')->find($suscriptor_id);
+        if ($suscriptor->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
         $data['edit'] = TRUE;
-        $data['proceso'] = $seguridad->Proceso;
-        $data['seguridad'] = $seguridad;
-        $data['content'] = 'backend/seguridad/editar';
-        $data['title'] = 'Editar Seguridad';
+        $data['proceso'] = $suscriptor->Proceso;
+        $data['suscriptor'] = $suscriptor;
+        $data['content'] = 'backend/suscriptores/editar';
+        $data['title'] = 'Editar Suscriptor';
         $this->load->view('backend/template',$data);
     }
 
-    public function editar_form($seguridad_id=NULL){
-        $seguridad=NULL;
-        if($seguridad_id){
-            $seguridad=Doctrine::getTable('Seguridad')->find($seguridad_id);
+    public function editar_form($suscriptor_id=NULL){
+        $suscriptor=NULL;
+        if($suscriptor_id){
+            $suscriptor=Doctrine::getTable('Suscriptor')->find($suscriptor_id);
         }else{
-            $seguridad=new SeguridadForm();
-            $seguridad->proceso_id=$this->input->post('proceso_id');
+            $suscriptor=new Suscriptor();
+            $suscriptor->proceso_id=$this->input->post('proceso_id');
         }
         $extra=$this->input->post('extra');
-        $tipoSeguridad=$extra['tipoSeguridad'];
-        if($seguridad->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+        $tipoSeguridad=$extra['idSeguridad'];
+        if($suscriptor->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar esta accion.';
             exit;
         }
         $this->form_validation->set_rules('institucion','Institucion','required');
-        $this->form_validation->set_rules('servicio','Servicio','required');
-        $this->form_validation->set_rules('extra[tipoSeguridad]','Tipo de seguridad','required');
-        switch ($tipoSeguridad){
-            case 'API_KEY':
-                $this->form_validation->set_rules('extra[apikey]','Llave de aplicación','required');
-                break;
-            case "HTTP_BASIC":
-                $this->form_validation->set_rules('extra[user]','user','required');
-                $this->form_validation->set_rules('extra[pass]','password','required'); 
-                break;
-            case "OAUTH2":
-                $this->form_validation->set_rules('extra[url_auth]','Url de Autenticación','required');
-                $this->form_validation->set_rules('extra[request_seg]','Request','required'); 
-                break;    
-        }
-        $seguridad->validateForm();
-        if(!$seguridad_id){
+        $this->form_validation->set_rules('extra[webhook]','Webhook','required');
+
+        $suscriptor->validateForm();
+        if(!$suscriptor_id){
             $this->form_validation->set_rules('proceso_id','Proceso','required');
         }
 
         $respuesta=new stdClass();
         if($this->form_validation->run()==TRUE){
-            if(!$seguridad){
+            if(!$suscriptor){
                 $this->form_validation->set_rules('proceso_id','Proceso','required');
             }
-            $seguridad->institucion=$this->input->post('institucion');
-            $seguridad->servicio=$this->input->post('servicio');
-            $seguridad->extra=$this->input->post('extra',false);
-            $seguridad->save();
+            $suscriptor->institucion=$this->input->post('institucion');
+            $suscriptor->extra=$this->input->post('extra',false);
+            $suscriptor->save();
             $respuesta->validacion=TRUE;
-            $respuesta->redirect=site_url('backend/Admseguridad/listar/'.$seguridad->Proceso->id);
+            $respuesta->redirect=site_url('backend/suscriptores/listar/'.$suscriptor->Proceso->id);
         }else{
             $respuesta->validacion=FALSE;
             $respuesta->errores=validation_errors();
@@ -110,40 +97,40 @@ class Suscriptores extends MY_BackendController {
         echo json_encode($respuesta);
     }
     
-    public function eliminar($seguridad_id){
-        $seguridad=Doctrine::getTable('Seguridad')->find($seguridad_id);
-        if($seguridad->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+    public function eliminar($suscriptor_id){
+        $suscriptor=Doctrine::getTable('Suscriptor')->find($suscriptor_id);
+        if($suscriptor->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para eliminar esta accion.';
             exit;
         }
-        $proceso=$seguridad->Proceso;
+        $proceso=$suscriptor->Proceso;
         $fecha = new DateTime ();
         // Auditar
         $registro_auditoria = new AuditoriaOperaciones ();
         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
-        $registro_auditoria->operacion = 'Eliminación de Seguridad';
+        $registro_auditoria->operacion = 'Eliminación de Suscriptor';
         $usuario = UsuarioBackendSesion::usuario ();
         $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
         $registro_auditoria->proceso = $proceso->nombre;
         $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
         //Detalles
-        $seguridad_array['proceso'] = $proceso->toArray(false);
-        $seguridad_array['seguridad'] = $seguridad->toArray(false);
-        unset($seguridad_array['seguridad']['proceso_id']);
-        $registro_auditoria->detalles=  json_encode($seguridad_array);
+        $suscriptor_array['proceso'] = $proceso->toArray(false);
+        $suscriptor_array['suscriptor'] = $suscriptor->toArray(false);
+        unset($suscriptor_array['suscriptor']['proceso_id']);
+        $registro_auditoria->detalles=  json_encode($suscriptor_array);
         $registro_auditoria->save();
-        $seguridad->delete();
-        redirect('backend/Admseguridad/listar/'.$proceso->id);
+        $suscriptor->delete();
+        redirect('backend/suscriptores/listar/'.$proceso->id);
     }
     
-    public function exportar($seguridad_id)
+    public function exportar($suscriptor_id)
     {
 
-        $seguridad = Doctrine::getTable('Accion')->find($seguridad_id);
+        $suscriptor = Doctrine::getTable('Suscriptor')->find($suscriptor_id);
 
-        $json = $seguridad->exportComplete();
+        $json = $suscriptor->exportComplete();
 
-        header("Content-Disposition: attachment; filename=\"".mb_convert_case(str_replace(' ','-',$seguridad->institucion),MB_CASE_LOWER).".simple\"");
+        header("Content-Disposition: attachment; filename=\"".mb_convert_case(str_replace(' ','-',$suscriptor->institucion),MB_CASE_LOWER).".simple\"");
         header('Content-Type: application/json');
         echo $json;
 
@@ -157,9 +144,9 @@ class Suscriptores extends MY_BackendController {
 
             if ($file_path && $proceso_id) {
                 $input = file_get_contents($_FILES['archivo']['tmp_name']);
-                $seguridad = Accion::importComplete($input, $proceso_id);
-                $seguridad->proceso_id = $proceso_id;            
-                $seguridad->save();            
+                $suscriptor = Accion::importComplete($input, $proceso_id);
+                $suscriptor->proceso_id = $proceso_id;
+                $suscriptor->save();
             } else {
                 die('No se especificó archivo o ID proceso');
             }

@@ -12,9 +12,6 @@ class Migration_43 extends Doctrine_Migration_Base {
             'institucion' => array(
                 'type' => 'varchar(128)'
             ),
-            'servicio' => array(
-                'type' => 'varchar(128)'
-            ),
             'extra' => array(
                 'type' => 'text'
             ),
@@ -23,11 +20,11 @@ class Migration_43 extends Doctrine_Migration_Base {
             )
         );
 
-        $this->createTable('suscriptores', $columns, array('primary' => array('id')));
+        $this->createTable('suscriptor', $columns, array('primary' => array('id')));
     }
 
     public function postUp() {
-        $this->createForeignKey( 'suscriptores', 'fk_trigger_proceso2', array(
+        $this->createForeignKey( 'suscriptor', 'fk_trigger_proceso2', array(
                 'local'        => 'proceso_id',
                 'foreign'      => 'id',
                 'foreignTable' => 'proceso',
@@ -38,7 +35,7 @@ class Migration_43 extends Doctrine_Migration_Base {
     }
 
     public function down() {
-        $this->dropTable('suscriptores');
+        $this->dropTable('suscriptor');
     }
 
 }

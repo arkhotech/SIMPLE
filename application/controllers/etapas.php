@@ -188,17 +188,6 @@ class Etapas extends MY_Controller {
         }
     }
 
-    function validate_captcha() {
-        $CI = & get_instance();
-        $captcha = $this->input->post('g-recaptcha-response');
-        $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $CI->config->item('secretkey') . "&response=" . $captcha . "&remoteip=" . $_SERVER['REMOTE_ADDR']); 
-        if ($response . 'success' == false) {
-            return FALSE; 
-        } else {
-            return TRUE;
-        }
-    }
-
     public function ejecutar_form($etapa_id, $secuencia) {
 
         log_message('info', 'ejecutar_form ($etapa_id [' . $etapa_id . '], $secuencia [' . $secuencia . '])');
