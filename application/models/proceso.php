@@ -48,6 +48,12 @@ class Proceso extends Doctrine_Record {
             'orderBy'=>'institucion asc'
         ));
 
+        $this->hasMany('Suscriptor as Suscriptores',array(
+            'local'=>'id',
+            'foreign'=>'proceso_id',
+            'orderBy'=>'institucion asc'
+        ));
+
         $this->hasMany('Documento as Documentos',array(
             'local'=>'id',
             'foreign'=>'proceso_id',

@@ -11,6 +11,7 @@
     <li><a href="<?= site_url('backend/documentos/listar/' . $proceso->id) ?>">Documentos</a></li>
     <li class="active"><a href="<?= site_url('backend/acciones/listar/' . $proceso->id) ?>">Acciones</a></li>
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
+    <li><a href="<?= site_url('backend/Suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
   
 
@@ -45,6 +46,10 @@
             </a>
         <?php } else if ($tipo == "callback") { ?>
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#callback" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "webhook") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webhook" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
         <?php } ?>

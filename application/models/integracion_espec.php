@@ -104,7 +104,7 @@ class FormNormalizer{
             if( $tarea->proceso_id === $proceso_id ){  //Si pertenece al proceso
                 foreach($tarea->Pasos as $paso ){ //Se extraen los pasos
                     //print_r($paso);
-                    if( $id_paso != NULL && $paso->paso->Formulario->id != $id_paso ){
+                    if( $id_paso != NULL && $paso->Formulario->id != $id_paso ){
                         continue;
                     }
                     $formSimple = 
