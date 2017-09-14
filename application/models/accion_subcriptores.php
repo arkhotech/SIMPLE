@@ -39,12 +39,10 @@ class AccionSubcriptores extends Accion {
                     $server = str_replace('"', '', $server);
                     $uri ='';
                     for ($i = 3; $i < count($base); $i++){
-                        $uri .='/'.$base[$i];
-                    }
-                    $caracter='/';
-                    $l = substr($uri, 0, 1);
-                    if($caracter===$l){
-                        $uri = substr($uri, 1);
+                        if($i==3)
+                            $uri .= $base[$i];
+                        else
+                            $uri .= '/'.$base[$i];
                     }
                     $uri = str_replace('"', '', $uri);
 
@@ -70,8 +68,8 @@ class AccionSubcriptores extends Accion {
                     }
 
 
-                    log_message('info',$this->varDump($output));
-                    log_message('info',"Request generado: ".$this->varDump($request));
+                    log_message('INFO',$this->varDump($output));
+                    log_message('INFO',"Request generado: ".$this->varDump($request));
 
                     $config = $this->getConfigRest($idSeguridad, $server);
 
@@ -79,7 +77,7 @@ class AccionSubcriptores extends Accion {
 
                     $CI = & get_instance();
 
-                    log_message('info',"Config: ".$this->varDump($config));
+                    log_message('INFO',"Config: ".$this->varDump($config));
 
                     $CI->rest->initialize($config);
                     $result = $CI->rest->post($uri, $request, 'json');

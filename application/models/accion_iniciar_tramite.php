@@ -11,9 +11,27 @@ class AccionIniciarTramite extends Accion {
 
         $tareas_proceso = Doctrine::getTable('Proceso')->findTareasProceso($proceso_id);
 
-        $data = Doctrine::getTable('Proceso')->find($proceso_id);
-        $conf_seguridad = $data->Admseguridad;
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        $cuenta = Doctrine::getTable('Cuenta')->find($proceso->cuenta_id);
+
         $display ='
+                <label>Cuentas</label>
+                <select id="cuentaSel" name="extra[cuentaSel]">
+                    <option value="">Seleccione...</option>
+                    <option value="'.$cuenta->id.'">'.$cuenta->nombre.'</option>';
+
+        /*foreach ($tramites_disponibles as $tramite) {
+            if ($this->extra->tramiteSel && $this->extra->tramiteSel == $tramite["id"]){
+                $display.='<option value="'.$tramite["id"].'" selected>'.$tramite["nombre"].'</option>';
+            }else{
+                $display.='<option value="'.$tramite["id"].'">'.$tramite["nombre"].'</option>';
+            }
+        }*/
+
+        $display.='</select>';
+
+        $display.='
                 <label>Trámites disponibles</label>
                 <select id="tramiteSel" name="extra[tramiteSel]">
                     <option value="">Seleccione...</option>';
@@ -27,11 +45,6 @@ class AccionIniciarTramite extends Accion {
                 }
 
         $display.='</select>';
-
-        /*$display.='
-                <label>Tareas disponibles del trámite para retorno</label>
-                <select id="tareaRetornoSel" name="extra[tareaRetornoSel]">';
-        $display.='</select>';*/
 
         $display.='
                 <label>Tarea desde la cual desea continuar el proceso</label>
