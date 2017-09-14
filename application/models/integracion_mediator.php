@@ -17,9 +17,20 @@ class IntegracionMediator{
             case "grid": return "grid";
             case "date" : return "date";
             case "subtitle" : return "string";
+            case "documento" : return "base64";
             default: return "string";
         }
     }
+    
+    private function varDireccion($campo){
+        switch ($campo['tipo']){
+            case "file": return "IN-OUT";
+            case "documento": return "OUT";
+            case "subtitle" : return "OUT";
+            default: return "IN";
+        }
+    }
+    
     /**
      * 
      * @param type $json
@@ -45,24 +56,24 @@ class IntegracionMediator{
         }
         //print_r($json);die;
 
-//        foreach ($form->Campos as $c) {
-//            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
-//            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
-// 
-//            if(count($c->validacion) > 0){
-//                foreach ($c->validacion as $validacion) {
-//                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
-//                    if($validacion == "required"){
-//                        $valor = $this->extractVariable($body,$c,$etapa->tramite_id);
-//                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
-//                        if($valor == "NE"){
-//                            $valida_formulario = FALSE;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        foreach ($form->Campos as $c) {
+            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
+ 
+            if(count($c->validacion) > 0){
+                foreach ($c->validacion as $validacion) {
+                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
+                    if($validacion == "required"){
+                        $valor = $this->extractVariable($json,$c,$etapa->tramite_id);
+                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
+                        if($valor == "NE"){
+                            $valida_formulario = FALSE;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
  
  
  
@@ -80,19 +91,18 @@ class IntegracionMediator{
                 }
             }
  
-            //echo $campo->nombre." ".$value_list[$campo['nombre']].". ";
-            array_push($retval['form']['campos'],
- 
-                  array(
+            $record = array(
                     "nombre" => $campo['nombre'],
                     "tipo_control" => $campo['tipo'],
                     "tipo" => $this->mapType($campo),  //$campo['dependiente_tipo'],
                     "obligatorio" => $obligatorio,
                     "solo_lectura" => ($campo['readonly']==0) ? false : true,
                     "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'],
-                    "valor" => ($value_list!=NULL) ? $value_list[$campo['nombre']] : "")//($campo['valor'] == NULL) ? $campo['valor_default'] : $campo['valor'])
+                    "valor" => ($value_list!=NULL) ? $value_list[$campo['nombre']] : "",
+                    "direccion" => ($this->varDireccion($campo)));
                 
-                    );
+            
+            array_push($retval['form']['campos'],$record);
                  
         }
         
@@ -136,7 +146,7 @@ class IntegracionMediator{
                     $formSimple = 
                             Doctrine::getTable('Formulario') ->find($paso->Formulario->id)->exportComplete();
                     $json = json_decode($formSimple,true);
-                    log_message("INFO", "Json formulario: ".$json, FALSE);
+                    //log_message("INFO", "Json formulario: ".$json, FALSE);
                     array_push($result,$this->normalizarFormulario($json,$paso->Formulario));
                 }
                 
@@ -172,83 +182,29 @@ class IntegracionMediator{
         $data = json_decode($formSimple->exportComplete(),true);
         return $this->normalizarFormulario($data,$formSimple,$etapa_id,$value_list);
     }
-
-    /**
-     * @param $formulario array con campos del formulario de entrada para iniciar el proceso
-     * @return string
-     */
-    function generar_swagger($formulario, $id_tramite, $id_tarea){
-
-        //log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
-        log_message("info", "Id trámite: ".$id_tramite, FALSE);
-        log_message("info", "Id tarea: ".$id_tarea, FALSE);
-
-        if(isset($formulario) && count($formulario) > 0){
-            //log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
-            $data_entrada = "";
-            $form = $formulario[0];
-            $campos = $form["form"];
-            foreach($campos["campos"] as $campo){
-                //Campo tipo file será tratado como string asumiendo que el archivo viene en base64
-                if($campo["tipo"] == "string" || $campo["tipo"] == "base64"){
-                    if($data_entrada != "") $data_entrada .= ",";
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\"}";
-                }else if($campo["tipo_control"] == "checkbox"){
-                    if($data_entrada != "") $data_entrada .= ",";
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}}";
-                }else if($campo["tipo"] == "date"){
-                    if($data_entrada != "") $data_entrada .= ",";
-                    $data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\",\"format\": \"date\"}";
-                }else if($campo["tipo"] == "grid"){
-
-                    if($data_entrada != "") $data_entrada .= ",";
-
-                    $data_entrada .= "";
-
-                    $columnas = array();
-                    $columnas = $campo["dominio_valores"];
-
-                    $nombres_columnas = "";
-                    foreach ($columnas["columns"] as $column){
-                        if($nombres_columnas != "") $nombres_columnas .= ",";
-                        $nombres_columnas .= "'".$column["header"]."'";
-                    }
-
-                    $data_entrada .= "\"".$campo["nombre"]."\": {
-                    \"description\": \"Formato de arreglo\n\nPrimera fila corresponde a nombres de columnas, los cuales son: [".$nombres_columnas."]\n\nFilas siguientes corresponden a los valores\nEjemplo:\n[\n  [nombre_columna_1, nombre_columna_2, .., nombre_columna_N],\n  [valor_1, valor_2, .., valor_N], .., [valor_1, valor_2, .., valor_N]\n]\n\",
-                    \"type\": \"array\",\"items\": {\"type\": \"array\",\"items\": {\"type\": \"string\"}},
-                    \"default\": \"[[".$nombres_columnas."]]\",";
-
-                    $data_entrada .= "\"minItems\": 1,";
-                    $data_entrada .= "\"maxItems\": ".count($columnas["columns"])."}";
-
-                }
+    
+    private function getOuputVarsSwagger($formulario,$proceso_id){
+        log_message('debug',"Recuperando variables de salida: ".$proceso_id);
+ 
+        $variables = Campo::getVarsExpFromFormulario($formulario[0]['form']['idForm'],$proceso_id);
+        $retval = null;
+        //Estas variables son las exportables como output
+        if(isset($variables)){
+            foreach($variables as $var ){
+                $retval['formvar'][]=$var->nombre;
             }
         }
-
-        $swagger = "";
-
-        $nombre_host = gethostname();
-        //($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
-
-        log_message("info", "HOST: ".$nombre_host, FALSE);
-
-        if ($file = fopen("uploads/swagger/start_swagger.json", "r")) {
-            log_message("debug", "Formulario recuperado", FALSE);
-            while(!feof($file)) {
-                $line = fgets($file);
-                $line = str_replace("-DATA_ENTRADA-", $data_entrada, $line);
-                $line = str_replace("-HOST-", $nombre_host, $line);
-                $line = str_replace("-id_tramite-", $id_tramite, $line);
-                $line = str_replace("-id_tarea-", $id_tarea, $line);
-                $swagger .= $line;
+        $accion_vars = Campo::getVarsAccionExpFromProceso($proceso_id);
+        
+        if(isset($accion_vars)){
+            foreach($accion_vars as $var ){
+                $retval['accionvar'][] = $var->extra->variable;
             }
-            fclose($file);
         }
-
-        return $swagger;
-
+        return $retval;
     }
+    
+    
     /**
      * Inicia un proceso simple
      * 
@@ -567,6 +523,9 @@ class IntegracionMediator{
             if($paso === NULL){
                 $etapa->avanzar();
                 $next_etapas = $this->obtenerProximaEtapa($etapa, $id_proceso);
+                if($next_etapas=== NULL){
+                    continue;
+                }
                 $ret = $this->getFormulariosFromEtapa($next_etapas,$id_proceso);
                 if($ret != NULL && count($ret)>0 ){
                     $forms[] = $ret[0];
@@ -593,6 +552,7 @@ class IntegracionMediator{
         $form_norm=array();
         $etapas = array();
         $forms = null;
+        $estado = 'undefined';
         $etapa_id = $etapa->id;
         //Si no tienes conexiones siguientes entonces es una tarea final
         
@@ -605,25 +565,46 @@ class IntegracionMediator{
             log_message("INFO", "###Id etapa despues de avanzar: ".$etapa->id, FALSE);
             if($next->estado === 'pendiente'){
                 log_message("debug","pendiente");
-                foreach($next->tareas as $tarea){
-                    log_message('debug','***** Revisando una etapa '.$tarea->id." ".$id_proceso);
-                    $etapas[] = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
-                }
-                
-                $forms[] = $this->getFormulariosFromEtapa($etapas,$id_proceso);
-                $estado = 'activo';
+                    foreach($next->tareas as $tarea){
+                        log_message('debug','***** Revisando una etapa '.$tarea->id." ".$id_proceso);
+                        $etapas[] = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
+                    }
+                    
+                    //Si no hay mas etapas, es el fin
+                    if(count($etapas) > 0 ){
+                        $forms = $this->getFormulariosFromEtapa($etapas,$id_proceso); //etapas sin formulario
+                        if($forms === NULL){  //no tiene formualrio, etapa vacia
+                            //no hay formularios, entonces avanzar al siguiente
+                            log_message('debug','Contando etapas');
+                            log_message('debug',''.get_class($etapas[0]));
+                            log_message('debug',''.  $this->varDump(get_class_methods($etapas[0])));
+                            if(count($etapas) === 1 && $etapas[0].isFinal ){
+                                //Etapa vacia y final, termina todo
+                                $forms=array();
+                                $estado = 'finalizado';
+                            }else if(count($etapas) === 1 && !$etapas[0].isFinal){
+                                //Obtener las nuevas etapas
+                            }
+                        }else{
+                            $estado = 'activo';
+                        }
+                    }
+            
             }else if($next->estado == 'completado'){
                 log_message("debug","completado");
                 $estado = 'finalizado';
             }else if($next->estado == 'standby'){  //Etapas paralelas pendientes
                 log_message("debug","standby");
                 $estado = 'standby';
+            }else{
+                log_message('debug',"Estado : ".$next->estado);
             }
-
+            $secuencia = 0;  //debe resetarse el paso
         }else{
-            
-//            $paso = $etapa->getPasoEjecutable($secuencia);
-//            $form_norm = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
+            //Procesar pasos de una misma etpa
+            $estado = 'activo';
+            $paso = $etapa->getPasoEjecutable($secuencia);
+            $forms[] = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
         }
         
         $campos = new Campo();
@@ -656,8 +637,8 @@ class IntegracionMediator{
                     $etapas = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
                 }
             }else{
-                log_message('debug','El trmite ha sido completado');
-                return $etapas;
+                log_message('debug','El tramite ha sido completado');
+                return NULL;
             }
         }else{
             $etapas = null;

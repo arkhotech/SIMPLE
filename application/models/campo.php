@@ -362,7 +362,9 @@ class Campo extends Doctrine_Record {
     public function getCamposExportables($etapa){
 
         log_message("INFO", "getListaExportables", FALSE);
-
+        if( !is_object($etapa) ){
+            throw new Exception('Se esperaba una instancia del "Objeto" de "Etapa"');
+        }
         $campos = null;
         foreach($etapa->Tarea->Pasos as $paso){
             foreach($paso->Formulario->Campos as $campo){
@@ -443,6 +445,53 @@ class Campo extends Doctrine_Record {
         }
         return null;
     }
+    /**
+     * Obtiene las variables que han sido como exportables pero de una definicion
+     * de proceso
+     * 
+     * @param type $form
+     * @return type
+     */
+    public static function getVarsExpFromFormulario($form_id,$proceso_id){
+        try{
+            
+            return $result = Doctrine_Query::create()
+            ->from('Campo c, c.Formulario f ')
+            ->where('c.formulario_id = f.id')
+            ->andWhere('exponer_campo = 1')
+            ->andWhere('f.proceso_id = ?', $proceso_id)
+            ->andWhere("f.id= ? ",$form_id)
+            ->execute(); 
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+            throw $e;
+        }
+        return null;
+    }
+    /**
+     * Obtiene las variables que se generan bajo una acción en la definición de un 
+     * proceso
+     * 
+     * @param type $id_proceso
+     * @param type $id_form
+     * @return type  { variable : {nombre} , experesion : { valor indeerminado JSON o String }
+     */
+     public static function getVarsAccionExpFromProceso($id_proceso){
+        try{
+            //select * from accion where tipo = 'variable' and proceso_id = 6 and exponer_variable = 1
+            return $result = Doctrine_Query::create()
+            ->from('Accion a')
+            ->where('a.tipo = "variable" ')
+            ->andWhere('exponer_variable = 1')
+            ->andWhere('a.proceso_id = ?', $id_proceso)
+            ->execute();
+            
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+        }
+        return null;
+    }
+    
     
     public function getVariableValor($nombre,$etapa){
         log_message('debug','Buscando valores de variable: '.$nombre." ".$etapa->id);

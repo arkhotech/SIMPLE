@@ -128,12 +128,7 @@
   "output": {
     "type": "object",
     "properties": {
-      "clave": {
-        "type": "string"
-      },
-      "valor": {
-        "type": "string"
-      }
+      -OUTPUT-
     }
   },
   "campo": {

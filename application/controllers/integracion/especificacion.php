@@ -53,9 +53,10 @@ class Especificacion extends REST_Controller{//MY_BackendController {
         $this->load->helper('download');
 
         $integrador = new IntegracionMediator();
+        $swagger = new Swagger();
             /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
         $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
-        $swagger_file = $integrador->generar_swagger($formulario, $id_proceso, $id_tarea);
+        $swagger_file = $swagger->generar_swagger($formulario, $id_proceso, $id_tarea);
 
         force_download("start_simple.json", $swagger_file);
         exit;

@@ -95,6 +95,7 @@ class Etapa extends Doctrine_Record {
     //Si se desea especificar el usuario a cargo de la prox etapa, se debe pasar como parametros en un array: $usuarios_a_asignar[$tarea_id]=$usuario_id.
     //Este parametro solamente es valido si la asignacion de la prox tarea es manual.
     public function avanzar($usuarios_a_asignar = null) {
+        log_message('debug',"Avanzando etapa");
         Doctrine_Manager::connection()->beginTransaction();
         //Cerramos esta etapa
         $this->cerrar();
@@ -363,7 +364,7 @@ class Etapa extends Doctrine_Record {
 
         if (isset($pasos[$secuencia]))
             return $pasos[$secuencia];
-
+        log_message("debug", "retornando null", FALSE);
         return null;
     }
 
