@@ -24,7 +24,7 @@ class IntegracionMediator{
     
     private function varDireccion($campo){
         switch ($campo['tipo']){
-            case "file": return "IN-OUT";
+            case "file": return "IN";
             case "documento": return "OUT";
             case "subtitle" : return "OUT";
             default: return "IN";
@@ -136,6 +136,11 @@ class IntegracionMediator{
         }else{
             log_message("INFO", "Recuperando tarea: ".$id_tarea, FALSE);
             $tarea = Doctrine::getTable("Tarea")->find($id_tarea);
+            
+            if(!$tarea){
+                log_message("error", 'Id de tarea no existe', FALSE);
+                throw new Exception("Id de Tarea no existe",404);
+            }
             log_message("INFO", "Comprobando proceso id: ".$tarea->proceso_id, FALSE);
             if( $tarea->proceso_id === $proceso_id ){  //Si pertenece al proceso
                 foreach($tarea->Pasos as $paso ){ //Se extraen los pasos
@@ -182,29 +187,7 @@ class IntegracionMediator{
         $data = json_decode($formSimple->exportComplete(),true);
         return $this->normalizarFormulario($data,$formSimple,$etapa_id,$value_list);
     }
-    
-    private function getOuputVarsSwagger($formulario,$proceso_id){
-        log_message('debug',"Recuperando variables de salida: ".$proceso_id);
- 
-        $variables = Campo::getVarsExpFromFormulario($formulario[0]['form']['idForm'],$proceso_id);
-        $retval = null;
-        //Estas variables son las exportables como output
-        if(isset($variables)){
-            foreach($variables as $var ){
-                $retval['formvar'][]=$var->nombre;
-            }
-        }
-        $accion_vars = Campo::getVarsAccionExpFromProceso($proceso_id);
-        
-        if(isset($accion_vars)){
-            foreach($accion_vars as $var ){
-                $retval['accionvar'][] = $var->extra->variable;
-            }
-        }
-        return $retval;
-    }
-    
-    
+
     /**
      * Inicia un proceso simple
      * 

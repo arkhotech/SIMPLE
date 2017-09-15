@@ -42,24 +42,32 @@ class Especificacion extends REST_Controller{//MY_BackendController {
      */
 
     public function servicio_get(){
-        $param = $this->get();
-        $id_proceso = $param['proceso'];
-        $id_tarea = $param['etapa'];
+        try{
+            $param = $this->get();
+            $id_proceso = $param['proceso'];
+            $id_tarea = $param['etapa'];
+
+            if($id_proceso == NULL || $id_tarea == NULL ){
+                $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
+            }
+
+            $this->load->helper('download');
+
+            $integrador = new IntegracionMediator();
+            $swagger = new Swagger();
+                /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
+            $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
+            $swagger_file = $swagger->generar_swagger($formulario, $id_proceso, $id_tarea);
+
+            force_download("start_simple.json", $swagger_file);
+            exit;
+        }catch(Exception $e){
+               $this->response(
+                       array("code"=> $e->getCode(),
+                           "message"=>$e->getMessage()),
+                       $e->getCode());
         
-        if($id_proceso == NULL || $id_tarea == NULL ){
-            $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
         }
-
-        $this->load->helper('download');
-
-        $integrador = new IntegracionMediator();
-        $swagger = new Swagger();
-            /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
-        $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
-        $swagger_file = $swagger->generar_swagger($formulario, $id_proceso, $id_tarea);
-
-        force_download("start_simple.json", $swagger_file);
-        exit;
     }
     /**
      * Para obtener la especificación de formularios

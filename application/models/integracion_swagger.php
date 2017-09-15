@@ -19,7 +19,9 @@ class Swagger {
      * @version 1.0
      */
     public function generar_swagger($formulario, $id_tramite, $id_etapa){
-
+        if(!isset($formulario)){
+            throw new Exception("Formulario no se puede recuper",404);
+        }
         //log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
         log_message("info", "Id trámite: ".$id_tramite, FALSE);
         log_message("info", "Id tarea: ".$id_etapa, FALSE);
@@ -33,11 +35,14 @@ class Swagger {
             $form = $formulario[0];
             $campos = $form["form"];
             foreach($campos["campos"] as $campo){
-                log_message('debug',$campos['nombre']." -> ".$campo['direccion']);
-                //Campo tipo file será tratado como string asumiendo que el archivo viene en base64
-                if($data_entrada != "") $data_entrada .= ",";
-                if($data_salida != "")  $data_salida .= ",";
                 
+                log_message('debug',$campo['nombre']." -> ".$campo['direccion']);
+                //Campo tipo file será tratado como string asumiendo que el archivo viene en base64
+                if($campo['direccion']=='IN' && $data_entrada != "") 
+                    $data_entrada .= ",";
+                if($campo['direccion']=='OUT' && $data_salida != "" )  
+                    $data_salida .= ",";
+              
                 
                 if($campo["tipo"] == "string" ){
                     ($campo['direccion']!='OUT') ? ($data_entrada .= "\"".$campo["nombre"]."\": {\"type\": \"string\"}"):
@@ -74,11 +79,16 @@ class Swagger {
             }
         }
         //Agregar las variables globales de salida
-        foreach($output_vars['accionvar'] as $var){
-             if($data_salida != "") {
-                 $data_salida .= ",";
-             }
-             $data_salida .= "\"".$var."\": {\"type\": \"string\"}";
+        if(isset($output_vars)){
+            foreach($output_vars['accionvar'] as $var){
+                log_message('debug','var: .'.$var.'.');
+                if($var != NULL && trim($var) != '' ){
+                    if($data_salida != "") {
+                        $data_salida .= ",";
+                    }
+                    $data_salida .= "\"".$var."\": {\"type\": \"string\"}";
+                }
+            }
         }
        
         $swagger = "";
