@@ -525,20 +525,47 @@ class Configuracion extends MY_BackendController {
             ->from('Usuario u')
             ->select('u.id, CONCAT(IF(u.open_id,u.rut,u.usuario),IF(u.email IS NOT NULL,CONCAT(" - ",u.email),"")) as text');
 
-        if(strlen($query) >= 3){
-            $doctrineQuery->having('text LIKE ?','%'.$query.'%')
+        if (strlen($query) >= 3) {
+            $doctrineQuery->having('text LIKE ?', '%' . $query . '%')
                 ->where('u.registrado = 1');
-        }else{
-            $doctrineQuery->where('u.cuenta_id = ?',UsuarioBackendSesion::usuario()->cuenta_id);
+        } else {
+            $doctrineQuery->where('u.cuenta_id = ?', UsuarioBackendSesion::usuario()->cuenta_id);
         }
 
-        $usuarios=$doctrineQuery->execute();
+        $usuarios = $doctrineQuery->execute();
 
         header('Content-Type: application/json');
         echo json_encode($usuarios->toArray());
 
     }
-    function nueva_conf_cms(){
+
+    function ajax_get_validacion_reglas() {
+
+        $rule = (isset($_GET['rule'])) ? $_GET['rule'] : '';
+        $proceso_id = (isset($_GET['proceso_id'])) ? $_GET['proceso_id'] : '';
+
+        log_message('debug', 'ajax_get_validacion_reglas() $rule [' .  $rule . ']');
+
+        $code = 200;
+        header('Content-Type: application/json');
+
+        if (strlen($rule) > 0) {
+            $regla = new Regla($rule);
+            $mensaje = $regla->validacionVariablesEnReglas($proceso_id);
+
+            if (isset($mensaje) && count($mensaje) == 0) {
+                $code = 202;
+            } else {
+                $mensaje = "Las sgtes. variables no existen: <br>" . implode(', ', $mensaje);
+            }
+        } else {
+            $code = 202;
+            $mensaje = "";
+        }
+        echo json_encode(array('code'=>$code, 'mensaje'=>$mensaje));
+    }
+
+    function nueva_conf_cms() {
         $url=(isset($_POST['url']))?$_POST['url']:'';
         $username=(isset($_POST['user']))?$_POST['user']:'';
         $pass=(isset($_POST['pass']))?$_POST['pass']:'';

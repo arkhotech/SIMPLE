@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function() {
         function escapeHtml(text) {
             return text
                 .replace(/&/g, "&amp;")
@@ -25,15 +25,16 @@
             $(this).tab('show');
         });
         
-        //Permite borrar pasos
-        $(".tab-pasos").on("click",".delete",function(){
+        // Permite borrar pasos
+        $(".tab-pasos").on("click",".delete",function() {
             $(this).closest("tr").remove();
             return false;
         });
-        //Permite agregar nuevos pasos
-        $(".tab-pasos .form-agregar-paso button").click(function(){
+
+        // Permite agregar nuevos pasos
+        $(".tab-pasos .form-agregar-paso button").click(function() {
             var $form=$(".tab-pasos .form-agregar-paso");
-            
+
             var pos=1+$(".tab-pasos table tbody tr").size();
             var formularioId=$form.find(".pasoFormulario option:selected").val();
             var formularioNombre=$form.find(".pasoFormulario option:selected").text();
@@ -58,12 +59,13 @@
             
             return false;
         });
+
         //Permite que los pasos sean reordenables
         $(".tab-pasos table tbody").sortable({
             revert: true,
-            stop: function(){
+            stop: function() {
                 //Reordenamos las posiciones
-                $(this).find("tr").each(function(i,e){
+                $(this).find("tr").each(function(i, e) {
                     $(e).find("td:nth-child(1)").text(i+1);
                     $(e).find("input[name*=formulario_id]").attr("name","pasos["+(i+1)+"][formulario_id]");
                     $(e).find("input[name*=regla]").attr("name","pasos["+(i+1)+"][regla]");
@@ -71,13 +73,13 @@
                 });
             }
         });
-        
-        
+
         //Permite borrar eventos
         $(".tab-eventos").on("click",".delete",function(){
             $(this).closest("tr").remove();
             return false;
         });
+
         //Permite agregar nuevos eventos
         $(".tab-eventos .form-agregar-evento button").click(function(){
             var $form=$(".tab-eventos .form-agregar-evento");
@@ -158,7 +160,6 @@
     });
 </script>
 
-
 <div class="modal-header">
     <a class="close" data-dismiss="modal">×</a>
     <h3>Editar Tarea</h3>
@@ -199,14 +200,14 @@
                         </div>
                         <div class="span6">
                             <script>
-                                $(document).ready(function(){
-                                    $("input[name=activacion]").change(function(){
-                                        if($("input[name=activacion]:checked").val()=='entre_fechas')
+                                $(document).ready(function() {
+                                    $("input[name=activacion]").change(function() {
+                                        if ($("input[name=activacion]:checked").val() == 'entre_fechas') {
                                             $("#activacionEntreFechas").show();
-                                        else
+                                        } else {
                                             $("#activacionEntreFechas").hide();  
+                                        }
                                     }).change();
-                                
                                 });
                             </script>
                             <label class="radio"><input name="activacion" value="si" type="radio" <?= $tarea->activacion == 'si' ? 'checked' : '' ?>>Tarea activada</label>
@@ -228,9 +229,6 @@
                             <div class="help-block">Información que aparecera en la bandeja de entrada al pasar el cursor por encima.</div>
                         </div>
                     </div>
-
-
-
                 </div>
                 <div class="tab-pane" id="tab2">
                     <script type="text/javascript">
@@ -260,12 +258,36 @@
                 </div>
                 <div class="tab-pane" id="tab3">
                     <script type="text/javascript">
-                        $(document).ready(function(){
-                            $("input[name=acceso_modo]").change(function(){
-                                if(this.value=="grupos_usuarios")
+                        $(document).ready(function() {
+                            $("input[name=acceso_modo]").change(function() {
+                                if (this.value == "grupos_usuarios") {
                                     $("#optionalGruposUsuarios").removeClass("hide");
-                                else
+                                } else {
                                     $("#optionalGruposUsuarios").addClass("hide");
+                                }
+                            });
+
+                            $(".reglas").blur(function() {
+                                var input = this;
+                                console.log("$rule: " + $(this).val());
+                                $.ajax({
+                                    url: '<?=site_url('backend/configuracion/ajax_get_validacion_reglas')?>',
+                                    data: {
+                                        rule:  $(input).val(),
+                                        proceso_id: <?= $proceso_id ?>
+                                    },
+                                    dataType: "json",
+                                    cache: false,
+                                    success: function(data) {
+                                        console.log("$data.mensaje: " + data.mensaje);
+                                        if (data.code == 200) {
+                                            $(input).parent().find(".message").html(data.mensaje);
+                                            $(input).parent().find(".message").show();
+                                        }
+                                    }
+                                });
+                            }).focus(function() {
+                                $(this).parent().find(".message").hide();
                             });
                         });
                     </script>
@@ -306,10 +328,11 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="pasoRegla" type="text" placeholder="Escribir regla condición aquí" />
+                                    <input class="pasoRegla reglas" type="text" placeholder="Escribir regla condición aquí" />
                                     <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/reglas-de-negocio-y-reglas-de-validacion.html" target="_blank">
                                         <span class="glyphicon glyphicon-info-sign"></span>
                                     </a>
+                                    <p class="message" style="color: red; display: block;"></p>
                                 </td>
                                 <td>
                                     <select class="pasoModo input-small">
@@ -366,7 +389,8 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="eventoRegla input-medium" type="text" placeholder="Escribir regla condición" />
+                                    <input class="eventoRegla input-medium reglas" type="text" placeholder="Escribir regla condición" />
+                                    <p class="message" style="color: red; display: block;"></p>
                                 </td>
                                 <td>
                                     <select class="eventoInstante input-small">

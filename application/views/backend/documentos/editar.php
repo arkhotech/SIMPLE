@@ -149,7 +149,7 @@
             </ul>
         </div>
 
-        <?php if ($proceso->Cuenta->HsmConfiguraciones->count()): ?>
+        <?php if (isset($proceso->Cuenta->HsmConfiguraciones) && $proceso->Cuenta->HsmConfiguraciones->count()): ?>
             <label>Firma Electronica Avanzada (HSM)</label>
             <select name="hsm_configuracion_id">
                 <option value="">No firmar con HSM</option>

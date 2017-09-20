@@ -97,12 +97,13 @@ class Procesos extends MY_BackendController {
 
         log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
 
-        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id || $proceso->activo != true) {
+        if ($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id || $proceso->activo != true) {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
-        
+
         $data['proceso'] = $proceso;
+        $data['proceso_id'] = $proceso_id;
 
         $data['title'] = 'Modelador';
         $data['content'] = 'backend/procesos/editar';
@@ -179,7 +180,7 @@ class Procesos extends MY_BackendController {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
-        
+
         $this->form_validation->set_rules('nombre', 'Nombre', 'required');
 
         $respuesta=new stdClass();
@@ -225,7 +226,7 @@ class Procesos extends MY_BackendController {
             echo 'Usuario no tiene permisos para editar esta tarea.';
             exit;
         }
-        
+        $data['proceso_id'] = $proceso_id;
         $data['tarea'] = $tarea;
         $data['formularios']=Doctrine::getTable('Formulario')->findByProcesoId($proceso_id);
         $data['acciones']=Doctrine::getTable('Accion')->findByProcesoId($proceso_id);
@@ -233,20 +234,20 @@ class Procesos extends MY_BackendController {
         $this->load->view('backend/procesos/ajax_editar_tarea',$data);
     }
     
-    public function editar_tarea_form($tarea_id){
-        $tarea=Doctrine::getTable('Tarea')->find($tarea_id);
-        
-        if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+    public function editar_tarea_form($tarea_id) {
+        $tarea = Doctrine::getTable('Tarea')->find($tarea_id);
+
+        if ($tarea->Proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para editar esta tarea.';
             exit;
         }
-        
+
         $this->form_validation->set_rules('nombre', 'Nombre', 'required');
-        if($this->input->post('vencimiento')){
-            $this->form_validation->set_rules('vencimiento_valor','Valor de Vencimiento','required|is_natural_no_zero');
-            if($this->input->post('vencimiento_notificar')){
-                $this->form_validation->set_rules('vencimiento_notificar_dias','Días para notificar vencimiento','required|is_natural_no_zero');
-                $this->form_validation->set_rules('vencimiento_notificar_email','Correo electronico para notificar vencimiento','required');
+        if ($this->input->post('vencimiento')) {
+            $this->form_validation->set_rules('vencimiento_valor','Valor de Vencimiento', 'required|is_natural_no_zero');
+            if ($this->input->post('vencimiento_notificar')) {
+                $this->form_validation->set_rules('vencimiento_notificar_dias', 'Días para notificar vencimiento', 'required|is_natural_no_zero');
+                $this->form_validation->set_rules('vencimiento_notificar_email', 'Correo electronico para notificar vencimiento', 'required');
             }
         }
 
@@ -271,38 +272,38 @@ class Procesos extends MY_BackendController {
             $tarea->activacion_fin=strtotime($this->input->post('activacion_fin'));
             $tarea->vencimiento=$this->input->post('vencimiento');
             $tarea->vencimiento_valor=$this->input->post('vencimiento_valor');
-            $tarea->vencimiento_unidad=$this->input->post('vencimiento_unidad');
-            $tarea->vencimiento_habiles=$this->input->post('vencimiento_habiles');
-            $tarea->vencimiento_notificar=$this->input->post('vencimiento_notificar');
-            $tarea->vencimiento_notificar_dias=$this->input->post('vencimiento_notificar_dias');
-            $tarea->vencimiento_notificar_email=$this->input->post('vencimiento_notificar_email');
-            $tarea->previsualizacion=$this->input->post('previsualizacion');
-            $tarea->externa=$this->input->post('externa');
+            $tarea->vencimiento_unidad = $this->input->post('vencimiento_unidad');
+            $tarea->vencimiento_habiles = $this->input->post('vencimiento_habiles');
+            $tarea->vencimiento_notificar = $this->input->post('vencimiento_notificar');
+            $tarea->vencimiento_notificar_dias =$this->input->post('vencimiento_notificar_dias');
+            $tarea->vencimiento_notificar_email = $this->input->post('vencimiento_notificar_email');
+            $tarea->previsualizacion = $this->input->post('previsualizacion');
+            $tarea->externa = $this->input->post('externa');
             $tarea->save();
-            
-            $respuesta->validacion=TRUE;
-            $respuesta->redirect=site_url('backend/procesos/editar/'.$tarea->Proceso->id);
-            
-        }else{
-            $respuesta->validacion=FALSE;
-            $respuesta->errores=validation_errors();
+
+            $respuesta->validacion = TRUE;
+            $respuesta->redirect = site_url('backend/procesos/editar/' . $tarea->Proceso->id);
+
+        } else {
+            $respuesta->validacion = FALSE;
+            $respuesta->errores = validation_errors();
         }
-        
+
         echo json_encode($respuesta);
     }
-    
-    public function eliminar_tarea($tarea_id){
-        $tarea=Doctrine::getTable('Tarea')->find($tarea_id);
-        
-        if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+
+    public function eliminar_tarea($tarea_id) {
+        $tarea = Doctrine::getTable('Tarea')->find($tarea_id);
+
+        if ($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para eliminar esta tarea.';
             exit;
         }
-        
+
         $proceso=$tarea->Proceso;
-        
-        $fecha = new DateTime ();
-        	
+
+        $fecha = new DateTime();
+
         // Auditar
         $registro_auditoria = new AuditoriaOperaciones ();
         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
@@ -311,126 +312,129 @@ class Procesos extends MY_BackendController {
         $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
         $registro_auditoria->proceso = $proceso->nombre;
         $registro_auditoria->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
-        
-        
+
         // Detalles
-        $tarea_array['proceso'] = $proceso ->toArray(false);
-        
+        $tarea_array['proceso'] = $proceso->toArray(false);
+
         $tarea_array['tarea'] = $tarea->toArray(false);
         unset($tarea_array['tarea']['posx']);
         unset($tarea_array['tarea']['posy']);
         unset($tarea_array['tarea']['proceso_id']);
-        
-        
+
         $registro_auditoria->detalles = json_encode($tarea_array);
         $registro_auditoria->save();
-        
+
         $tarea->delete();
-    
-        redirect('backend/procesos/editar/'.$proceso->id);
+
+        redirect('backend/procesos/editar/' . $proceso->id);
     }
     
-    public function ajax_crear_conexion($proceso_id){        
-        $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
-        $tarea_origen=Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$this->input->post('tarea_id_origen'));
-        $tarea_destino=Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$this->input->post('tarea_id_destino'));
-        
-        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+    public function ajax_crear_conexion($proceso_id) {
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+        $tarea_origen = Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$this->input->post('tarea_id_origen'));
+        $tarea_destino = Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$this->input->post('tarea_id_destino'));
+
+        if ($proceso->cuenta_id != UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para crear esta conexion.';
             exit;
         }
-        if($tarea_origen->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+        if ($tarea_origen->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para crear esta conexion.';
             exit;
         }
-        if($tarea_destino->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+        if ($tarea_destino->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para crear esta conexion.';
             exit;
         }
-        
-        //El tipo solamente se setea en la primera conexion creada para esa tarea.
-        $tipo=$this->input->post('tipo');
-        if($tarea_origen->ConexionesOrigen->count())
-            $tipo=$tarea_origen->ConexionesOrigen[0]->tipo;
-        
-        $conexion=new Conexion();
-        $conexion->tarea_id_origen=$tarea_origen->id;
-        $conexion->tarea_id_destino=$tarea_destino->id;
+
+        // El tipo solamente se setea en la primera conexion creada para esa tarea.
+        $tipo = $this->input->post('tipo');
+        if ($tarea_origen->ConexionesOrigen->count())
+            $tipo = $tarea_origen->ConexionesOrigen[0]->tipo;
+
+        $conexion = new Conexion();
+        $conexion->tarea_id_origen = $tarea_origen->id;
+        $conexion->tarea_id_destino = $tarea_destino->id;
         $conexion->tipo=$tipo;
         $conexion->save();
     }
     
-    public function ajax_editar_conexiones($proceso_id,$tarea_origen_identificador){        
+    public function ajax_editar_conexiones($proceso_id,$tarea_origen_identificador) {
         $conexiones=  Doctrine_Query::create()
-                ->from('Conexion c, c.TareaOrigen t')
-                ->where('t.proceso_id=? AND t.identificador=?',array($proceso_id,$tarea_origen_identificador))
-                ->execute();
-        
-        if($conexiones[0]->TareaOrigen->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+            ->from('Conexion c, c.TareaOrigen t')
+            ->where('t.proceso_id=? AND t.identificador=?', array($proceso_id, $tarea_origen_identificador))
+            ->execute();
+
+        if ($conexiones[0]->TareaOrigen->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para editar estas conexiones.';
             exit;
         }
-        
+
+        $data['proceso_id'] = $proceso_id;
         $data['conexiones'] = $conexiones;
-        
+
         $this->load->view('backend/procesos/ajax_editar_conexiones',$data);
     }
     
-    public function editar_conexiones_form($tarea_id){
-        $tarea=Doctrine::getTable('Tarea')->find($tarea_id);
-        
-        if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+    public function editar_conexiones_form($tarea_id) {
+
+        log_message('debug', 'method: editar_conexiones_form(' . $tarea_id . ')');
+
+        $tarea = Doctrine::getTable('Tarea')->find($tarea_id);
+
+        if ($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para editar estas conexiones.';
             exit;
         }
-        
+
         $this->form_validation->set_rules('conexiones', 'Conexiones','required');
 
-        $respuesta=new stdClass();
+        $respuesta = new stdClass();
         if ($this->form_validation->run() == TRUE) {
-            $tarea->setConexionesFromArray($this->input->post('conexiones',false));
+
+            $tarea->setConexionesFromArray($this->input->post('conexiones', false));
             $tarea->save();
-            
-            $respuesta->validacion=TRUE;
-            $respuesta->redirect=site_url('backend/procesos/editar/'.$tarea->Proceso->id);
-            
-        }else{
-            $respuesta->validacion=FALSE;
-            $respuesta->errores=validation_errors();
+
+            $respuesta->validacion = TRUE;
+            $respuesta->redirect = site_url('backend/procesos/editar/' . $tarea->Proceso->id);
+
+        } else {
+            $respuesta->validacion = FALSE;
+            $respuesta->errores = validation_errors();
         }
-        
+
         echo json_encode($respuesta);
     }
-    
-    public function eliminar_conexiones($tarea_id){
-        $tarea=Doctrine::getTable('Tarea')->find($tarea_id);
-        
-        if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+
+    public function eliminar_conexiones($tarea_id) {
+        $tarea = Doctrine::getTable('Tarea')->find($tarea_id);
+
+        if ($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para eliminar esta conexion.';
             exit;
         }
-        
-        $proceso=$tarea->Proceso;
+
+        $proceso = $tarea->Proceso;
         $tarea->ConexionesOrigen->delete();
-    
-        redirect('backend/procesos/editar/'.$proceso->id);
+
+        redirect('backend/procesos/editar/' . $proceso->id);
     }
 
     public function ajax_editar_modelo($proceso_id) {
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
-        if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
+        if ($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id) {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
-        
-        $modelo=$this->input->post('modelo');
-                
+
+        $modelo = $this->input->post('modelo');
+
         $proceso->updateModelFromJSON($modelo);
-        
+
     }
 
-    public function exportar($proceso_id){
+    public function exportar($proceso_id) {
 
         $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
 
