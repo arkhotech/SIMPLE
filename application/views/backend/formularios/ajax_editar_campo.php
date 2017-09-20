@@ -113,8 +113,10 @@ if(!isset($idagendaeditar) || !is_numeric($idagendaeditar)){
 <div class="modal-body">
     <form id="formEditarCampo" class="ajaxForm" method="POST" action="<?= site_url('backend/formularios/editar_campo_form/' . ($edit ? $campo->id : '')) ?>">
         <div class="validacion"></div>
-        <input type="hidden" name="formulario_id" value="<?= $formulario->id ?>" />
-        <input type="hidden" name="tipo" value="<?= $campo->tipo ?>" />
+        <?php if (!$edit): ?>
+            <input type="hidden" name="formulario_id" value="<?= $formulario->id ?>" />
+            <input type="hidden" name="tipo" value="<?= $campo->tipo ?>" />
+        <?php endif; ?>
         <label>Etiqueta
         </label>
         <?php if($campo->etiqueta_tamano=='xxlarge'):?>

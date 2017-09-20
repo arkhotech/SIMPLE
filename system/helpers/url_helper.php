@@ -126,6 +126,21 @@ if ( ! function_exists('index_page'))
 	}
 }
 
+/**
+ * sitekey
+ *
+ * Returns the "sitekey" from your config file
+ *
+ * @access	public
+ * @return	string
+ */
+if (!function_exists('sitekey')) {
+	function sitekey() {
+		$CI =& get_instance();
+		return $CI->config->item('sitekey');
+	}
+}
+
 // ------------------------------------------------------------------------
 
 /**

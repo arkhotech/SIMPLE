@@ -44,22 +44,7 @@ class Etapas extends MY_Controller {
         $data['sidebar'] = 'inbox';
         $data['content'] = 'etapas/inbox';
         $data['title'] = 'Bandeja de Entrada';
-        $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id); 
-        if($config){
-           $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-           $nombre = $config->nombre;
-           if ($nombre=='default'){
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-           } else {
-                $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-           }
-           
-        }else{
-           $data['template_path'] = 'uploads/themes/default/';
-           $this->load->view('themes/default/template', $data);
-        }
+        $this->load->view('template', $data);
     }
     
     public function sinasignar($offset=0) {                
@@ -184,22 +169,7 @@ class Etapas extends MY_Controller {
             $data['title'] = $etapa->Tarea->nombre;
             $template = $this->input->get('iframe') ? 'template_iframe' : 'template';
 
-            $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id);
-            if($config){
-               $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-               $nombre = $config->nombre;
-               if ($nombre=='default'){
-                    $data['template_path'] = 'uploads/themes/default/';
-                    $this->load->view('themes/default/template', $data);
-               } else {
-                    $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                    $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-               }
-               
-            }else{
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-            }
+            $this->load->view('template', $data);
         }
     }
 
@@ -370,22 +340,7 @@ class Etapas extends MY_Controller {
         $data['title'] = $etapa->Tarea->nombre;
         $template = $this->input->get('iframe') ? 'template_iframe' : 'template';
 
-        $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id); 
-        if($config){
-           $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-           $nombre = $config->nombre;
-           if ($nombre=='default'){
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-           } else {
-                $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-           }
-           
-        }else{
-           $data['template_path'] = 'uploads/themes/default/';
-           $this->load->view('themes/default/template', $data);
-        }
+        $this->load->view('template', $data);
     }
 
     public function ejecutar_fin_form($etapa_id) {
@@ -466,22 +421,7 @@ class Etapas extends MY_Controller {
         $data['sidebar'] = 'participados';
         $data['title'] = 'Historial - ' . $etapa->Tarea->nombre;
         $data['content'] = 'etapas/ver';
-        $config =Doctrine::getTable('CuentaHasConfig')->findOneByIdparAndCuentaId(1,Cuenta::cuentaSegunDominio()->id); 
-        if($config){
-           $config =Doctrine::getTable('Config')->findOneByIdAndIdparAndCuentaIdOrCuentaId($config->config_id,$config->idpar,Cuenta::cuentaSegunDominio()->id,0);
-           $nombre = $config->nombre;
-           if ($nombre=='default'){
-                $data['template_path'] = 'uploads/themes/default/';
-                $this->load->view('themes/default/template', $data);
-           } else {
-                $data['template_path'] = 'uploads/themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/';
-                $this->load->view('themes/'.Cuenta::cuentaSegunDominio()->id.'/'.$nombre.'/template', $data);
-           }
-           
-        }else{
-           $data['template_path'] = 'uploads/themes/default/';
-           $this->load->view('themes/default/template', $data);
-        }
+        $this->load->view('template', $data);
     }
 
     public function descargar($tramites){
