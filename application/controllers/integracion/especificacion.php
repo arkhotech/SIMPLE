@@ -9,6 +9,7 @@ class Especificacion extends REST_Controller{//MY_BackendController {
     public function procesos_get(){
         //print_r(Cuenta::cuentaSegunDominio());die;
         $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(Cuenta::cuentaSegunDominio()->id);
+        log_message('debug','Recuperando procesos expuestos: '.count($tarea));
         $result = array();
         $nombre_host = gethostname();
         (isset($_SERVER['HTTPS']) ? $protocol = 'https://' : $protocol = 'http://');

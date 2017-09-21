@@ -108,4 +108,17 @@ class Formulario extends Doctrine_Record {
     }
      * 
      */
+    public function getCamposEntrada(){
+        try{
+        return $result = Doctrine_Query::create()
+            ->from('Campo c, c.Formulario f')
+          
+            ->andWhere('c.readonly = 0')
+            ->andWhere('f.id = ?', $this->id)
+            ->execute();
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+            throw $e;
+        }       
+    }
 }

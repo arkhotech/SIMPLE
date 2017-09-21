@@ -42,7 +42,13 @@ class ProcesoTable extends Doctrine_Table {
     }
 
     public function findVariblesFormularios($proceso_id, $tarea_id){
-        $sql="select f.nombre as nombre_formulario, c.id as variable_id, c.nombre as nom_variables, c.exponer_campo from proceso p,tarea t, paso pa, formulario f, campo c where p.id=t.proceso_id and p.id=".$proceso_id." and t.id=".$tarea_id." and t.id=pa.tarea_id and pa.formulario_id=f.id and f.id=c.formulario_id and p.activo=1 and c.tipo<>'title' GROUP by f.nombre, c.id, c.nombre, c.exponer_campo;";
+        $sql="select f.nombre as nombre_formulario, c.id as variable_id, c.nombre as nom_variables, "
+                . "c.exponer_campo from proceso p,tarea t, paso pa, formulario f, campo c "
+                . "where p.id=t.proceso_id and p.id=".$proceso_id.""
+                . " and t.id=".$tarea_id." and t.id=pa.tarea_id and pa.formulario_id=f.id "
+                . " and f.id=c.formulario_id and p.activo=1 and c.tipo not "
+                . " in('title','paragraph','subtitle','recaptcha','javascript')  "
+                . " GROUP by f.nombre, c.id, c.nombre, c.exponer_campo;";
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
         ->fetchAll();

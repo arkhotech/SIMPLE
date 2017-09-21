@@ -24,9 +24,13 @@ class IntegracionMediator{
     
     private function varDireccion($campo){
         switch ($campo['tipo']){
-            case "file": return "IN";
-            case "documento": return "OUT";
-            case "subtitle" : return "OUT";
+            case "documento": 
+            case "subtitle" :
+            case "paragaph":
+            case "title":
+            case "recaptcha":
+            case "javascript":
+                return "OUT";
             default: return "IN";
         }
     }
@@ -54,26 +58,25 @@ class IntegracionMediator{
         if($etapa_id === NULL){
             unset($retval['form']['idEtapa']);
         }
-        //print_r($json);die;
 
-        foreach ($form->Campos as $c) {
-            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
-            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
- 
-            if(count($c->validacion) > 0){
-                foreach ($c->validacion as $validacion) {
-                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
-                    if($validacion == "required"){
-                        $valor = $this->extractVariable($json,$c,$etapa->tramite_id);
-                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
-                        if($valor == "NE"){
-                            $valida_formulario = FALSE;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+//        foreach ($form->Campos as $c) {
+//            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
+//            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
+// 
+//            if(count($c->validacion) > 0){
+//                foreach ($c->validacion as $validacion) {
+//                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
+//                    if($validacion == "required"){
+//                        $valor = $this->extractVariable($json,$c,$etapa->tramite_id);
+//                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
+//                        if($valor == "NE"){
+//                            $valida_formulario = FALSE;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
  
  
  
@@ -90,7 +93,7 @@ class IntegracionMediator{
                     }
                 }
             }
- 
+
             $record = array(
                     "nombre" => $campo['nombre'],
                     "tipo_control" => $campo['tipo'],
@@ -144,7 +147,6 @@ class IntegracionMediator{
             log_message("INFO", "Comprobando proceso id: ".$tarea->proceso_id, FALSE);
             if( $tarea->proceso_id === $proceso_id ){  //Si pertenece al proceso
                 foreach($tarea->Pasos as $paso ){ //Se extraen los pasos
-                    //print_r($paso);
                     if( $id_paso != NULL && $paso->Formulario->id != $id_paso ){
                         continue;
                     }
@@ -315,9 +317,10 @@ class IntegracionMediator{
                 $respuesta = new stdClass();
                 $validar_formulario = FALSE;
                 // Almacenamos los campos
-                $this->validarCamposObligatorios($body,$formulario->Campos);
+                $campos = $formulario->Campos;
+                $this->validarCamposObligatorios($body,$formulario);
                 //Guardar los campos
-                $this->saveFields($formulario->Campos,$etapa,$body);
+                $this->saveFields($campos,$etapa,$body);
                 
                 $etapa->save();
                 $etapa->finalizarPaso($paso);
@@ -333,6 +336,9 @@ class IntegracionMediator{
 
         }catch(Exception $e){
             log_message('ERROR',$e->getTraceAsString());
+            if($e->getCode() === 400 ){
+                throw $e;
+            }
             throw new Exception("Error interno", 500);
         }
         return $result;
@@ -370,17 +376,27 @@ class IntegracionMediator{
         }
     }
 
-    public function validarCamposObligatorios($body,$campos){
-        log_message('DEBUG',"Revisando campos: ".$campos);
+    public function validarCamposObligatorios($body,$form){
+        
+        $campos = $form->getCamposEntrada();
+        log_message('debug','Validando campos obligatorios: '.$this->varDump($body['data']));
+        $error = false;
+        $campos_faltantes = "";
         foreach($campos as $c){
-            if(!isset($body['data'][$c->nombre])){  //si no esta el campo se valida si es obligatorio
+            if(!key_exists($c->nombre,$body['data'])){  //si no esta el campo se valida si es obligatorio
                 foreach($c->validacion as $rule ){
-                    if($rule === "required"){
-                        throw new Exception('Faltan parametros de entrada obligatorios',400);
+                    if(strpos($rule,"required")>=0){  //si conteine require entonces es obligatorio
+                        $campos_faltantes[]=$c->nombre;
+                        $error = true;
                     }
                 }
             }
         }
+        
+        if($error){
+            throw new Exception('Faltan parametros de entrada obligatorios: '.  json_encode($campos_faltantes),400);
+        }
+        
     } 
 
     private function registrarCallbackURL($callback,$callback_id,$etapa){
@@ -399,26 +415,25 @@ class IntegracionMediator{
         }
     }
     
-    public function registerUserFromHeadersClaveUnica($headers){
+    public static function registerUserFromHeadersClaveUnica($body){
+        
         log_message('INFO','Registrando cuenta clave unica ',FALSE);
-        $user =Doctrine::getTable('Usuario')->findOneByRut($headers['Rut']);
+        $user =Doctrine::getTable('Usuario')->findOneByRut($body->rut);
         
         if($user == NULL){  //Registrar el usuario
-            log_message('INFO','Registrando usuario: '.$headers['Rut'],FALSE);
+            log_message('INFO','Registrando usuario: '.$body->rut,FALSE);
             $user = new Usuario();
             $user->usuario = random_string('unique');
             $user->setPasswordWithSalt(random_string('alnum', 32));
-            $user->rut = $headers['Rut'];
-            $nombres = explode(";",$headers['Nombres']);
-            if(count($nombres)< 3 ){
+            $user->rut = $body->rut;
+            $apellidos = explode(";",$body->apellidos);
+            if(count($apellido)< 2 ){
                 throw new Exception("Credenciales incompletas",403);
-//                header("HTTP/1.1 403 Forbiden. Credenciales incompletas");
-//                exit;
             }
-            $user->nombres = $nombres[0];//$headers['Nombres'];
-            $user->apellido_paterno = $nombres[1]; //$headers['Apellido-Paterno'];
-            $user->apellido_materno = $nombres[2];//$headers['Apellido-Materno'];
-            $user->email = $headers['Email'];
+            $user->nombres = $body->nombres;
+            $user->apellido_paterno = $apellidos[0]; 
+            $user->apellido_materno = $apellidos[1];
+            $user->email = $body->email;
             $user->open_id = TRUE;
             $user->save();
         }

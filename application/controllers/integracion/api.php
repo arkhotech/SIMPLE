@@ -1,4 +1,4 @@
-<?php
+ <?php
 require APPPATH.'/core/REST_Controller.php';
 class API extends REST_Controller{//MY_BackendController {
     
@@ -33,7 +33,7 @@ class API extends REST_Controller{//MY_BackendController {
         if(!isset($this->get()['tramite']) 
                 || !isset($this->get()['etapa']) 
                 || !isset($this->get()['paso'])){
-            $this->response(array('message' => 'Parametros insuficientes'), 400);
+            $this->response(array( 'message' => 'Parametros insuficientes'), 400);
         }
         //Recuperar los valores
         $etapa_id = $this->get()['etapa'];
@@ -98,21 +98,20 @@ class API extends REST_Controller{//MY_BackendController {
             error_log("etapa debe ser una instancia de Etapa");
             throw new Exception("Etapa no existe",500);
         }
- 
-        $headers = $this->input->request_headers();
+        
+        $body = json_decode($this->request->body,false);
+
         $cu_keys = $this->userHeadersKeys;
         log_message('DEBUG','Check modo',FALSE);
 
         switch($tarea->acceso_modo){
         case 'claveunica':
-            foreach($cu_keys as $key){
-                
-                if(!key_exists($key,$headers)){
-                    throw new Exception('Headers Clave Unica no enviados',403);
-                }
-            }
             
-            $this->registerUserFromHeadersClaveUnica($headers);
+            if(!isset($body->identificacion)){
+                throw new Exception('Headers Clave Unica no enviados',403);
+            }
+            $mediator = new IntegracionMediator();
+            $mediator->registerUserFromHeadersClaveUnica($body->identificacion);
             if(UsuarioSesion::usuario()==NULL){
                 log_message('ERROR','No se pudo registrar el usuario Open ID',FALSE);
                 throw new Exception('No se pudo registrar el usuario Open ID',500);    
@@ -120,9 +119,9 @@ class API extends REST_Controller{//MY_BackendController {
             break;
         case 'registrados':
         case 'grupos_usuarios':
-            
-            if( !key_exists('User', $headers) || !UsuarioSesion::registrarUsuario($headers['User'])){
-                error_log("No existe el usuario o no viene el header");
+            log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body->usuario_simple->user),TRUE);
+            if( !isset($body->usuario_simple)|| !UsuarioSesion::registrarUsuario($body->usuario_simple->user)){
+                log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body),TRUE);
                 throw new Exception('No se ha enviado el usuario',403); 
             }
             log_message('DEBUG','recuperando usuarios',FALSE);
@@ -131,7 +130,7 @@ class API extends REST_Controller{//MY_BackendController {
                 $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
                 foreach($usuarios as $user){
                     
-                    if($headers['User']===$user->usuario){
+                    if($body->usuario_simple->user===$user->usuario){
                         log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
                         return TRUE;
                     }
@@ -152,10 +151,6 @@ class API extends REST_Controller{//MY_BackendController {
         }
           
     }
-    
-    
-    
-
     /**
      * 
      * @param type $etapa_id

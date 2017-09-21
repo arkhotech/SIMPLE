@@ -84,6 +84,7 @@
             -DATA_ENTRADA-
         }
       }
+      -AUTH-
     }
   },
   "response": {
@@ -93,10 +94,7 @@
         "type": "string"
       },
       "output": {
-        "type": "object",
-        "items": {
           "$ref": "#/definitions/output"
-        }
       },
       "idEtapa": {
         "type": "string"
@@ -171,13 +169,41 @@
       }
     }
   },
+  
+  "simple":{
+    "type": "object",
+        "properties":{
+          "user": {
+            "type": "string"
+          }
+        }
+   },
+  "clave_unica":{
+    "type": "object",
+    "required": ["rut","nombres","apellidos","email"],
+    "properties":{
+      "rut":{
+        "type": "string"
+      },
+      "nombres": {
+        "type": "string"
+      },
+      "apellidos":{
+        "description": "Apellidos separados por ;",
+        "type": "string"
+      },
+      "email":{
+        "type": "string"
+      }
+    }
+  },
   "error": {
     "type": "object",
     "properties": {
-      "codigo_retorno": {
+      "codigo": {
         "type": "integer"
       },
-      "descripcion_retorno": {
+      "mensaje": {
         "type": "string"
       }
     }

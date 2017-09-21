@@ -136,6 +136,9 @@ class Campo extends Doctrine_Record {
         log_message("INFO", "Nombre campo: ".$this->nombre, FALSE);
        
        $dato =  Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($this->nombre,$etapa_id);
+       if(!$dato ){
+           return "";
+       }
         log_message("INFO", "Nombre dato: ".$dato->nombre, FALSE);
         log_message("INFO", "Valor dato: ".$dato->valor, FALSE);
         log_message("INFO", "this->valor_default: ".$this->valor_default, FALSE);
@@ -458,7 +461,7 @@ class Campo extends Doctrine_Record {
             return $result = Doctrine_Query::create()
             ->from('Campo c, c.Formulario f ')
             ->where('c.formulario_id = f.id')
-            ->andWhere('exponer_campo = 1')
+            ->andWhere("c.exponer_campo = 1 or c.tipo='documento'")
             ->andWhere('f.proceso_id = ?', $proceso_id)
             ->andWhere("f.id= ? ",$form_id)
             ->execute(); 
