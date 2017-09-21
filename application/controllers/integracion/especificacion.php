@@ -42,23 +42,32 @@ class Especificacion extends REST_Controller{//MY_BackendController {
      */
 
     public function servicio_get(){
-        $param = $this->get();
-        $id_proceso = $param['proceso'];
-        $id_tarea = $param['etapa'];
+        try{
+            $param = $this->get();
+            $id_proceso = $param['proceso'];
+            $id_tarea = $param['etapa'];
+
+            if($id_proceso == NULL || $id_tarea == NULL ){
+                $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
+            }
+
+            $this->load->helper('download');
+
+            $integrador = new IntegracionMediator();
+            $swagger = new Swagger();
+                /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
+            $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
+            $swagger_file = $swagger->generar_swagger($formulario, $id_proceso, $id_tarea);
+
+            force_download("start_simple.json", $swagger_file);
+            exit;
+        }catch(Exception $e){
+               $this->response(
+                       array("code"=> $e->getCode(),
+                           "message"=>$e->getMessage()),
+                       $e->getCode());
         
-        if($id_proceso == NULL || $id_tarea == NULL ){
-            $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
         }
-
-        $this->load->helper('download');
-
-        $integrador = new IntegracionMediator();
-            /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
-        $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
-        $swagger_file = $integrador->generar_swagger($formulario, $id_proceso, $id_tarea);
-
-        force_download("start_simple.json", $swagger_file);
-        exit;
     }
     /**
      * Para obtener la especificación de formularios
@@ -66,17 +75,22 @@ class Especificacion extends REST_Controller{//MY_BackendController {
     public function formularios_get(){
         $param = $this->get();
         
-        if(!isset($param['tramite'])){
-            $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
+        if(!isset($param['proceso'])){
+            $this->response(
+                    array('codigo' => 400, 
+                        'message' => 'Parametros obligatorios no enviados'), 400);
         }
         
-        $id_tramite = $param['tramite'];
-        $id_tarea = $param['tarea'];
-        $id_paso = $param['paso'];
-        
-        $integrador = new IntegracionMediator();
-        $response = $integrador->obtenerFormularios($id_tramite, $id_tarea, $id_paso);
-        $this->response($response);
+        $id_proceso = $param['proceso'];
+        $id_tarea = isset($param['tarea']) ? $param['tarea'] : null;
+        $id_paso = isset($param['paso']) ? $param['paso'] : null; 
+        try{
+            $integrador = new IntegracionMediator();
+            $response = $integrador->obtenerFormularios($id_proceso, $id_tarea, $id_paso);
+            $this->response($response);
+        }catch(Exception $e){
+            $this->response(array("code"=> $e->getCode(),"message"=>$e->getMessage()),$e->getCode());
+        }
     }
     
 }

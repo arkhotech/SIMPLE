@@ -350,7 +350,7 @@ class Campo extends Doctrine_Record {
     
     public function obtenerResultados($etapa){
         $varProexp = $this->getVariablesExportables($etapa);
-        $varexp = $this->getListaExportables($etapa);
+        $varexp = $this->getCamposExportables($etapa);
         $retval = array_merge($varexp,$varProexp);
         return $retval; 
     }
@@ -359,12 +359,12 @@ class Campo extends Doctrine_Record {
      * @param type $etapa
      * @return type
      */
-    public function getListaExportables($etapa){
+    public function getCamposExportables($etapa){
 
         log_message("INFO", "getListaExportables", FALSE);
-
-        $tramite = $etapa->Tramite;
-        $dato_seguimiento = null;
+        if( !is_object($etapa) ){
+            throw new Exception('Se esperaba una instancia del "Objeto" de "Etapa"');
+        }
         $campos = null;
         foreach($etapa->Tarea->Pasos as $paso){
             foreach($paso->Formulario->Campos as $campo){
@@ -372,7 +372,6 @@ class Campo extends Doctrine_Record {
                     $campos[] = $campo;
                 }
             }
-            
         }
        
         $return=array();
@@ -403,36 +402,105 @@ class Campo extends Doctrine_Record {
         log_message("INFO", "Variables a retornar: ".$this->varDump($return), FALSE);
         return $return;
     }
-
+    /**
+     * Exporta todas las variables creadas por una accion
+     * @param type $etapa
+     * @return type
+     */
     public function getVariablesExportables($etapa){
-        $retval = array();
+        
         $proceso_id = $etapa->Tarea->proceso_id;
-        $sql = "select a.id as variable_id, a.nombre as nombre_variable, a.extra, "
-                . "a.exponer_variable, p.nombre as nombre_proceso from accion a, proceso p, "
-                . "tarea t where a.proceso_id=p.id and a.tipo='variable' and p.activo=1 and "
-                . "a.proceso_id=".$proceso_id." and p.id=t.proceso_id group by a.id, a.nombre,"
-                . " a.extra, a.exponer_variable, p.nombre;";
-        log_message("INFO", "SQL: ".$sql, FALSE);
-        $stmn = Doctrine_Manager::getInstance()->connection();
-        $result = $stmn->execute($sql)->fetchAll();
+        $tramite_id = $etapa->Tramite->id;
+        $result = Doctrine_Query::create()
+    	->from('Accion a, a.Proceso p')
+    	->where('p.activo=1 AND p.id=?', $proceso_id)
+    	->andWhere("tipo = 'variable'")
+        ->andWhere("a.exponer_variable = 1")
+    	->execute();
+        
         $return=array();
-        log_message("INFO", "Recorriendo resultados", FALSE);
+        log_message("INFO", "#### Recorriendo resultados: ".$proceso_id, FALSE);
         foreach ($result as $value) {
-            log_message("INFO", "key: ".$value['nombre_variable'], FALSE);
-            $key= $value['nombre_variable'];
-            $return[$key]=str_replace('"', '',$this->getVariableValor($value['nombre_variable'],$etapa));
+            log_message("INFO", "#### key: ".$value->nombre, FALSE);
+            $key= $value->extra->variable;
+            $return[$key]=str_replace('"', '',$this->getValosVariableGlobal($key,$tramite_id));
         }
-        log_message("INFO", "Variables exportables a retornar: ".$this->varDump($return), FALSE);
         return $return;
     }
     
+    private function getValosVariableGlobal($nombre,$tramite_id){
+        try{
+            $result = Doctrine_Query::create()
+            ->from('DatoSeguimiento d, d.Etapa e')
+            ->where('d.etapa_id = e.id')
+            ->andWhere('e.tramite_id = ?', $tramite_id)
+            ->andWhere("d.nombre = ? ",$nombre)
+            ->execute();
+            if($result!= NULL && count($result) === 1){
+                return $result[0]->valor;
+            }
+
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+        }
+        return null;
+    }
+    /**
+     * Obtiene las variables que han sido como exportables pero de una definicion
+     * de proceso
+     * 
+     * @param type $form
+     * @return type
+     */
+    public static function getVarsExpFromFormulario($form_id,$proceso_id){
+        try{
+            
+            return $result = Doctrine_Query::create()
+            ->from('Campo c, c.Formulario f ')
+            ->where('c.formulario_id = f.id')
+            ->andWhere('exponer_campo = 1')
+            ->andWhere('f.proceso_id = ?', $proceso_id)
+            ->andWhere("f.id= ? ",$form_id)
+            ->execute(); 
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+            throw $e;
+        }
+        return null;
+    }
+    /**
+     * Obtiene las variables que se generan bajo una acción en la definición de un 
+     * proceso
+     * 
+     * @param type $id_proceso
+     * @param type $id_form
+     * @return type  { variable : {nombre} , experesion : { valor indeerminado JSON o String }
+     */
+     public static function getVarsAccionExpFromProceso($id_proceso){
+        try{
+            //select * from accion where tipo = 'variable' and proceso_id = 6 and exponer_variable = 1
+            return $result = Doctrine_Query::create()
+            ->from('Accion a')
+            ->where('a.tipo = "variable" ')
+            ->andWhere('exponer_variable = 1')
+            ->andWhere('a.proceso_id = ?', $id_proceso)
+            ->execute();
+            
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());
+        }
+        return null;
+    }
+    
+    
     public function getVariableValor($nombre,$etapa){
+        log_message('debug','Buscando valores de variable: '.$nombre." ".$etapa->id);
         $var = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($nombre, $etapa->id);
         if($var != NULL){
 
             return $var->valor;
         }else{
-            return "N/D";
+            return "";
         }
     }
     

@@ -18,7 +18,7 @@
     "application/json"
   ],
   "paths": {
-    "/tramites/-id_tramite-/-id_tarea-": {
+    "/tramites/proceso/-id_tramite-/etapa/-id_tarea-": {
       "post": {
         "summary": "Inicio Trámite SIMPLE",
         "description": "Servicio responsable de iniciar un trámite en SIMPLE.",
@@ -128,12 +128,7 @@
   "output": {
     "type": "object",
     "properties": {
-      "clave": {
-        "type": "string"
-      },
-      "valor": {
-        "type": "string"
-      }
+      -OUTPUT-
     }
   },
   "campo": {

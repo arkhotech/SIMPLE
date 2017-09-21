@@ -95,6 +95,7 @@ class Etapa extends Doctrine_Record {
     //Si se desea especificar el usuario a cargo de la prox etapa, se debe pasar como parametros en un array: $usuarios_a_asignar[$tarea_id]=$usuario_id.
     //Este parametro solamente es valido si la asignacion de la prox tarea es manual.
     public function avanzar($usuarios_a_asignar = null) {
+        log_message('debug',"Avanzando etapa");
         Doctrine_Manager::connection()->beginTransaction();
         //Cerramos esta etapa
         $this->cerrar();
@@ -203,6 +204,7 @@ class Etapa extends Doctrine_Record {
                 }
                 //Si son en paralelo, vamos juntando el grupo de tareas proximas.
                 else if ($c->tipo == 'paralelo' || $c->tipo == 'paralelo_evaluacion') {
+                    
                     $resultado->tareas[] = $c->TareaDestino;
                     $resultado->estado = 'pendiente';
                     $resultado->conexion=$c->tipo;
@@ -358,12 +360,11 @@ class Etapa extends Doctrine_Record {
     //Es decir, tomando en cuenta las condiciones para que se ejecute cada paso.
     public function getPasoEjecutable($secuencia) {
         $pasos = $this->getPasosEjecutables($this->tramite_id);
-
         log_message("INFO", "Cantidad de pasos: ".count($pasos), FALSE);
 
         if (isset($pasos[$secuencia]))
             return $pasos[$secuencia];
-
+        log_message("debug", "retornando null", FALSE);
         return null;
     }
 
