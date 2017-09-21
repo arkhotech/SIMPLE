@@ -177,6 +177,7 @@
                 <li><a href="#tab6">Vencimiento</a></li>
                 <li><a href="#tab7">Otros</a></li>
                 <li><a href="#tab8">Datos</a></li>
+                <li><a href="#tab9">Cuentas</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab1">
@@ -658,6 +659,37 @@
                         </div>
                     </div>
                 </div>
+
+
+
+                <div class="tab-datos-expuestos tab-pane" id="tab9">
+                    <div class="row-fluid">
+                        <div class="span12"><h5>Cuentas a las que desea dar acceso para iniciar este proceso
+                                <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/disenador.html#pestana_datos" target="_blank">
+                                    <span class="glyphicon glyphicon-info-sign"></span>
+                                </a></h5></div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12" style="overflow-y: auto; height:280px;width:96%;border:.5px solid;border-radius: 5px;border-color:#DDDDDD;">
+                            <?
+                                foreach ($cuentas as $cuenta) {?>&nbsp;
+                                    <input type="checkbox" class="SelectAll" name="cuentas_con_permiso[]" id="cuenta_<? echo $cuenta->id; ?>" value="<? echo $cuenta->id; ?>"/>&nbsp;<? echo $cuenta->nombre;?></br><?
+                                    foreach ($cuentas_con_permiso as $cuenta_permiso) {
+                                        if($cuenta_permiso["id"] == $cuenta->id){?>
+                                            <script type="text/javascript">
+                                                $("#cuenta_"+<? echo $cuenta->id; ?>).prop('checked',true);
+                                            </script>
+                                        <?
+                                        break;
+                                        }
+                                    }
+                                }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </form>

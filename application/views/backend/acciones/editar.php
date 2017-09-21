@@ -94,7 +94,7 @@
         case "callback":
             ?><script src="<?= base_url() ?>assets/js/accion_callback.js"></script><?
             break;
-        case "tramite_simple":
+        case "iniciar_tramite":
             ?><script src="<?= base_url() ?>assets/js/accion_tramite_simple.js"></script><?
             break;
         default:

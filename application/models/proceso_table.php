@@ -150,7 +150,7 @@ class ProcesoTable extends Doctrine_Table {
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)->fetchAll();
 
-        log_message('info','Result: '.$this->varDump($result), FALSE);
+        //log_message('info','Result: '.$this->varDump($result), FALSE);
 
         return $result;
     }

@@ -11,17 +11,29 @@ function validateForm(){
     }
 }
 
-/*$(document).ready(function(){
-    $("#tramiteSel").change(function(){
-        var idTramite = $("#tramiteSel").val();
+$(document).ready(function(){
+    $("#cuentaSel").change(function(){
+
+        console.log("Buscando procesos vinculados a la cuenta");
+
+        var idCuenta = $("#cuentaSel").val();
+
+        var todosLosProcesos = false;
+        if($("#cuenta_actual_id").val() == idCuenta){
+            todosLosProcesos = true;
+        }
 
         var json='';
         $.ajax({
-            url:'/backend/acciones/getTareasProceso',
+            url:'/backend/acciones/getProcesosCuentas',
             type:'POST',
             async:false,
             dataType: 'JSON',
-            data: {idProceso: idTramite}
+            data: {
+                idCuenta: idCuenta,
+                idCuentaOrigen: $("#cuenta_actual_id").val(),
+                todos: todosLosProcesos
+            }
         })
             .done(function(d){
                 json=d;
@@ -30,16 +42,17 @@ function validateForm(){
                 json=0;
             });
 
-        console.log("Respuesta tareas con callback: "+json);
+        console.log("Respuesta procesos con permisos para cuenta seleccionada: "+json);
         console.log(json.data);
 
         if(json.data.length > 0){
-            $("#callbackSel").append("<option value=''>Seleccione...</option>");
+            $("#tramiteSel").empty();
+            $("#tramiteSel").append("<option value=''>Seleccione...</option>");
             for (var i = 0; i < json.data.length; i++){
                 console.log("Id: "+json.data[i].id);
                 console.log("Nombre: "+json.data[i].nombre);
-                $("#callbackSel").append("<option value='"+json.data[i].id_tarea+"'>"+json.data[i].nombre+"</option>");
+                $("#tramiteSel").append("<option value='"+json.data[i].id+"'>"+json.data[i].nombre+"</option>");
             }
         }
     });
-});*/
+});

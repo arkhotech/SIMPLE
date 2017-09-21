@@ -231,6 +231,23 @@ class Procesos extends MY_BackendController {
         $data['proceso'] = $proceso;
         $data['variablesFormularios']=Doctrine::getTable('Proceso')->findVariblesFormularios($proceso_id,$tarea['id']);
         $data['variablesProcesos']=Doctrine::getTable('Proceso')->findVariblesProcesos($proceso_id);
+
+        $cuentas = Doctrine::getTable('Cuenta')->findAll();
+
+        $index = 0;
+        foreach ($cuentas as $cuenta) {
+            if($tarea->Proceso->cuenta_id == $cuenta->id){
+                unset($cuentas[$index]);
+                break;
+            }
+            $index++;
+        }
+
+        $data['cuentas'] = $cuentas;
+
+        $proceso_cuenta = new ProcesoCuenta();
+        $data['cuentas_con_permiso'] = $proceso_cuenta->findCuentasProcesos($proceso_id);
+
         $this->load->view('backend/procesos/ajax_editar_tarea',$data);
     }
 
@@ -251,6 +268,20 @@ class Procesos extends MY_BackendController {
             }
         }
         Doctrine::getTable('Proceso')->updateVaribleExposed($this->input->post('varForm'),$this->input->post('varPro'),$tarea->Proceso->id,$tarea_id);
+
+        $proceso_cuenta = new ProcesoCuenta();
+        $proceso_cuenta->deleteCuentasConPermiso($tarea->Proceso->id);
+        $cuentas_con_permiso = $this->input->post('cuentas_con_permiso');
+        if(isset($cuentas_con_permiso) && count($cuentas_con_permiso) > 0){
+            foreach ($cuentas_con_permiso as $id_cuenta){
+                $proceso_cuenta = new ProcesoCuenta();
+                $proceso_cuenta->id_proceso = $tarea->Proceso->id;
+                $proceso_cuenta->id_cuenta_origen = $tarea->Proceso->cuenta_id;
+                $proceso_cuenta->id_cuenta_destino = $id_cuenta;
+                $proceso_cuenta->save();
+            }
+        }
+
         $respuesta=new stdClass();
         if ($this->form_validation->run() == TRUE) {
             $tarea->nombre=$this->input->post('nombre');
@@ -519,6 +550,16 @@ class Procesos extends MY_BackendController {
         //exit;
         echo json_encode($modelo);
     }
+
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
+
 }
 
 

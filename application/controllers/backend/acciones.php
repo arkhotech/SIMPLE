@@ -435,4 +435,28 @@ class Acciones extends MY_BackendController {
         echo $respuesta;
         exit;
     }
+
+    public function getProcesosCuentas(){
+        log_message('info','En getProcesosCuentas', FALSE);
+        $id_cuenta = $this->input->post('idCuenta');
+        $id_cuenta_origen = $this->input->post('idCuentaOrigen');
+        $todos = $this->input->post('todos');
+        log_message('info','Input cuenta: '.$id_cuenta, FALSE);
+        log_message('info','Input todos: '.$todos, FALSE);
+        if($todos){
+            $tramites_disponibles = Doctrine::getTable('Proceso')->findProcesosExpuestos($id_cuenta);
+        }else{
+            $proceso_cuenta = new ProcesoCuenta();
+            $tramites_disponibles = $proceso_cuenta->findProcesosExpuestosConPermiso($id_cuenta, $id_cuenta_origen);
+        }
+
+        $json=json_encode($tramites_disponibles);
+
+        $respuesta = "{\"data\": ".$json."}";
+
+        log_message("INFO", "Respuesta json: ".$respuesta, FALSE);
+
+        echo $respuesta;
+        exit;
+    }
 }
