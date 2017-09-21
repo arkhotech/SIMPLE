@@ -253,7 +253,7 @@ class FormNormalizer{
 
         try{
             $input = json_decode($body,true);
-            log_message("INFO", "Input: ".$this->varDump($input), FALSE);
+            //log_message("INFO", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
             /*if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
                 throw new Exception("Bad Request", 400);
