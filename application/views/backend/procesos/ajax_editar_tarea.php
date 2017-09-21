@@ -671,9 +671,14 @@
                     </div>
                     <div class="row-fluid">
                         <div class="span12" style="overflow-y: auto; height:280px;width:96%;border:.5px solid;border-radius: 5px;border-color:#DDDDDD;">
-                            <?
-                                foreach ($cuentas as $cuenta) {?>&nbsp;
-                                    <input type="checkbox" class="SelectAll" name="cuentas_con_permiso[]" id="cuenta_<? echo $cuenta->id; ?>" value="<? echo $cuenta->id; ?>"/>&nbsp;<? echo $cuenta->nombre;?></br><?
+                            <div class="campo control-group">
+                            <label class="control-label">Suscriptores:</label>
+                            <div class="controls">
+                                <?foreach ($cuentas as $cuenta) {?>
+                                <label class="checkbox">
+                                    <input type="checkbox" name="cuentas_con_permiso[]" id="cuenta_<? echo $cuenta->id; ?>" value="<? echo $cuenta->id; ?>">
+                                    <? echo $cuenta->nombre;?>
+                                </label><?
                                     foreach ($cuentas_con_permiso as $cuenta_permiso) {
                                         if($cuenta_permiso["id"] == $cuenta->id){?>
                                             <script type="text/javascript">
@@ -685,6 +690,8 @@
                                     }
                                 }
                             ?>
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
