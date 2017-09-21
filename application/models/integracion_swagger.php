@@ -31,7 +31,7 @@ class Swagger {
         if(isset($formulario) && count($formulario) > 0){
             //log_message("info", "Formulario recuperado: ".$this->varDump($formulario), FALSE);
             $data_entrada = "";
-            $data_salida = "";
+            
             $form = $formulario[0];
             $campos = $form["form"];
             
@@ -76,14 +76,15 @@ class Swagger {
                 }
             }
         }
+        $data_salida = "";
         //Agregar las variables globales de salida
         if(isset($output_vars)){
             //VARIABLES DE ACCION
             if(isset($output_vars['accionvar'])){
-                $data_salida .= $this->crearOutputVars($output_vars['accionvar'], $data_salida);
+                $data_salida = $this->crearOutputVars($output_vars['accionvar'], $data_salida);
             }
             if(isset($output_vars['formvar'])){
-                $data_salida .= $this->crearOutputVars($output_vars['formvar'], $data_salida);   
+                $data_salida = $this->crearOutputVars($output_vars['formvar'], $data_salida); 
             }
         }
        
@@ -113,11 +114,12 @@ class Swagger {
 
     }
     
-    private function crearOutputVars($output_vars, $salida) {
-        if(!isset($output_vars))
+    private function crearOutputVars($vars, $salida) {
+        if(!isset($vars))
             return array();
         $data_salida = $salida;
-        foreach ($output_vars as $var) {
+        foreach ($vars as $var) {
+            log_message('debug',"*****   ".$var['nombre']);
             if ($var != NULL && is_array($var)) {
                 if ($data_salida != "") {
                     $data_salida .= ",";
@@ -129,6 +131,7 @@ class Swagger {
                 }else{
                     $data_salida .= "\"".$var['nombre']."\":" .json_encode(array('type'=>'string'));
                 }
+                log_message('debug',$data_salida);
             }
         }
         return $data_salida;
