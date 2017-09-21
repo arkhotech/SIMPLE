@@ -125,4 +125,14 @@ class Suscriptor extends Doctrine_Record {
         return $suscriptor;
     }
 
+    public function findSuscriptoresProceso($proceso_id){
+        $sql = "select s.id, s.institucion from suscriptor s 
+            where s.proceso_id = ".$proceso_id.";";
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+            ->fetchAll();
+        return $result;
+    }
+
 }

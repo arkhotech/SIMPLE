@@ -71,6 +71,8 @@
         log_message("INFO", "En view editar, $key: ".$key, FALSE);
         if($tipo == "rest" || $tipo == "soap" || $tipo == "callback" || $accion->tipo == "rest" || $accion->tipo == "soap" || $accion->tipo == "callback" || $accion->tipo == "iniciar_tramite" || $tipo == "iniciar_tramite" || $accion->tipo == "continuar_tramite" || $tipo == "continuar_tramite"){
             echo $accion->displaySecurityForm($proceso->id);
+        }else if($tipo == "webhook" || $accion->tipo == "webhook"){
+            echo $accion->displaySuscriptorForm($proceso->id);
         }else{
             echo $accion->displayForm();
         }

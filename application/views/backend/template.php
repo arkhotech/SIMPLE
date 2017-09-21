@@ -10,6 +10,9 @@
         <link href="<?= base_url() ?>assets/css/bootstrap.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/responsive.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/common.css?v=0.2" rel="stylesheet">
+
+        <link href="<?= base_url() ?>assets/css/frontend.css" rel="stylesheet">
+
         <link href="<?= base_url() ?>assets/js/bootstrap-datepicker/css/datepicker.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/js/jquery.chosen/chosen.css" rel="stylesheet">
