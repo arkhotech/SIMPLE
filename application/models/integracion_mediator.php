@@ -427,7 +427,7 @@ class IntegracionMediator{
             $user->setPasswordWithSalt(random_string('alnum', 32));
             $user->rut = $body->rut;
             $apellidos = explode(";",$body->apellidos);
-            if(count($apellido)< 2 ){
+            if(count($apellidos)< 2 ){
                 throw new Exception("Credenciales incompletas",403);
             }
             $user->nombres = $body->nombres;
