@@ -221,12 +221,14 @@ class IntegracionMediator{
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
             //Recuper la priemra etapa
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
-            //Ejecuta y guarda los campos
-            $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
-            
+
             if(array_key_exists('callback',$input)){
                 $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
             }
+
+            //Ejecuta y guarda los campos
+            $result = $this->ejecutarEntrada($etapa_id, $input, 0, $tramite->id);
+            
             log_message("INFO", "Preparando respuesta: ".$proceso_id, FALSE);
             //validaciones etapa vencida, si existe o algo por el estilo
              return $result['result'];

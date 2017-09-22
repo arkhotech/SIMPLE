@@ -3,7 +3,7 @@ abstract class REST_Controller extends CI_Controller {
 	protected $rest_format = NULL; // Set this in a controller to use a default format
 	protected $methods = array(); // contains a list of method properties such as limit, log and level
 	public $request = NULL; // Stores accept, language, body, headers, etc
-	public $rest = NULL; // Stores DB, keys, key level, etc
+	public $rest_api = NULL; // Stores DB, keys, key level, etc
 	private $_get_args = array();
 	private $_post_args = array();
 	private $_put_args = array();
@@ -26,10 +26,10 @@ abstract class REST_Controller extends CI_Controller {
 	{
 		parent::__construct();
 		// Lets grab the config and get ready to party
-		$this->load->config('rest');
+		$this->load->config('rest-config');
                 $this->request = new stdClass();
                 $this->response = new stdClass();
-                $this->rest = new stdClass();
+                $this->rest_api = new stdClass();
 		;
 		// How is this request being made? POST, DELETE, GET, PUT?
 		$this->request->method = $this->_detect_method();
@@ -91,7 +91,7 @@ abstract class REST_Controller extends CI_Controller {
 		// Load DB if its enabled
 		if (config_item('rest_database_group') AND (config_item('rest_enable_keys') OR config_item('rest_enable_logging')))
 		{
-			$this->rest->db = $this->load->database(config_item('rest_database_group'), TRUE);
+			$this->rest_api->db = $this->load->database(config_item('rest_database_group'), TRUE);
 		}
 		// Checking for keys? GET TO WORK!
 		if (config_item('rest_enable_keys'))
@@ -131,7 +131,7 @@ abstract class REST_Controller extends CI_Controller {
 			return;
 		}
 		// Doing key related stuff? Can only do it if they have a key right?
-		if (config_item('rest_enable_keys') AND !empty($this->rest->key))
+		if (config_item('rest_enable_keys') AND !empty($this->rest_api->key))
 		{
 			// Check the limit
 			if (config_item('rest_enable_limits') AND !$this->_check_limit($controller_method))
@@ -142,7 +142,7 @@ abstract class REST_Controller extends CI_Controller {
 			// If no level is set use 0, they probably aren't using permissions
 			$level = isset($this->methods[$controller_method]['level']) ? $this->methods[$controller_method]['level'] : 0;
 			// If no level is set, or it is lower than/equal to the key's level
-			$authorized = $level <= $this->rest->level;
+			$authorized = $level <= $this->rest_api->level;
 			// IM TELLIN!
 			if (config_item('rest_enable_logging') AND $log_method)
 			{
@@ -286,19 +286,19 @@ abstract class REST_Controller extends CI_Controller {
 	{
 		// Work out the name of the SERVER entry based on config
 		$key_name = 'HTTP_' . strtoupper(str_replace('-', '_', config_item('rest_key_name')));
-		$this->rest->key = NULL;
-		$this->rest->level = NULL;
-		$this->rest->ignore_limits = FALSE;
+		$this->rest_api->key = NULL;
+		$this->rest_api->level = NULL;
+		$this->rest_api->ignore_limits = FALSE;
 		// Find the key from server or arguments
 		if ($key = isset($this->_args['API-Key']) ? $this->_args['API-Key'] : $this->input->server($key_name))
 		{
-			if ( ! $row = $this->rest->db->where('key', $key)->get(config_item('rest_keys_table'))->row())
+			if ( ! $row = $this->rest_api->db->where('key', $key)->get(config_item('rest_keys_table'))->row())
 			{
 				return FALSE;
 			}
-			$this->rest->key = $row->key;
-			$this->rest->level = $row->level;
-			$this->rest->ignore_limits = $row->ignore_limits;
+			$this->rest_api->key = $row->key;
+			$this->rest_api->level = $row->level;
+			$this->rest_api->ignore_limits = $row->ignore_limits;
 			return TRUE;
 		}
 		// No key has been sent
@@ -339,11 +339,11 @@ abstract class REST_Controller extends CI_Controller {
 	 */
 	private function _log_request($authorized = FALSE)
 	{
-		return $this->rest->db->insert(config_item('rest_logs_table'), array(
+		return $this->rest_api->db->insert(config_item('rest_logs_table'), array(
 			'uri' => $this->uri->uri_string(),
 			'method' => $this->request->method,
 			'params' => serialize($this->_args),
-			'api_key' => isset($this->rest->key) ? $this->rest->key : '',
+			'api_key' => isset($this->rest_api->key) ? $this->rest_api->key : '',
 			'ip_address' => $this->input->ip_address(),
 			'time' => function_exists('now') ? now() : time(),
 			'authorized' => $authorized
@@ -357,7 +357,7 @@ abstract class REST_Controller extends CI_Controller {
 	private function _check_limit($controller_method)
 	{
 		// They are special, or it might not even have a limit
-		if (!empty($this->rest->ignore_limits) OR !isset($this->methods[$controller_method]['limit']))
+		if (!empty($this->rest_api->ignore_limits) OR !isset($this->methods[$controller_method]['limit']))
 		{
 			// On your way sonny-jim.
 			return TRUE;
@@ -365,18 +365,18 @@ abstract class REST_Controller extends CI_Controller {
 		// How many times can you get to this method an hour?
 		$limit = $this->methods[$controller_method]['limit'];
 		// Get data on a keys usage
-		$result = $this->rest->db
+		$result = $this->rest_api->db
 						->where('uri', $this->uri->uri_string())
-						->where('api_key', $this->rest->key)
+						->where('api_key', $this->rest_api->key)
 						->get(config_item('rest_limits_table'))
 						->row();
 		// No calls yet, or been an hour since they called
 		if (!$result OR $result->hour_started < time() - (60 * 60))
 		{
 			// Right, set one up from scratch
-			$this->rest->db->insert('limits', array(
+			$this->rest_api->db->insert('limits', array(
 				'uri' => $this->uri->uri_string(),
-				'api_key' => isset($this->rest->key) ? $this->rest->key : '',
+				'api_key' => isset($this->rest_api->key) ? $this->rest_api->key : '',
 				'count' => 1,
 				'hour_started' => time()
 			));
@@ -389,9 +389,9 @@ abstract class REST_Controller extends CI_Controller {
 			{
 				return FALSE;
 			}
-			$this->rest->db
+			$this->rest_api->db
 					->where('uri', $this->uri->uri_string())
-					->where('api_key', $this->rest->key)
+					->where('api_key', $this->rest_api->key)
 					->set('count', 'count + 1', FALSE)
 					->update(config_item('limits'));
 		}

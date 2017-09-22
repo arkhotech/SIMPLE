@@ -10,7 +10,7 @@ class API extends REST_Controller{//MY_BackendController {
         
          if(!isset($this->get()['proceso']) 
                 || !isset($this->get()['etapa'])){
-            $this->response(array('message' => 'Parametros insuficientes'), 400);
+            $this->response(array('message' => 'Parámetros insuficientes'), 400);
         }
         try{
             $this->checkIdentificationHeaders($this->get()['etapa']);

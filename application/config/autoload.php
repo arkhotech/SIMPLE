@@ -54,7 +54,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('form_validation','session','email','rest','curl','nusoap');
+$autoload['libraries'] = array('form_validation','session','email','curl','rest','nusoap');
 
 /*
 | -------------------------------------------------------------------

@@ -78,8 +78,6 @@ class AccionSubcriptores extends Accion {
                         $output['idTarea'] = $etapa['Tarea']['id'];
                         $output['data'] = $data;
 
-                        log_message('info', $this->varDump($output));
-
                         $request = json_encode($output);
 
                         $request_suscriptor = $suscriptor->extra->request;
@@ -91,7 +89,8 @@ class AccionSubcriptores extends Accion {
                         }
 
 
-                        $config = $this->getConfigRest($idSeguridad, $server);
+                        $seguridad = new SeguridadIntegracion();
+                        $config = $seguridad->getConfigRest($idSeguridad, $server);
 
                         log_message("INFO", "Llamando a suscriptor URL: " . $uri, FALSE);
 
@@ -133,71 +132,6 @@ class AccionSubcriptores extends Accion {
             log_message('Error general en notificaciones a suscriptores ',$e->getMessage());
             AuditoriaOperaciones::registrarAuditoria($proceso->nombre, "Ejecutar PUSH", $e->getMessage(), array());
         }
-    }
-
-    private function getConfigRest($id_seguridad, $server){
-
-        $seguridad = Doctrine::getTable('Seguridad')->find($id_seguridad);
-        $tipo_seguridad = $seguridad->extra->tipoSeguridad;
-        $user = $seguridad->extra->user;
-        $pass = $seguridad->extra->pass;
-        $api_key = $seguridad->extra->apikey;
-        $name_key = $seguridad->extra->namekey;
-        $url_auth = $seguridad->extra->url_auth;
-        $uri_auth = $seguridad->extra->uri_auth;
-        $request_seg = $seguridad->extra->request_seg;
-
-        $CI = & get_instance();
-        switch ($tipo_seguridad) {
-            case "HTTP_BASIC":
-                //Seguridad basic
-                $config = array(
-                    'timeout'         => 30,
-                    'server'          => $server,
-                    'http_user'       => $user,
-                    'http_pass'       => $pass,
-                    'http_auth'       => 'basic'
-                );
-                break;
-            case "API_KEY":
-                //Seguriad api key
-                $config = array(
-                    'timeout'         => 30,
-                    'server'          => $server,
-                    'api_key'         => $api_key,
-                    'api_name'        => $name_key
-                );
-                break;
-            case "OAUTH2":
-                //SEGURIDAD OAUTH2
-                $config_seg = array(
-                    'server'          => $url_auth
-                );
-                $CI->rest->initialize($config_seg);
-                $result = $CI->rest->post($uri_auth, $request_seg, 'json');
-                //Se obtiene la codigo de la cabecera HTTP
-                $debug_seg = $CI->rest->debug();
-                $response_seg= intval($debug_seg['info']['http_code']);
-                if($response_seg >= 200 && $response_seg < 300){
-                    $config = array(
-                        'timeout'         => 30,
-                        'server'          => $server,
-                        'api_key'         => $result->token_type.' '.$result->access_token,
-                        'api_name'        => 'Authorization'
-                    );
-                }
-                break;
-            default:
-                //SIN SEGURIDAD
-                $config = array(
-                    'timeout'         => 30,
-                    'server'          => $server
-                );
-                break;
-        }
-
-        return $config;
-
     }
 
     function varDump($data){

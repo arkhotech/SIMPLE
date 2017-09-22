@@ -65,18 +65,10 @@ class AccionCallback extends Accion {
     public function ejecutar(Etapa $etapa) {
 
         log_message("INFO", "Ejecutando Callback", FALSE);
-        $accion=Doctrine::getTable('Accion')->find($this->id);
-        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
         $proceso = Doctrine::getTable('Proceso')->findProceso($etapa['Tarea']['proceso_id']);
         $callback = Doctrine::getTable('Proceso')->findVaribleCallback($etapa->id);
-        log_message("INFO", "Callback: ".$callback['valor'], FALSE);
-        if ($callback['valor']>0){
 
-            $tipoSeguridad=$data->extra->tipoSeguridad;
-            $user = $data->extra->user;
-            $pass = $data->extra->pass;
-            $ApiKey = $data->extra->apikey;
-            ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
+        if ($callback['valor']>0){
 
             foreach ($callback['data'] as $res){
                 if($res['nombre']=='callback'){
@@ -88,23 +80,25 @@ class AccionCallback extends Accion {
                 }
             }
 
-   
             $callback_url = str_replace('\/', '/', $callback_url);
             $base = explode("/", $callback_url);
             $server = $base[0].'//'.$base[2];
             $server = str_replace('"', '', $server);
             $uri ='';
-            for ($i = 3; $i <= count($base); $i++){
-                $uri .='/'.$base[$i];
-            }
-
-            $caracter='/';
-            $l = substr($uri, 0, 1);
-            if($caracter===$l){
-                $uri = substr($uri, 1);
+            for ($i = 3; $i < count($base); $i++){
+                if ($i == 3)
+                    $uri .= $base[$i];
+                else
+                    $uri .= '/' . $base[$i];
             }
             $uri = str_replace('"', '', $uri);
-            
+
+            log_message("INFO", "Server: ".$server, FALSE);
+            log_message("INFO", "Uri: ".$uri, FALSE);
+
+            $seguridad = new SeguridadIntegracion();
+            $config = $seguridad->getConfigRest($this->extra->idSeguridad, $server);
+
             $campo = new Campo();
             $data=$campo->obtenerResultados($etapa,$etapa['Tarea']['proceso_id']);
             $output['idInstancia']=$etapa['tramite_id'];
@@ -112,59 +106,12 @@ class AccionCallback extends Accion {
             $output['callback-id']=$callback_id;
             $output['data']=$data;
 
-            log_message('info',$this->varDump($output));
-
             $request=json_encode($output);
-            log_message('info',$this->varDump($output));
-            log_message('info',$this->varDump($request));
 
             $CI = & get_instance();
-            switch ($tipoSeguridad) {
-                case "HTTP_BASIC":
-                    //Seguridad basic
-                    $config = array(
-                        'server'          => $server,
-                        'http_user'       => $user,
-                        'http_pass'       => $pass,
-                        'http_auth'       => 'basic'
-                    );
-                    break;
-                case "API_KEY":
-                    //Seguriad api key
-                    $config = array(
-                        'server'          => $server,
-                        'api_key'         => $ApiKey,
-                        'api_name'        => $NameKey
-                    );
-                    break;
-                case "OAUTH2":
-                    //SEGURIDAD OAUTH2
-                    $config_seg = array(
-                        'server'          => $url_auth
-                    );
-                    $request_seg= $data->extra->request_seg;
-                    $CI->rest->initialize($config_seg);
-                    $result = $CI->rest->post($uri_auth, $request_seg, 'json');
-                    //Se obtiene la codigo de la cabecera HTTP
-                    $debug_seg = $CI->rest->debug();
-                    $response_seg= intval($debug_seg['info']['http_code']);
-                    if($response_seg >= 200 && $response_seg < 300){
-                        $config = array(
-                            'server'          => $server,
-                            'api_key'         => $result->token_type.' '.$result->access_token,
-                            'api_name'        => 'Authorization'
-                        );
-                    }
-                break;
-                default:
-                    //SIN SEGURIDAD
-                    $config = array(
-                         'server'          => $server
-                    );
-                break;
-            }
+
             // obtenemos el Headers si lo hay
-            if(isset($this->extra->header)){
+            if(isset($this->extra->header) && strlen($this->extra->header) > 0){
                 $r=new Regla($this->extra->header);
                 $header=$r->getExpresionParaOutput($etapa->id);
                 $headers = json_decode($header);
@@ -172,24 +119,25 @@ class AccionCallback extends Accion {
                     $CI->rest->header($name.": ".$value);
                 }
             }
+
             try{
-                log_message("INFO", "Llamando a callback URL: ".$uri, FALSE);
+                log_message("INFO", "Llamando a callback URL: ".$server."/".$uri, FALSE);
                 log_message("INFO", "Llamando a callback Request: ".$request, FALSE);
                 log_message("INFO", "Llamando a callback Metodo: ".$this->extra->tipoMetodoC, FALSE);
+
+                $CI->rest->initialize($config);
+
                 // Se ejecuta la llamada segun el metodo
                 if($this->extra->tipoMetodoC == "POST"){
-                    $CI->rest->initialize($config);
                     $result = $CI->rest->post($uri, $request, 'json');
                 }else if($this->extra->tipoMetodoC == "PUT"){
-                    $CI->rest->initialize($config);
                     $result = $CI->rest->put($uri, $request, 'json');
                 }else if($this->extra->tipoMetodoC == "DELETE"){
-                    $CI->rest->initialize($config);
                     $result = $CI->rest->delete($uri, $request, 'json');
                 }
                 //Se obtiene la codigo de la cabecera HTTP
                 $debug = $CI->rest->debug();
-                log_message("INFO", "Llamando a callback debug: ".$this->varDump($debug), FALSE);
+
                 $parseInt=intval($debug['info']['http_code']);
                 if ($parseInt<200 || $parseInt>204){
                     // Ocurio un error en el server del Callback ## Error en el servidor externo ##
