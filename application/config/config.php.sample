@@ -56,7 +56,6 @@ $config['uri_protocol']	= 'AUTO';
 |
 | http://codeigniter.com/user_guide/general/urls.html
 */
-
 $config['url_suffix'] = '';
 
 /*
@@ -93,7 +92,6 @@ $config['charset'] = 'UTF-8';
 */
 $config['enable_hooks'] = FALSE;
 
-
 /*
 |--------------------------------------------------------------------------
 | Class Extension Prefix
@@ -107,7 +105,6 @@ $config['enable_hooks'] = FALSE;
 |
 */
 $config['subclass_prefix'] = 'MY_';
-
 
 /*
 |--------------------------------------------------------------------------
@@ -330,7 +327,6 @@ $config['compress_output'] = FALSE;
 */
 $config['time_reference'] = 'local';
 
-
 /*
 |--------------------------------------------------------------------------
 | Rewrite PHP Short Tags
@@ -342,7 +338,6 @@ $config['time_reference'] = 'local';
 |
 */
 $config['rewrite_short_tags'] = FALSE;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -357,14 +352,12 @@ $config['rewrite_short_tags'] = FALSE;
 */
 $config['proxy_ips'] = '';
 
-
 /*
  * Libreria que se va a utilizar para hacer los diagramas de flujo.
  * jsplumb: Gratuita y libre uso
  * gojs: requiere licencia
  */
 $config['js_diagram']='jsplumb';
-
 
 /*
  * Servidor soporta HTTPS
@@ -406,7 +399,6 @@ $config['base_service']='http://dev2.arkho.tech/';
  */
 $config['context_service']='v1/';//context del servicio
 
-
 /*  
  * Identificado de aplicación o cuenta para acceder al microservicio de 
  * agendas.
@@ -419,7 +411,6 @@ $config['appkey']='mMRUI7s7Nn0yGq0';
  * 
  */
 $config['records']=10;// numero de registros por pagina
-
 
 /*
  * Minutos para eliminar una cita si no ha sido confirmada
@@ -439,5 +430,11 @@ $config['sitekey']='';
  */
 $config['secretkey']='';
 
+/*
+ * Maps Key
+ *
+ */
+$config['mapskey']='';
+
 /* End of file config.php */
-/* Location: ./application/config/config.php */
+/* Location: ./application/config/config.php.sample */
