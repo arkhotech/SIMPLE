@@ -221,6 +221,8 @@ class IntegracionMediator{
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
             //Recuper la priemra etapa
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
+            log_message("INFO", "Tarea id: ".$id_tarea, FALSE);
+            log_message("INFO", "Etapa id: ".$etapa_id, FALSE);
 
             if(array_key_exists('callback',$input)){
                 $this->registrarCallbackURL($input['callback'],$input['callback-id'],$etapa_id);
@@ -453,14 +455,14 @@ class IntegracionMediator{
         return $ret_val;
     }
     
-    public function continuarProceso($id_proceso,$id_etapa,$secuencia, $body){
+    public function continuarProceso($id_proceso, $id_etapa, $secuencia, $body){
 
         log_message("INFO", "En continuar proceso, input data: ".$body);
 
         try{
             $input = json_decode($body,true);
 
-            if($id_etapa == NULL || $id_secuencia=NULL ){
+            if($id_etapa == NULL || $secuencia == NULL ){
                 header("HTTP/1.1 400 Bad Request");
                 return;
             }
@@ -646,7 +648,6 @@ class IntegracionMediator{
         return $etapas;
     }
 
-    
 }
 
 

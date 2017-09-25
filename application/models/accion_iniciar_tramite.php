@@ -92,7 +92,7 @@ class AccionIniciarTramite extends Accion {
 
     public function ejecutar(Etapa $etapa) {
 
-        log_message("INFO", "En ejecución trámite", FALSE);
+        log_message("INFO", "En ejecución accion iniciando trámite simple", FALSE);
 
         $CI = & get_instance();
         // Se declara el tipo de seguridad segun sea el caso
@@ -117,8 +117,12 @@ class AccionIniciarTramite extends Accion {
         }*/
         try{
 
-            $integracion = new FormNormalizer();
-            $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, $etapa->tramite_id, $this->extra->tareaRetornoSel, $request);
+            $integracion = new IntegracionMediator();
+
+            //TODO al parecer falta indicar tarea de inicio
+            $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, $etapa->id, $request);
+
+            $this->registrarRetorno($info_inicio['idInstancia'], $this->extra->tareaRetornoSel);
 
             $response_inicio = "{\"respuesta_inicio\": ".$info_inicio."}";
 
@@ -147,6 +151,23 @@ class AccionIniciarTramite extends Accion {
         }
     }
 
+    private function registrarRetorno($tramite_id, $retorno_id){
+
+        $tramite = Doctrine::getTable('Tramite')->find($tramite_id);
+        $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
+
+        $dato = new DatoSeguimiento();
+        $dato->nombre = "tramite_retorno";
+        $dato->valor = $tramite_id;
+        $dato->etapa_id = $etapa_id;
+        $dato->save();
+
+        $dato = new DatoSeguimiento();
+        $dato->nombre = "tarea_retorno";
+        $dato->valor = $retorno_id;
+        $dato->etapa_id = $etapa_id;
+        $dato->save();
+    }
 
     function varDump($data){
         ob_start();
