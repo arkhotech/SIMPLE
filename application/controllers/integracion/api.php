@@ -1,16 +1,13 @@
  <?php
 require APPPATH.'/core/REST_Controller.php';
-class API extends REST_Controller{//MY_BackendController {
-    
-    private $userHeadersKeys = array('Rut','Nombres','Email');
-    
-    public function tramites_post(){   //$proceso_id=null, $etapa_id = null
+class API extends REST_Controller{
+      
+    public function tramites_post(){ 
         log_message("INFO", "inicio proceso", FALSE);
-        log_message("INFO", "Call check headers", FALSE);
         
          if(!isset($this->get()['proceso']) 
                 || !isset($this->get()['etapa'])){
-            $this->response(array('message' => 'Parámetros insuficientes'), 400);
+            $this->response(array('message' => 'Parámetros insuficientes',"code"=> 400), 400);
         }
         try{
             $this->checkIdentificationHeaders($this->get()['etapa']);
@@ -33,7 +30,7 @@ class API extends REST_Controller{//MY_BackendController {
         if(!isset($this->get()['tramite']) 
                 || !isset($this->get()['etapa']) 
                 || !isset($this->get()['paso'])){
-            $this->response(array( 'message' => 'Parametros insuficientes'), 400);
+            $this->response(array( 'message' => 'Parametros insuficientes',"code" => 400), 400);
         }
         //Recuperar los valores
         $etapa_id = $this->get()['etapa'];
@@ -53,7 +50,7 @@ class API extends REST_Controller{//MY_BackendController {
        
             $data = $mediator->continuarProceso($tramite_id,$etapa_id,$secuencia,$this->request->body);
         }catch(Exception $e){
-            $this->response(array("message" => $e->getMessage()),$e->getCode());
+            $this->response(array("message" => $e->getMessage(),"code" => $e->getCode() ),$e->getCode());
         }
         $this->response($data);        
     }
@@ -98,15 +95,12 @@ class API extends REST_Controller{//MY_BackendController {
             error_log("etapa debe ser una instancia de Etapa");
             throw new Exception("Etapa no existe",500);
         }
-        
         $body = json_decode($this->request->body,false);
-
-        $cu_keys = $this->userHeadersKeys;
+        
         log_message('DEBUG','Check modo',FALSE);
 
         switch($tarea->acceso_modo){
         case 'claveunica':
-            
             if(!isset($body->identificacion)){
                 throw new Exception('Headers Clave Unica no enviados',403);
             }
@@ -207,6 +201,22 @@ class API extends REST_Controller{//MY_BackendController {
         $ret_val = ob_get_contents();
         ob_end_clean();
         return $ret_val;
+    }
+    
+     private function utf8ize($d) {
+        try{
+            if (is_array($d))
+                foreach ($d as $k => $v)
+                    $d[$k] = $this->utf8ize($v);
+            else if(is_object($d))
+                foreach ($d as $k => $v)
+                    $d->$k = $this->utf8ize($v);
+            else
+                return utf8_encode($d);
+        }catch (Exception $e){
+            log_message('info', 'Exception utf8ize: '.$this->varDump($e), FALSE);
+        }
+        return $d;
     }
    
 }

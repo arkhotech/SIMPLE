@@ -59,29 +59,9 @@ class IntegracionMediator{
             unset($retval['form']['idEtapa']);
         }
 
-//        foreach ($form->Campos as $c) {
-//            // Validamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
-//            log_message("INFO", "Campo nombre: ".$c->nombre, FALSE);
-// 
-//            if(count($c->validacion) > 0){
-//                foreach ($c->validacion as $validacion) {
-//                    log_message("INFO", "Campo requerido en for: " . $validacion, FALSE);
-//                    if($validacion == "required"){
-//                        $valor = $this->extractVariable($json,$c,$etapa->tramite_id);
-//                        log_message("INFO", "Valor para campo: " . $valor, FALSE);
-//                        if($valor == "NE"){
-//                            $valida_formulario = FALSE;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
- 
- 
  
         foreach( $json['Campos'] as $campo){
-            if($campo['tipo'] == "subtitle"){
+            if($campo['tipo'] == "subtitle" ){
                 continue;  //se ignoran los campos de tipo subtitle
             }
  
@@ -129,8 +109,6 @@ class IntegracionMediator{
             $tramite = Doctrine::getTable('Proceso')->find($proceso_id);
 
             foreach($tramite->Formularios as $form){
-                
-                //$formSimple = $form;//Doctrine::getTable('Formulario')->find($form->id);
                 $json = json_decode($form->exportComplete(),true);
                 array_push($result,$this->c($json,$form));
 
@@ -153,7 +131,7 @@ class IntegracionMediator{
                     $formSimple = 
                             Doctrine::getTable('Formulario') ->find($paso->Formulario->id)->exportComplete();
                     $json = json_decode($formSimple,true);
-                    //log_message("INFO", "Json formulario: ".$json, FALSE);
+
                     array_push($result,$this->normalizarFormulario($json,$paso->Formulario));
                 }
                 
@@ -300,7 +278,7 @@ class IntegracionMediator{
         if ($etapa->vencida()) {
             throw new Exception("Esta etapa se encuentra vencida", 412);
         }
-        AuditoriaOperaciones::registrarAuditoria($etapa->Tarea->Proceso->nombre, "Iniciar Proceso", "Audoitoria", $body);
+        //AuditoriaOperaciones::registrarAuditoria($etapa->Tarea->Proceso->nombre, "Iniciar Proceso", "Auditoria", $body);
 
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
@@ -322,8 +300,15 @@ class IntegracionMediator{
                 $campos = $formulario->Campos;
                 $this->validarCamposObligatorios($body,$formulario);
                 //Guardar los campos
-                $this->saveFields($campos,$etapa,$body);
-                
+                log_message('debug','$$$$$$  Campos'.count($campos));
+                if(!$paso->getReadonly()){
+                    $this->saveFields($campos,$etapa,$body);
+                }else{
+                    //si es de solo lectura y además envió datos entonces error
+                    if(count($campos)> 0){
+                        throw new Exception('El formulario es de solo lectura',400);
+                    }
+                }
                 $etapa->save();
                 $etapa->finalizarPaso($paso);
                 //Obtiene el siguiete paso...
@@ -333,8 +318,6 @@ class IntegracionMediator{
             log_message("INFO", "procesar_proximo_paso: $secuencia, $next_step, $etapa, $id_proceso", FALSE);
             //Verificar si es el último paso, etonces la etapa actual esta finalizada
             $result = $this->procesar_proximo_paso($secuencia, $next_step, $etapa, $id_proceso);
-
-            //log_message("DEBUG", "Result: ".$this->varDump($result), FALSE);
 
         }catch(Exception $e){
             log_message('ERROR',$e->getTraceAsString());
@@ -354,11 +337,11 @@ class IntegracionMediator{
      * @param type $etapa Etapa a la que pertenece el formulario
      * @param type $body Estructura "data" -> array( key => value );
      */
-    public function saveFields($campos, $etapa, $body) {
+    public function saveFields($campos, Etapa $etapa, $body) {
        
         foreach ($campos as $c) {
             // Almacenamos los campos que no sean readonly y que esten disponibles (que su campo dependiente se cumpla)
-
+            log_message('debug','$$$$$$$$   registrando campo: '.$c->nombre);
             if ($c->isEditableWithCurrentPOST($etapa->id, $body)) {
                 $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($c->nombre, $etapa->id);
                 if (!$dato)
@@ -417,7 +400,7 @@ class IntegracionMediator{
         }
     }
     
-    public static function registerUserFromHeadersClaveUnica($body){
+    public static function registerUserFromHeadersClaveUnica(stdClass $body){
         
         log_message('INFO','Registrando cuenta clave unica ',FALSE);
         $user =Doctrine::getTable('Usuario')->findOneByRut($body->rut);
@@ -455,19 +438,23 @@ class IntegracionMediator{
     
     public function continuarProceso($id_proceso,$id_etapa,$secuencia, $body){
 
-        log_message("INFO", "En continuar proceso, input data: ".$body);
+        log_message("debug", "En continuar proceso, input data: ".$body);
 
         try{
+            if(!is_numeric($secuencia) || !is_numeric($id_proceso) || !is_numeric($id_etapa)){
+                $data= "proc: $id_proceso; etapa: $id_etapa; sec: $secuencia";
+                throw new Exception("Error en parametros-> $data",400);
+            }
             $input = json_decode($body,true);
+            if(get_)
 
             if($id_etapa == NULL || $id_secuencia=NULL ){
-                header("HTTP/1.1 400 Bad Request");
-                return;
+                throw new Exception('Datos de Secuencia o etapa no entregados', 400);
             }
             //Obtener el nombre del proceso
 
-            log_message("INFO", "id_etapa: ".$id_etapa);
-            log_message("INFO", "secuencia: ".$secuencia);
+            log_message("debug", "id_etapa: ".$id_etapa);
+            log_message("debug", "secuencia: ".$secuencia);
 
             $result = $this->ejecutarEntrada($id_etapa, $input, $secuencia, $id_proceso);
 
@@ -478,7 +465,6 @@ class IntegracionMediator{
                 "estadoProceso" => $result ['result']['estadoProceso'],
                 "proximoFormulario" => $result['result']['proximoFormulario']
             );
-            //$this->responseJson($response);
             return $response;
         }catch(Exception $e){
             log_message('error',$e->getMessage());

@@ -102,3 +102,28 @@ function json_indent($json) {
 function isJSON($string){
    return is_string($string) && is_array(json_decode($string, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
 }
+
+
+function getJson(){
+    
+    switch(json_last_error()) {
+        case JSON_ERROR_NONE:
+            echo ' - Sin errores';
+        break;
+        case JSON_ERROR_DEPTH:
+            throw new Exception(' - Excedido tamaño máximo de la pila',500);
+        case JSON_ERROR_STATE_MISMATCH:
+            throw new Exception(' - Desbordamiento de buffer o los modos no coinciden',500);
+        case JSON_ERROR_CTRL_CHAR:
+            throw new Exception(' - Encontrado carácter de control no esperado',500);
+        case JSON_ERROR_SYNTAX:
+            throw new Exception(' - Error de sintaxis, JSON mal formado',500);
+        case JSON_ERROR_UTF8:
+            throw new Exception(' - Error de sintaxis, JSON mal formado',500);
+        default:
+            echo ' - Error desconocido';
+        break;
+    }
+
+    
+}

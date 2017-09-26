@@ -21,7 +21,8 @@ class AuditoriaOperaciones extends Doctrine_Record {
      * @param type $motivo Detalles de la auditoría. Ej.  Registo de llmaados
      * @param type $detalles Detalles en JSON
      */
-    static public function registrarAuditoria($proceso_nombre,$operacion, $motivo, $detalles){
+    static public function registrarAuditoria($proceso_nombre,$operacion, $motivo, $data){
+           
         $fecha = new DateTime();
         $registro_auditoria = new AuditoriaOperaciones ();
         $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
@@ -32,7 +33,7 @@ class AuditoriaOperaciones extends Doctrine_Record {
             $datauser = trim($user->nombres)==0 ? 'Anonymous' : $user->nombres;
             $datauser .= (trim($user->apellido_paterno)!= 0) ? " ".$user->apellido_paterno : "";
             $datauser .= (trim($user->apellido_materno)!= 0) ? " ".$user->apellido_materno : "";        
-            $datauser .= (trim($user->email)!= 0) ? " <".$user->email.">" :" <anonymous@no-domain.com>";       
+            $datauser .= (trim($user->email)!= '') ? " <".$user->email.">" :" <anonymous@no-domain.com>";       
                     
         }
         log_message('INFO','Usuario Registrado '.$datauser);
@@ -43,9 +44,11 @@ class AuditoriaOperaciones extends Doctrine_Record {
          $registro_auditoria->motivo = $motivo;
 
          //unset($accion_array['accion']['proceso_id']);
-         $registro_auditoria->detalles=  $detalles;//json_encode($accion_array);
+         log_message('debug',$str_detalles);
+         
+         $registro_auditoria->detalles=  json_encode($data);
          $registro_auditoria->save();
-
+         log_message('debug','Regstro guardado');
     }
 	
 }
