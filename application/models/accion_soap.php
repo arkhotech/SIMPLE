@@ -86,44 +86,22 @@ class AccionSoap extends Accion {
         $CI->form_validation->set_rules('extra[operacion]', 'Métodos', 'required');
     }
 
-    public function ejecutar(Etapa $etapa) { 
-        $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
-        $tipoSeguridad=$data->extra->tipoSeguridad;
-        $user = $data->extra->user;
-        $pass = $data->extra->pass;
-        $ApiKey = $data->extra->apikey;
-        
+    public function ejecutar(Etapa $etapa) {
+
         //Se declara el cliente soap
         $client = new nusoap_client($this->extra->wsdl, 'wsdl');
-        
+
+        if(isset($this->extra->idSeguridad) && strlen($this->extra->idSeguridad) > 0 && $this->extra->idSeguridad > 0){
+            $seguridad = new SeguridadIntegracion();
+            $client = $seguridad->setSecuritySoap($client);
+        }
+
         // Se asigna valor de timeout
         $client->soap_defencoding = 'UTF-8';
         $client->decode_utf8 = true;
         $client->timeout = $this->extra->timeout;
         $client->response_timeout = $this->extra->timeout;
         
-        //Se instancia el tipo de seguridad segun sea el caso
-        switch ($tipoSeguridad) {
-            case "HTTP_BASIC":
-                //SEGURIDAD BASIC
-                $client->setCredentials($user, $pass, 'basic');
-                break;
-            case "API_KEY":
-                //SEGURIDAD API KEY
-                $header = 
-                "<SECINFO>
-                  <KEY>".$this->extra->apikey."</KEY>
-                </SECINFO>";
-                $client->setHeaders($header);
-                break;
-            case "OAUTH2":
-                //SEGURIDAD OAUTH2
-                $client->setCredentials($user, $pass, 'basic');
-                break;
-            default:
-                //NO TIENE SEGURIDAD
-            break;
-        }
         try{
             $CI = & get_instance();
             $r=new Regla($this->extra->wsdl);
@@ -132,34 +110,32 @@ class AccionSoap extends Accion {
                 $r=new Regla($this->extra->request);
                 $request=$r->getExpresionParaOutput($etapa->id);
             }
-            
-            //Se EJECUTA el llamado Soap
-            $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
 
-            $error = $client->getError();
-            log_message("INFO", "Error SOAP ".$this->varDump($error), FALSE);
+            $intentos = 1;
+            do{
+                //Se EJECUTA el llamado Soap
+                $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
 
-            //se verifica si existe numero de reintentos
-            if(isset($error) && strpos($error, 'timed out') !== false){
-                log_message("INFO", "Reintentando ".$this->extra->timeout_reintentos." veces.", FALSE);
-                $intentos = 1;
-                while($intentos < $this->extra->timeout_reintentos && strpos($error, 'timed out') !== false){
+                $error = $client->getError();
+                log_message("INFO", "Error SOAP ".$this->varDump($error), FALSE);
+
+                //se verifica si existe numero de reintentos
+                if(isset($error) && strpos($error, 'timed out') !== false){
                     log_message("INFO", "Reintento Nro: ".$intentos, FALSE);
-                    $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
-                    $error = $client->getError();
                     log_message("INFO", "Error SOAP ".$error, FALSE);
                     $intentos++;
                 }
-            }
-
+            }while($intentos < $this->extra->timeout_reintentos && strpos($error, 'timed out') !== false);
+            
             log_message('info', 'Result: '.$this->varDump($result), FALSE);
             log_message('info', 'Client data: '.$this->varDump($client->document), FALSE);
 
             if ($error){
-                $result['response_soap']= $error;   
+                $error_timeout['time_out']=true;
+                $error_timeout['error']=$error;
+                $result['response_soap']= $error_timeout;
             }else{
                 $result['response_soap']= $this->utf8ize($result);
-                //$result['response_soap']= $client->response;
             }
 
 

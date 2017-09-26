@@ -76,4 +76,38 @@ class SeguridadIntegracion{
 
     }
 
+    public function setSecuritySoap($client, $idSeguridad){
+
+        $data = Doctrine::getTable('Seguridad')->find($idSeguridad);
+        $tipoSeguridad=$data->extra->tipoSeguridad;
+        $user = $data->extra->user;
+        $pass = $data->extra->pass;
+        $ApiKey = $data->extra->apikey;
+
+        //Se instancia el tipo de seguridad segun sea el caso
+        switch ($tipoSeguridad) {
+            case "HTTP_BASIC":
+                //SEGURIDAD BASIC
+                $client->setCredentials($user, $pass, 'basic');
+                break;
+            case "API_KEY":
+                //SEGURIDAD API KEY
+                $header =
+                    "<SECINFO>
+                  <KEY>".$this->extra->apikey."</KEY>
+                </SECINFO>";
+                $client->setHeaders($header);
+                break;
+            case "OAUTH2":
+                //SEGURIDAD OAUTH2
+                $client->setCredentials($user, $pass, 'basic');
+                break;
+            default:
+                //NO TIENE SEGURIDAD
+                break;
+        }
+
+        return $client;
+
+    }
 }

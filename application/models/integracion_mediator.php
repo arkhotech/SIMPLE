@@ -303,12 +303,8 @@ class IntegracionMediator{
                 log_message('debug','$$$$$$  Campos'.count($campos));
                 if(!$paso->getReadonly()){
                     $this->saveFields($campos,$etapa,$body);
-                }else{
-                    //si es de solo lectura y además envió datos entonces error
-                    if(count($campos)> 0){
-                        throw new Exception('El formulario es de solo lectura',400);
-                    }
                 }
+
                 $etapa->save();
                 $etapa->finalizarPaso($paso);
                 //Obtiene el siguiete paso...
