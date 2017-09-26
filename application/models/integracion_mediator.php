@@ -110,7 +110,7 @@ class IntegracionMediator{
 
             foreach($tramite->Formularios as $form){
                 $json = json_decode($form->exportComplete(),true);
-                array_push($result,$this->c($json,$form));
+                array_push($result,$this->normalizarFormulario($json,$form));
 
             }
             return $result;
