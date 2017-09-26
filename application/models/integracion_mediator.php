@@ -157,7 +157,7 @@ class IntegracionMediator{
         $formSimple = Doctrine::getTable('Formulario') ->find($form_id);
         
         if($formSimple == NULL){
-            throw new Exception("Fomrulario $form_id no existe");
+            throw new Exception("Formulario $form_id no existe");
         }
         $value_list = array();
         foreach( $formSimple->Campos as $campo ){
@@ -517,7 +517,8 @@ class IntegracionMediator{
                     $forms[] = $ret[0];
                 }
                 
-            }else{   
+            }else{  
+                $etapa->iniciarPaso($paso);
                 $forms[] = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
             }  
         }
@@ -590,6 +591,7 @@ class IntegracionMediator{
             //Procesar pasos de una misma etpa
             $estado = 'activo';
             $paso = $etapa->getPasoEjecutable($secuencia);
+            $etapa->iniciarPaso($paso);
             $forms[] = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
         }
         
@@ -631,8 +633,6 @@ class IntegracionMediator{
         }
         return $etapas;
     }
-
-    
 }
 
 

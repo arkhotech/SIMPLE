@@ -131,27 +131,37 @@ class Campo extends Doctrine_Record {
      * @return type
      */
     public function displayDatoSeguimiento($etapa_id){
+        try{
+            log_message("INFO", "Obteniendo valor de campo para etapa: ".$etapa_id, FALSE);
+            log_message("INFO", "Nombre campo: ".$this->nombre, FALSE);
 
-        log_message("INFO", "Obteniendo valor de campo para etapa: ".$etapa_id, FALSE);
-        log_message("INFO", "Nombre campo: ".$this->nombre, FALSE);
-       
-       $dato =  Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($this->nombre,$etapa_id);
-       if(!$dato ){
-           return "";
-       }
-        log_message("INFO", "Nombre dato: ".$dato->nombre, FALSE);
-        log_message("INFO", "Valor dato: ".$dato->valor, FALSE);
-        log_message("INFO", "this->valor_default: ".$this->valor_default, FALSE);
-        if(isset($this->valor_default) && strlen($this->valor_default) > 0 ){
-            $regla=new Regla($this->valor_default);
-            $valor_dato=$regla->getExpresionParaOutput($etapa_id);
-        }else{
-            $valor_dato = $dato->valor;
+           $dato =  Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($this->nombre,$etapa_id);
+           if(!$dato ){
+               //Se deben crear
+               $dato = new DatoSeguimiento();
+               $dato->nombre = $this->nombre;
+               $dato->etapa_id = $etapa_id;
+               $dato->valor = NULL;
+           }
+            log_message("INFO", "Nombre dato: ".$dato->nombre, FALSE);
+            log_message("INFO", "Valor dato: .".$dato->valor.".", FALSE);
+            log_message("INFO", "this->valor_default: ".$this->valor_default, FALSE);
+            if(isset($this->valor_default) && strlen($this->valor_default) > 0 && $dato->valor === NULL){
+                $regla=new Regla($this->valor_default);
+                $valor_dato=$regla->getExpresionParaOutput($etapa_id);
+                $dato->valor = $valor_dato;
+                $dato->save();
+            }else{
+                $valor_dato = $dato->valor;
+            }
+
+            log_message("INFO", "valor_default: ".$valor_dato, FALSE);
+
+           return $valor_dato;
+        }catch(Exception $e){
+            log_message('error',$e->getMessage());die;
+            throw $e;
         }
-
-        log_message("INFO", "valor_default: ".$valor_dato, FALSE);
-
-       return $valor_dato;
     }
     
     

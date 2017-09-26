@@ -77,7 +77,7 @@ class Regla {
                 
          $new_regla=preg_replace_callback('/@!(\w+)/', function($match) use ($etapa_id) {
                     $nombre_dato = $match[1];
-                    
+                    log_message('debug','&&&&&&&&&   Ejecutando validación');
                     $etapa=Doctrine::getTable('Etapa')->find($etapa_id);
                     $usuario=$etapa->Usuario;
                     
