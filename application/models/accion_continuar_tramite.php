@@ -82,8 +82,6 @@ class AccionContinuarTramite extends Accion {
         }*/
         try{
 
-            $integracion = new FormNormalizer();
-
             log_message("INFO", "Continuar desde etapa_id: ".$etapa->id, FALSE);
 
             $tramite_id=Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa("tramite_retorno",$etapa->id);
@@ -92,7 +90,8 @@ class AccionContinuarTramite extends Accion {
             log_message("INFO", "Continuar tramite_id: ".$tramite_id->valor, FALSE);
             log_message("INFO", "Continuar tarea_id: ".$tarea_id->valor, FALSE);
 
-            $info_continuar = $integracion->continuarProceso($etapa->tramite_id, $tramite_id->valor, $tarea_id->valor, $request);
+            $integracion = new IntegracionMediator();
+            $info_continuar = $integracion->continuarProceso($tramite_id->valor, $tarea_id->valor, "0", $request);
 
             $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
 

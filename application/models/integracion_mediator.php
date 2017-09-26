@@ -157,7 +157,7 @@ class IntegracionMediator{
         $formSimple = Doctrine::getTable('Formulario') ->find($form_id);
         
         if($formSimple == NULL){
-            throw new Exception("Formulario $form_id no existe");
+            throw new Exception("Formulario $form_id no existe",404);
         }
         $value_list = array();
         foreach( $formSimple->Campos as $campo ){
@@ -436,7 +436,7 @@ class IntegracionMediator{
         return $ret_val;
     }
     
-    public function continuarProceso($id_proceso,$id_etapa,$secuencia, $body){
+    public function continuarProceso($id_proceso, $id_etapa, $secuencia, $body){
 
         log_message("debug", "En continuar proceso, input data: ".$body);
 
@@ -446,9 +446,7 @@ class IntegracionMediator{
                 throw new Exception("Error en parametros-> $data",400);
             }
             $input = json_decode($body,true);
-            if(get_)
 
-            if($id_etapa == NULL || $id_secuencia=NULL ){
                 throw new Exception('Datos de Secuencia o etapa no entregados', 400);
             }
             //Obtener el nombre del proceso
@@ -633,6 +631,9 @@ class IntegracionMediator{
         }
         return $etapas;
     }
+
+    
+
 }
 
 
