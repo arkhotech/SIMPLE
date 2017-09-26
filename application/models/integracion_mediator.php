@@ -447,8 +447,6 @@ class IntegracionMediator{
             }
             $input = json_decode($body,true);
 
-            //Obtener el nombre del proceso
-
             log_message("debug", "id_etapa: ".$id_etapa);
             log_message("debug", "secuencia: ".$secuencia);
 
@@ -490,7 +488,7 @@ class IntegracionMediator{
     private function getFormulariosFromEtapa($_etapas,$id_proceso){
         $forms = null;
         
-        if($_etapas === NULL && !is_object($etapa) ){
+        if($_etapas === NULL && !is_object($_etapas) ){
             log_message('debug',"No es un objeto");
             return NULL;
         }
