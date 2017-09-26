@@ -447,8 +447,6 @@ class IntegracionMediator{
             }
             $input = json_decode($body,true);
 
-                throw new Exception('Datos de Secuencia o etapa no entregados', 400);
-            }
             //Obtener el nombre del proceso
 
             log_message("debug", "id_etapa: ".$id_etapa);
