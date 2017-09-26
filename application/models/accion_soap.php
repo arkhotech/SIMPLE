@@ -127,9 +127,6 @@ class AccionSoap extends Accion {
                 }
             }while($intentos < $this->extra->timeout_reintentos && strpos($error, 'timed out') !== false);
             
-            log_message('info', 'Result: '.$this->varDump($result), FALSE);
-            log_message('info', 'Client data: '.$this->varDump($client->document), FALSE);
-
             if ($error){
                 $error_timeout['time_out']=true;
                 $error_timeout['error']=$error;
@@ -137,7 +134,6 @@ class AccionSoap extends Accion {
             }else{
                 $result['response_soap']= $this->utf8ize($result);
             }
-
 
             foreach($result as $key=>$value){
 
