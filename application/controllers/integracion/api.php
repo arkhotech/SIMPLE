@@ -67,14 +67,14 @@ class API extends REST_Controller{
         log_message("INFO", "Status proceso", FALSE);
 
         try{
-            if(!isset($this->get()['tramite']) && !isset($this->get()['rut'])){
+            if(!isset($this->get()['tramite']) && !isset($this->get()['rut']) && !isset($this->get()['user'])){
                 $this->response(array('message' => 'Parámetros insuficientes',"code"=> 400), 400);
             }
 
             if(isset($this->get()['tramite'])) {
                 $status = $this->obtenerStatusPorTramite($this->get()['tramite']);
-            }else{
-                $status = $this->obtenerStatusPorRut($this->get()['rut']);
+            }else if(isset($this->get()['rut']) || isset($this->get()['user'])) {
+                $status = $this->obtenerStatusPorUsuario($this->get()['rut'], $this->get()['user']);
             }
 
             $this->response($status);
@@ -214,14 +214,18 @@ class API extends REST_Controller{
 
     }
 
-    private function obtenerStatusPorRut($rut){
+    private function obtenerStatusPorUsuario($rut=null, $nombre_usuario=null){
 
         log_message('INFO','Obteniendo estado trámites para rut: '.$rut,FALSE);
 
         try{
 
             $user = new Usuario();
-            $usuario = $user->findUsuarioPorRut($rut);
+            if($rut != null){
+                $usuario = $user->findUsuarioPorRut($rut);
+            }else{
+                $usuario = $user->findUsuarioPorUser($nombre_usuario);
+            }
 
             if(isset($usuario) && is_array($usuario) && count($usuario) > 0){
 
