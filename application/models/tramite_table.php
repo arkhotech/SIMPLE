@@ -55,4 +55,14 @@ class TramiteTable extends Doctrine_Table {
 
         return $query->execute();
     }
+
+    public function tramitesPorUsuario($usuario_id){
+        $query=Doctrine_Query::create()
+            ->from('Tramite t, t.Proceso.Cuenta c, t.Etapas e, e.Usuario u')
+            ->where('u.id = ?',$usuario_id)
+            ->orderBy('t.updated_at desc');
+
+        return $query->execute();
+    }
+
 }

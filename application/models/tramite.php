@@ -204,5 +204,5 @@ class Tramite extends Doctrine_Record {
     			'dias_vencidos - Dias vencidos de etapas actuales del Trámite'
     	);
     }
-    
+
 }

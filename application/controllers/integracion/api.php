@@ -36,7 +36,9 @@ class API extends REST_Controller{
         $etapa_id = $this->get()['etapa'];
         $tramite_id = $this->get()['tramite'];
         $secuencia = $this->get()['paso'];
+
         try{
+
             $mediator = new IntegracionMediator();
 
             $etapa = Doctrine::getTable('Etapa')->findOneById($etapa_id);
@@ -46,7 +48,6 @@ class API extends REST_Controller{
 
             $this->checkIdentificationHeaders($etapa->tarea_id);
             $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites");
-           
        
             $data = $mediator->continuarProceso($tramite_id,$etapa_id,$secuencia,$this->request->body);
         }catch(Exception $e){
@@ -61,25 +62,30 @@ class API extends REST_Controller{
      * @param type $id_tramite
      * @param type $id_paso
      */
-    public function status($tipo,$id_tramite, $rut ){
+    public function status_get(){
 
-        if($tipo!= "tramite" ){
-            show_error("404 No encontrado",404, "No se encuentra la operacion" );
-            exit;
+        log_message("INFO", "Status proceso", FALSE);
+
+        try{
+            if(!isset($this->get()['tramite']) && !isset($this->get()['rut'])){
+                $this->response(array('message' => 'Parámetros insuficientes',"code"=> 400), 400);
+            }
+
+            if(isset($this->get()['tramite'])) {
+                $status = $this->obtenerStatusPorTramite($this->get()['tramite']);
+            }else{
+                $status = $this->obtenerStatusPorRut($this->get()['rut']);
+            }
+
+            $this->response($status);
+        }catch(Exception $e){
+            $this->response(
+                array("message" => $e->getMessage(),
+                "code" => $e->getCode()),$e->getCode());
         }
 
-        if($rut == NULL || $id_tramite == NULL ){
-            show_error("400 Bad Request",400, "Uno de los parametros de entrada no ha sido especificado" );
-        }
-
-        switch($this->input->server('REQUEST_METHOD')){
-            case "GET":
-                $this->obtenerStatus($id_tramite,$rut);
-                break;
-            default:
-                header("HTTP/1.1 405 Metodo no permitido.");
-        }
     }
+
     /**
      * Realiza un check de los headers para degerminar a quien están asignados
      * 
@@ -183,16 +189,112 @@ class API extends REST_Controller{
                 "Auditoria de llamados a API REST", json_encode($data));
     }
 
-    private function obtenerStatus($id_tramite, $rut ){
+    private function obtenerStatusPorTramite($id_tramite){
 
-        $response = array("idTramite" => $id_tramite,
-            "nombreTramite" => "Hardcoded Dummy",
-            "rutUsuario" => $rut,
-            "nombreEtapaActual" => "Eetapa Cero");
-        $this->responseJson($response);
+        log_message('INFO','Obteniendo estado para trámite: '.$id_tramite,FALSE);
+
+        try{
+            $tramite = Doctrine::getTable('Tramite')->find($id_tramite);
+
+            if(isset($tramite) && is_object($tramite)){
+
+                log_message('INFO','Tramite recuperado',FALSE);
+
+                $status = $this->obtenerInfoTramite($tramite);
+
+            }else{
+                throw new Exception("Trámite no encontrado", 412);
+            }
+
+            log_message('INFO','Status: '.$this->varDump($status),FALSE);
+            return $status;
+        }catch(Exception $e){
+            throw new Exception($e->getMessage(), 500);
+        }
+
     }
 
-    
+    private function obtenerStatusPorRut($rut){
+
+        log_message('INFO','Obteniendo estado trámites para rut: '.$rut,FALSE);
+
+        try{
+
+            $user = new Usuario();
+            $usuario = $user->findUsuarioPorRut($rut);
+
+            if(isset($usuario) && is_array($usuario) && count($usuario) > 0){
+
+                log_message('INFO','Usuario recuperado: '.$usuario[0]["id"],FALSE);
+
+                $tramites = Doctrine::getTable('Tramite')->tramitesPorUsuario($usuario[0]["id"]);
+
+                log_message('INFO','Tramites recuperados: '.$tramites,FALSE);
+
+                if(isset($tramites) && (is_object($tramites) || is_array($tramites))){
+                    $statusTramites = array();
+                    foreach ($tramites as $tramite){
+                        $status = $this->obtenerInfoTramite($tramite);
+                        array_push($statusTramites, $status);
+                    }
+                }
+
+            }else{
+                throw new Exception("Usuario no encontrado", 412);
+            }
+
+            log_message('INFO','Status: '.$this->varDump($statusTramites),FALSE);
+            return $statusTramites;
+        }catch(Exception $e){
+            throw new Exception($e->getMessage(), 500);
+        }
+    }
+
+    private function obtenerInfoTramite($tramite){
+
+
+        try {
+
+            $etapa = $tramite->getEtapasActuales()->get(0);
+
+            $proceso = Doctrine::getTable('Proceso')->find($tramite->proceso_id);
+
+            if (isset($etapa) && is_object($etapa)) {
+
+                log_message('INFO', 'Etapa recuperada', FALSE);
+                log_message('INFO', 'Id usuario: ' . $etapa->usuario_id, FALSE);
+
+                $usuario = Doctrine::getTable('Usuario')->find($etapa->usuario_id);
+
+                $rut = "No existe información";
+                if (isset($usuario) && isset($usuario->rut) && strlen($usuario->rut) > 0) {
+                    log_message('INFO', 'Usuario rut: ' . $usuario->rut, FALSE);
+                    $rut = $usuario->rut;
+                }
+
+                log_message('INFO', 'Nombre proceso: ' . $proceso->nombre, FALSE);
+
+                $tarea = Doctrine::getTable('Tarea')->find($etapa->tarea_id);
+
+                $status = array("idTramite" => $tramite->id,
+                    "nombreTramite" => $proceso->nombre,
+                    "estado" => $tramite->pendiente == 1 ? "Pendiente" : "Completado",
+                    "rutUsuario" => $rut,
+                    "nombreEtapaActual" => $tarea->nombre);
+
+            } else {
+                $status = array("idTramite" => $tramite->id,
+                    "nombreTramite" => $proceso->nombre,
+                    "estado" => "Completado",
+                    "rutUsuario" => "No existe información",
+                    "nombreEtapaActual" => "No existe información");
+            }
+            return $status;
+        }catch(Exception $e){
+            throw new Exception("Problema al recuperar información del trámite");
+        }
+    }
+
 
     private function varDump($data){
         ob_start();
@@ -203,20 +305,4 @@ class API extends REST_Controller{
         return $ret_val;
     }
     
-     private function utf8ize($d) {
-        try{
-            if (is_array($d))
-                foreach ($d as $k => $v)
-                    $d[$k] = $this->utf8ize($v);
-            else if(is_object($d))
-                foreach ($d as $k => $v)
-                    $d->$k = $this->utf8ize($v);
-            else
-                return utf8_encode($d);
-        }catch (Exception $e){
-            log_message('info', 'Exception utf8ize: '.$this->varDump($e), FALSE);
-        }
-        return $d;
-    }
-   
 }
