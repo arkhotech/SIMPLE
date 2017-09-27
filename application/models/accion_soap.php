@@ -43,12 +43,12 @@ class AccionSoap extends Accion {
                 <br />
                 <!-- <span id="resultRequest" class="spanError"></span> -->
                 <br /><br />
-            </div>
-           <div class="col-md-12">
+            </div>';
+           /*<div class="col-md-12">
                 <label>Response</label>
                 <textarea id="response" name="extra[response]" rows="7" cols="70" placeholder="{ object }" class="input-xxlarge" readonly>' . ($this->extra ? $this->extra->response : '') . '</textarea>
                 <br /><br />
-            </div>';
+            </div>';*/
         $display.='<div id="modalImportarWsdl" class="modal hide fade">
                 <form method="POST" enctype="multipart/form-data" action="backend/acciones/upload_file">
                 <div class="modal-header">

@@ -259,13 +259,8 @@ class IntegracionMediator{
             throw new Exception("Etapa no fue encontrada", 404);
         }
         
-        $respuesta = new stdClass();
-        $validar_formulario = FALSE;
-        // Almacenamos los campos
-
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
-        
         if ($etapa->tramite_id != $id_proceso) {
             throw new Exception("Etapa no pertenece al proceso ingresado", 412);
         }
@@ -278,7 +273,6 @@ class IntegracionMediator{
         if ($etapa->vencida()) {
             throw new Exception("Esta etapa se encuentra vencida", 412);
         }
-        //AuditoriaOperaciones::registrarAuditoria($etapa->Tarea->Proceso->nombre, "Iniciar Proceso", "Auditoria", $body);
 
         try{
             //obtener el primer paso de la secuencia o el pasado por parámetro
@@ -294,8 +288,6 @@ class IntegracionMediator{
                 
                 $formulario = $paso->Formulario;
 
-                $respuesta = new stdClass();
-                $validar_formulario = FALSE;
                 // Almacenamos los campos
                 $campos = $formulario->Campos;
                 $this->validarCamposObligatorios($body,$formulario);

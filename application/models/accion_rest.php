@@ -96,161 +96,83 @@ class AccionRest extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
-        $data = null;
-        $tipoSeguridad = "NONE";
-        if(isset($this->extra->idSeguridad) && $this->extra->idSeguridad != -1){ //no hay ningun regustro configurado, osea esta cvacio
-            $data = Doctrine::getTable('Seguridad')->find($this->extra->idSeguridad);
-            $tipoSeguridad=$data->extra->tipoSeguridad;
-            $user = $data->extra->user;
-            $pass = $data->extra->pass;
-            $ApiKey = $data->extra->apikey;
-            ($data->extra->namekey ? $NameKey = $data->extra->namekey : $NameKey = '');
-        }
-        ($this->extra->timeout ? $timeout = $this->extra->timeout : $timeout = 30);
-        
-        //que hace esto ?
-       
-        $r=new Regla($this->extra->url);
-        $url=$r->getExpresionParaOutput($etapa->id);
-        $caracter="/";
-        $f = substr($url, -1);
-        if($caracter===$f){
-            $url = substr($url, 0, -1);
-        }
 
-        $r=new Regla($this->extra->uri);
-        $uri=$r->getExpresionParaOutput($etapa->id);
-        $l = substr($uri, 0, 1);
-        if($caracter===$l){
-            $uri = substr($uri, 1);
-        }
-        if($data !=  null ){
-            $r=new Regla($data->extra->url_auth);
-            $url_auth=$r->getExpresionParaOutput($etapa->id);
-            $l = substr($url_auth, 0, 1);
-            if($caracter===$l){
-                $url_auth = substr($url_auth, 1);
-            }
-        }
-
-        $CI = & get_instance();
-        // Se declara el tipo de seguridad segun sea el caso
-        switch ($tipoSeguridad) {
-            case "HTTP_BASIC":
-                //Seguridad basic
-                $config = array(
-                    'timeout'         => $timeout,
-                    'server'          => $url,
-                    'http_user'       => $user,
-                    'http_pass'       => $pass,
-                    'http_auth'       => 'basic'
-                );
-                break;
-            case "API_KEY":
-                //Seguridad api key
-                $config = array(
-                    'timeout'         => $timeout,
-                    'server'          => $url,
-                    'api_key'         => $ApiKey,
-                    'api_name'        => $NameKey
-                );
-                break;
-            case "OAUTH2":
-                //SEGURIDAD OAUTH2
-                $config_seg = array(
-                    'timeout'         => $timeout,
-                    'server'          => $url_auth
-                );
-                $request_seg= $data->extra->request_seg;
-                $CI->rest->initialize($config_seg);
-                $result = $CI->rest->post($uri_auth, $request_seg, 'json');
-                //Se obtiene la codigo de la cabecera HTTP
-                $debug_seg = $CI->rest->debug();
-                $response_seg= intval($debug_seg['info']['http_code']);
-                if($response_seg >= 200 && $response_seg < 300){
-                    $config = array(
-                        'timeout'         => $timeout,
-                        'server'          => $url,
-                        'api_key'         => $result->token_type.' '.$result->access_token,
-                        //'api_key'         => $result->token_type.' kjfghiofut485fhgruiotjbfgrhjh4uiyru',
-                        'api_name'        => 'Authorization'
-                    );
-                }
-            break;
-            default:
-                //SIN SEGURIDAD
-                $config = array(
-                    'timeout'         => $timeout,
-                    'server'          => $url
-                );
-            break;
-        }
-        if(isset($this->extra->request)){
-            $r=new Regla($this->extra->request);
-            $request=$r->getExpresionParaOutput($etapa->id);
-        }
-        //Hacemos encoding a la url
-        $url=preg_replace_callback('/([\?&][^=]+=)([^&]+)/', function($matches){
-            $key=$matches[1];
-            $value=$matches[2];
-            return $key.urlencode($value);
-        },
-        $url);
-        //obtenemos el Headers si lo hay
-        if(isset($this->extra->header)){
-            $r=new Regla($this->extra->header);
-            $header=$r->getExpresionParaOutput($etapa->id);
-            $headers = json_decode($header);
-            
-            if( isset($header) && trim($header) != ''){
-            
-                foreach ($headers as $name => $value) {
-                    $CI->rest->header($name.": ".$value);
-                }
-            }
-        }
         try{
-            // Se ejecuta la llamada segun el metodo
-            if($this->extra->tipoMetodo == "GET"){
-                $CI->rest->initialize($config);
-                $result = $CI->rest->get($uri, array() , 'json');
-            }else if($this->extra->tipoMetodo == "POST"){
-                $CI->rest->initialize($config);
-                $result = $CI->rest->post($uri, $request, 'json');
-            }else if($this->extra->tipoMetodo == "PUT"){
-                $CI->rest->initialize($config);
-                $result = $CI->rest->put($uri, $request, 'json');
-            }else if($this->extra->tipoMetodo == "DELETE"){
-                $CI->rest->initialize($config);
-                $result = $CI->rest->delete($uri, $request, 'json');
+
+            log_message("INFO", "Ejecutando llamado REST", FALSE);
+
+            $CI = & get_instance();
+            ($this->extra->timeout ? $timeout = $this->extra->timeout : $timeout = 30);
+
+            $r=new Regla($this->extra->url);
+            $server=$r->getExpresionParaOutput($etapa->id);
+            $caracter="/";
+            $f = substr($server, -1);
+            if($caracter===$f){
+                $server = substr($server, 0, -1);
             }
-            //Se obtiene la codigo de la cabecera HTTP
-            $debug = $CI->rest->debug();
-            //log_message("INFO", "Http response: ".$this->varDump($debug), FALSE);
-            //se verifica si existe numero de reintentos
-            if(isset($this->extra->timeout_reintentos) && isset($debug['error_code']) && $debug['error_code'] == '28'){
-                log_message("INFO", "Reintentando ".$this->extra->timeout_reintentos." veces.", FALSE);
-                $intentos = 1;
-                while($intentos < $this->extra->timeout_reintentos && $debug['error_code'] == '28'){
-                    log_message("INFO", "Reintento Nro: ".$intentos, FALSE);
-                    if($this->extra->tipoMetodo == "GET"){
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->get($uri, array() , 'json');
-                    }else if($this->extra->tipoMetodo == "POST"){
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->post($uri, $request, 'json');
-                    }else if($this->extra->tipoMetodo == "PUT"){
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->put($uri, $request, 'json');
-                    }else if($this->extra->tipoMetodo == "DELETE"){
-                        $CI->rest->initialize($config);
-                        $result = $CI->rest->delete($uri, $request, 'json');
+
+            $r=new Regla($this->extra->uri);
+            $uri=$r->getExpresionParaOutput($etapa->id);
+            $l = substr($uri, 0, 1);
+            if($caracter===$l){
+                $uri = substr($uri, 1);
+            }
+
+            log_message("INFO", "Server: ".$server, FALSE);
+            log_message("INFO", "Resource: ".$uri, FALSE);
+
+            $seguridad = new SeguridadIntegracion();
+            $config = $seguridad->getConfigRest($this->extra->idSeguridad, $server);
+
+            if(isset($this->extra->request)){
+                $r=new Regla($this->extra->request);
+                $request=$r->getExpresionParaOutput($etapa->id);
+            }
+
+            log_message("INFO", "Request: ".$request, FALSE);
+
+            //obtenemos el Headers si lo hay
+            if(isset($this->extra->header)){
+                $r=new Regla($this->extra->header);
+                $header=$r->getExpresionParaOutput($etapa->id);
+                $headers = json_decode($header);
+
+                if( isset($header) && trim($header) != ''){
+
+                    foreach ($headers as $name => $value) {
+                        $CI->rest->header($name.": ".$value);
                     }
-                    $debug = $CI->rest->debug();
-                    log_message("INFO", "Http response: ", FALSE);
+                }
+            }
+
+            $CI->rest->initialize($config);
+
+            $intentos = 1;
+            do{
+
+                // Se ejecuta la llamada segun el metodo
+                if($this->extra->tipoMetodo == "GET"){
+                    $result = $CI->rest->get($uri, array() , 'json');
+                }else if($this->extra->tipoMetodo == "POST"){
+                    $result = $CI->rest->post($uri, $request, 'json');
+                }else if($this->extra->tipoMetodo == "PUT"){
+                    $result = $CI->rest->put($uri, $request, 'json');
+                }else if($this->extra->tipoMetodo == "DELETE"){
+                    $result = $CI->rest->delete($uri, $request, 'json');
+                }
+                $debug = $CI->rest->debug();
+                //se verifica si existe numero de reintentos
+                $reintentos = 0;
+                if(isset($this->extra->timeout_reintentos)){
+                    $reintentos = $this->extra->timeout_reintentos;
+                }
+                if(isset($debug['error_code']) && $debug['error_code'] == '28') {
+                    log_message("INFO", "Reintentando " . $this->extra->timeout_reintentos . " veces.", FALSE);
                     $intentos++;
                 }
-            }
+
+            }while($intentos < $reintentos && $debug['error_code'] == '28');
 
             if($debug['info']['http_code']=='204'){
                 $result2['code']= '204';
@@ -269,6 +191,7 @@ class AccionRest extends Accion {
                 }
             }
             $response["response".$this->extra->tipoMetodo]=$result2;
+
             foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
                 if(!$dato)
