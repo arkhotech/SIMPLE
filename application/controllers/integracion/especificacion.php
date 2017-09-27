@@ -57,7 +57,7 @@ class Especificacion extends REST_Controller{//MY_BackendController {
             $integrador = new IntegracionMediator();
             $swagger = new Swagger();
                 /* Siempre obtengo el paso número 1 para generar el swagger de la opracion iniciar trámite */
-            $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 0);
+            $formulario = $integrador->obtenerFormularios($id_proceso, $id_tarea, 1);
             $swagger_file = $swagger->generar_swagger($formulario, $id_proceso, $id_tarea);
 
             force_download("start_simple.json", $swagger_file);
@@ -80,16 +80,36 @@ class Especificacion extends REST_Controller{//MY_BackendController {
             $this->response(
                     array('codigo' => 400, 
                         'message' => 'Parametros obligatorios no enviados'), 400);
+       
         }
-        
         $id_proceso = $param['proceso'];
         $id_tarea = isset($param['tarea']) ? $param['tarea'] : null;
         $id_paso = isset($param['paso']) ? $param['paso'] : null; 
+        
+        if(!is_null($id_proceso) && !is_numeric($id_proceso)){
+             $this->response(array("code"=> 400,
+                "message"=> 'Proceso debe ser distinto a null y un valor numerico')
+                    ,400);
+        }
+        
+        if(!is_null($id_tarea) && !is_numeric($id_tarea)){
+            $this->response(array("code"=> 400,
+                "message"=> 'Terea debe ser distinto a null y un valor numerico')
+                    ,400);
+        }
+        
+        if(isset($id_paso) && !is_null($id_paso) && $id_paso < 1 ){
+            $this->response(array("code"=> 400,
+                "message"=> 'El valor de paso no es valido, debe ser numero >= 1')
+                    ,400);
+        }
+        
         try{
             $integrador = new IntegracionMediator();
             $response = $integrador->obtenerFormularios($id_proceso, $id_tarea, $id_paso);
             $this->response($response);
         }catch(Exception $e){
+            log_message('error',$e->getMessage());
             $this->response(array("code"=> $e->getCode(),"message"=>$e->getMessage()),$e->getCode());
         }
     }
