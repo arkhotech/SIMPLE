@@ -43,7 +43,7 @@ function CovertJson(myArrClean,operaciones){
 }
 
  function CambioRadio(){
-    $("[id='operacion']").on("change", function (e) {
+    /*$("[id='operacion']").on("change", function (e) {
         $("#request").val("");
     	$("#response").val("");
     	ObjectSoap=this.value;
@@ -93,7 +93,7 @@ function CovertJson(myArrClean,operaciones){
         		});
     	    }
 	    });
-    });
+    });*/
 }
 
 function manejorespuesta(data){
