@@ -79,8 +79,10 @@ class Documento extends Doctrine_Record {
 
         //Renderizamos     
         $this->render($file->id, $file->llave_copia, $etapa->id, $file->filename, false);
+        /*
         $filename_copia = $filename_uniqid . '.copia.pdf';
         $this->render($file->id, $file->llave_copia, $etapa->id,$filename_copia, true);
+        */
 
         return $file;
     }
@@ -157,23 +159,12 @@ class Documento extends Doctrine_Record {
         if ($filename) {
             $obj->Output($uploadDirectory . $filename, 'F');
             if (!$copia && $this->hsm_configuracion_id) {
-                $client = new SoapClient($CI->config->item('hsm_url'));
-
-                $result = $client->IntercambiaDoc(array(
-                    'Encabezado' => array(
-                        'User' => $CI->config->item('hsm_user'),
-                        'Password' => $CI->config->item('hsm_password'),
-                        'TipoIntercambio' => 'pdf',
-                        'NombreConfiguracion' => $this->HsmConfiguracion->nombre,
-                        'FormatoDocumento' => 'b64'
-                    ),
-                    'Parametro' => array(
-                        'Documento' => base64_encode(file_get_contents($uploadDirectory . $filename)),
-                        'NombreDocumento' => $filename
-                    )
-                ));
-
-                file_put_contents($uploadDirectory . $filename, base64_decode($result->IntercambiaDocResult->Documento));
+                
+                $hsm = new HsmConfiguracion();
+                $file_path = $uploadDirectory.$filename;
+                $fechatime = time();
+                $expiracion = date("Y-m-d", $fechatime).'T'.date("H:i:s",$fechatime);
+                $resultadoFirma = $hsm->firmar($file_path,$this->HsmConfiguracion->entidad,$this->HsmConfiguracion->nombre,$expiracion,$this->HsmConfiguracion->proposito);
             }
         } else {
             $obj->Output($filename);

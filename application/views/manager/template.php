@@ -70,6 +70,7 @@
                             <li><a href="<?= site_url('manager/cuentas') ?>">Cuentas</a></li>
                             <li><a href="<?= site_url('manager/usuarios') ?>">Usuarios Backend</a></li>
                             <li><a href="<?= site_url('manager/diaferiado') ?>">D&iacute;as Feriados</a></li>
+                            <li><a href="<?= site_url('manager/categorias') ?>">Categorías</a></li>
                             <li class="nav-header">Estadisticas</li>
                             <li><a href="<?= site_url('manager/estadisticas/cuentas') ?>">Trámites en curso</a></li>
                         </ul>

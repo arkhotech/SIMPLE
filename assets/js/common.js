@@ -195,27 +195,6 @@ $(document).ready(function(){
     
     
 });
-function obtenerService(nombre){
-    var resultado="";
-    $.ajax({
-        url: "http://localhost/uploads/services.txt",
-        dataType: "json",
-        async:false,
-        success: function( data ) {
-            if(data.code==200){
-                var items=data.services.items;
-                $.each(items, function(index, element) {
-                    if( jQuery.trim(element.nombre) == jQuery.trim(nombre) ){
-                        resultado=element.url;
-                    }
-                });
-            }else{
-                resultado="";
-            }
-        }
-    });
-    return resultado;
-}
 function buscarAgenda(){
     if(jQuery.trim($('.js-pertenece').val())!=""){
         var base_url=$('#base_url').val();

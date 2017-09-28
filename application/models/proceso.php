@@ -9,6 +9,9 @@ class Proceso extends Doctrine_Record {
         $this->hasColumn('height');     //alto de la grilla
         $this->hasColumn('cuenta_id');
         $this->hasColumn('proc_cont');
+        $this->hasColumn('categoria_id');
+        $this->hasColumn('destacado');
+        $this->hasColumn('icon_ref');
         $this->hasColumn('activo');
     }
 

@@ -1,0 +1,139 @@
+#sideMenu2 {
+    list-style:none;
+    padding-left:0;
+    
+}
+
+.menubar{
+    margin-left: 15%;
+}
+
+.navbar-brand{
+    /*ext-shadow: 0 1px 0 rgba(255,255,255,.25);*/
+    font-family: gobCL,Tahoma,Verdana,Segoe,sans-serif;
+    color: #475156;
+    height: auto;
+    padding: 17px 10px;
+    float:left;
+    font-size: 18px;
+    line-height: 20px;
+    width:100%;
+    
+}
+
+#sideMenu2 ul{
+    width: 100%;
+}
+
+#sideMenu2 li{
+    float: left;
+    width: 100%;
+    display: block;
+    height: 50px;
+    vertical-align: middle;
+    border-bottom-color: black;
+    /*height: 55px;*/
+    margin-bottom: 6px;
+}
+
+#sideMenu2 .iniciar{
+    background: rgb(255,255,238);
+    font-family: gobCL,Tahoma,Verdana,Segoe,sans-serif;
+    box-sizing: border-box;
+    color: #dddddd;
+}
+
+#sideMenu2 li[class='active'] > a{
+   color: #0f69b4;
+   border-bottom: 2px solid #0f69b4;
+   background-color: #ddd;
+} 
+
+#sideMenu2 li > a{
+    height: 40px;
+    padding-top: 14px;
+    padding-bottom: 0;
+    padding-left: 15px;
+    margin-right: -1px;
+    margin-left: -1px;
+    border-right: 1px solid #e6e6e6;
+    border-bottom: 2px solid #bdc9d1;
+    color: #475156;
+    font-family: gobCL,Tahoma,Verdana,Segoe,sans-serif;
+    font-size: 13px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.25);
+}
+
+#sideMenu2 li > a:hover{
+   color: #0f69b4;
+   border-bottom: 2px solid #0f69b4;
+  
+   
+}
+
+#sideMenu2 .nav-list > .active > a, .nav-list > .active > a:hover, .nav-list > .active > a:focus {
+    background-color: transparent;
+}
+
+#sideMenu2 a{
+    background-color: transparent;
+}
+
+#sideMenu2 .iniciar{
+    background-color: transparent;
+}
+
+
+#sideMenu2 .navbar {
+   font-family: gobCL,Tahoma,Verdana,Segoe,sans-serif;
+    
+}
+
+
+@media screen and (max-width: 739px){
+        
+    .navbar-brand > * {
+        border: 1px solid  black;
+        display: inline-block;
+    }
+    #sideMenu2{
+        visibility: visible!important;
+        margin-bottom: 20px;
+    }
+}
+
+.navbar-toggle {
+  position: relative;
+  float: right;
+  padding: 9px 10px;
+  margin-top: 8px;
+  margin-right: 0;
+  margin-bottom: 8px;
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 0;
+}
+
+.icon-bar {
+  background-color: #475156;
+}
+
+.navbar-toggle:focus {
+  outline: 0;
+}
+.navbar-toggle .icon-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+}
+.navbar-toggle .icon-bar + .icon-bar {
+  margin-top: 4px;
+}
+
+@media (min-width: 740px) {
+  .navbar-toggle {
+    display: none;
+  }
+}

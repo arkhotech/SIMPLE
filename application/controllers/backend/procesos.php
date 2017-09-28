@@ -101,12 +101,17 @@ class Procesos extends MY_BackendController {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
+        
+              
 
         $data['proceso'] = $proceso;
+
         $data['proceso_id'] = $proceso_id;
 
         $data['title'] = 'Modelador';
         $data['content'] = 'backend/procesos/editar';
+        $data['iconos'] = $iconos;
+        
         $this->load->view('backend/template', $data);
     }
 
@@ -162,6 +167,7 @@ class Procesos extends MY_BackendController {
 
     public function ajax_editar($proceso_id){
         $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
+        $categorias=Doctrine::getTable('Categoria')->findAll();
         
         if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar este proceso';
@@ -169,7 +175,7 @@ class Procesos extends MY_BackendController {
         }
         
         $data['proceso']=$proceso;
-        
+        $data['categorias']=$categorias;
         $this->load->view('backend/procesos/ajax_editar',$data);
     }
     
@@ -188,6 +194,13 @@ class Procesos extends MY_BackendController {
             $proceso->nombre=$this->input->post('nombre');
             $proceso->width=$this->input->post('width');
             $proceso->height=$this->input->post('height');
+            $proceso->categoria_id=$this->input->post('categoria');
+            $proceso->icon_ref=$this->input->post('logo');
+            if ($this->input->post('destacado')) {
+                $proceso->destacado=1;
+            } else {
+                $proceso->destacado=0;
+            }
             $proceso->save();         
             
             $respuesta->validacion=TRUE;
@@ -520,5 +533,48 @@ class Procesos extends MY_BackendController {
         echo json_encode($modelo);
     }
     
-
+    public function seleccionar_icono() {
+        $DS = DIRECTORY_SEPARATOR;
+        $directory = FCPATH . 'assets' . $DS .'img'. $DS .'icons';
+        $html = '';
+        $error = '';
+        $hideButton = true;
+        $isImage = false;
+        
+        if (file_exists($directory)) {
+            $icons = @scandir($directory);            
+            if ($icons !== FALSE) {
+                if (count($icons) > 0) {
+                    $hideButton = false;
+                    foreach ($icons as $icon) {                        
+                        if ($this->isImage($directory . $DS . $icon)) {
+                            $isImage = true;                            
+                            $html .= '<div class="item"><a class="sel-icono" href="javascript:;" rel="' . $icon . '"><img src="' . base_url('assets/img/icons/' . $icon) . '" alt="' . $icon . '" title="' . $icon . '"></a></div>';
+                        }
+                    }
+                    
+                    if (!$isImage) {
+                        $error .= '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>No hay &iacuteconos en la carpeta "assets/img/icons"</div>';
+                    }
+                } else {
+                    $error .= '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>No hay &iacuteconos en la carpeta "assets/img/icons"</div>';
+                }
+            } else {
+                $error .= '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>No se pudo leer la carpeta "assets/img/icons"</div>';
+            }
+        } else {
+            $error .= '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>La carpeta "assets/img/icons" no existe</div>';
+        }
+        
+        $data['hideButton'] = $hideButton;
+        $data['iconos'] = $html;
+        $data['error'] = $error;
+        
+        $this->load->view('backend/procesos/seleccionar_icono', $data);
+    }
+    
+    private function isImage($image)
+    {        
+        return @is_array(getimagesize($image));
+    }
 }

@@ -5,6 +5,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <?php $this->load->view('head') ?>
+        <link href="<?= base_url() ?>assets/home/css/navbar.css" rel="stylesheet">
     </head>
 
     <body>
@@ -82,20 +83,25 @@
             <div class="container">
                 <div class="row">
                     <div class="span3">
-                        <ul id="sideMenu" class="nav nav-list">    
-                            <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a href="<?= site_url('tramites/disponibles') ?>">Iniciar trámite</a></li>
-                            <?php if (UsuarioSesion::usuario()->registrado): ?>
-                                <?php
-                                $npendientes=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                                $nsinasignar=Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                                $nparticipados=Doctrine::getTable('Tramite')->findParticipadosALL(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                                ?>
-                                <li class="<?= isset($sidebar) && $sidebar == 'inbox' ? 'active' : '' ?>"><a href="<?= site_url('etapas/inbox') ?>">Bandeja de Entrada (<?= $npendientes ?>)</a></li>
-                                <?php if($nsinasignar): ?><li class="<?= isset($sidebar) && $sidebar == 'sinasignar' ? 'active' : '' ?>"><a href="<?= site_url('etapas/sinasignar') ?>">Sin asignar  (<?=$nsinasignar  ?>)</a></li><?php endif ?>
-                                <li class="<?= isset($sidebar) && $sidebar == 'participados' ? 'active' : '' ?>"><a href="<?= site_url('tramites/participados') ?>">Historial de Trámites  (<?= $nparticipados ?>)</a></li>
-                                <li class="<?= isset($sidebar) && $sidebar == 'miagenda' ? 'active' : '' ?>"><a href="<?= site_url('agenda/miagenda') ?>">Mi Agenda</a></li>
-                            <?php endif; ?>
-                        </ul>
+                        <div class="menubar">
+                        <div class="navbar-header">
+                                <span class="navbar-brand">Menú</span>                            
+                            </div>
+                            <ul id="sideMenu2" class="nav nav-list">    
+                                <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a href="<?= site_url('home/index') ?>">Iniciar trámite</a></li>
+                                <?php if (UsuarioSesion::usuario()->registrado): ?>
+                                    <?php
+                                    $npendientes=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                                    $nsinasignar=Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                                    $nparticipados=Doctrine::getTable('Tramite')->findParticipadosALL(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                                    ?>
+                                    <li class="<?= isset($sidebar) && $sidebar == 'inbox' ? 'active' : '' ?>"><a href="<?= site_url('etapas/inbox') ?>">Bandeja de Entrada (<?= $npendientes ?>)</a></li>
+                                    <?php if($nsinasignar): ?><li class="<?= isset($sidebar) && $sidebar == 'sinasignar' ? 'active' : '' ?>"><a href="<?= site_url('etapas/sinasignar') ?>">Sin asignar  (<?=$nsinasignar  ?>)</a></li><?php endif ?>
+                                    <li class="<?= isset($sidebar) && $sidebar == 'participados' ? 'active' : '' ?>"><a href="<?= site_url('tramites/participados') ?>">Historial de Trámites  (<?= $nparticipados ?>)</a></li>
+                                    <li class="<?= isset($sidebar) && $sidebar == 'miagenda' ? 'active' : '' ?>"><a href="<?= site_url('agenda/miagenda') ?>">Mi Agenda</a></li>
+                                <?php endif; ?>
+                            </ul>
+                        </div>
                     </div>
                     <div class="offset1 span8">
                         <?php $this->load->view('messages') ?>

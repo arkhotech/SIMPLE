@@ -180,3 +180,13 @@
 <div class="modal hide fade" id="modal">
 
 </div>
+<div class="modal hide fade" id="modalSelectIcon"></div>
+<script>
+    $(function() {
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+        $(document).on('click', '#SelectIcon', function() {
+            $("#modalSelectIcon").load("<?= site_url('backend/procesos/seleccionar_icono') ?>");
+            $("#modalSelectIcon").modal();
+        });
+    });
+</script>

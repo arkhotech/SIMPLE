@@ -15,7 +15,8 @@ class Agenda extends MY_Controller {
         include APPPATH . 'third_party/httpful/bootstrap.php';
         $this->base_services=$this->config->item('base_service');
         $this->context=$this->config->item('context_service');
-        $this->records=empty($this->config->item('records'))?10:$this->config->item('records');
+        $recordsc = $this->config->item('records');
+        $this->records=empty($recordsc)?10:$recordsc;
         $cuenta = Cuenta::cuentaSegunDominio()->id;
         try{
             $service=new Connect_services();
