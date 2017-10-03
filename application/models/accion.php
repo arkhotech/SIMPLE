@@ -18,7 +18,7 @@ class Accion extends Doctrine_Record     {
                 'AccionRest'  => array('tipo' => 'rest'),
                 'AccionSoap'  => array('tipo' => 'soap'),
                 'AccionCallback'  => array('tipo' => 'callback'),
-                'AccionSubcriptores'  => array('tipo' => 'webhook'),
+                'AccionNotificaciones'  => array('tipo' => 'webhook'),
                 'AccionIniciarTramite'  => array('tipo' => 'iniciar_tramite'),
                 'AccionContinuarTramite'  => array('tipo' => 'continuar_tramite')
             )

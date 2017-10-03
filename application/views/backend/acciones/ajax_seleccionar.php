@@ -18,7 +18,7 @@
             <option value="callback">Generar Callback</option>
             <option value="iniciar_tramite">Iniciar Trámite</option>
             <option value="continuar_tramite">Continuar Trámite</option>
-            <option value="webhook">Notificación Suscriptores</option>
+            <option value="webhook">Notificaciones</option>
         </select>
     </form>
 </div>

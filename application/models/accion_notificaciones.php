@@ -1,7 +1,7 @@
 <?php
 require_once('accion.php');
 
-class AccionSubcriptores extends Accion {
+class AccionNotificaciones extends Accion {
 
     public function displaySuscriptorForm($proceso_id) {
 

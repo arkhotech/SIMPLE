@@ -7,26 +7,32 @@ class Especificacion extends REST_Controller{//MY_BackendController {
      * Operación que despliega lista de servicios.
      */
     public function procesos_get(){
-        //print_r(Cuenta::cuentaSegunDominio());die;
-        $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(Cuenta::cuentaSegunDominio()->id);
-        log_message('debug','Recuperando procesos expuestos: '.count($tarea));
-        $result = array();
-        $nombre_host = gethostname();
-        (isset($_SERVER['HTTPS']) ? $protocol = 'https://' : $protocol = 'http://');
-        foreach($tarea as $res ){
-            array_push($result, array(
-                "id" => $res['id'],
-                "nombre" => $res['nombre'],
-                "tarea" => $res['tarea'],
-                "version" => "1.0",
-                "institucion" => "N/I",
-                "descripcion" => $res['previsualizacion'],
-                "URL" => $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/etapa/'.$res['id_tarea']
-            ));
+        try{
+            //print_r(Cuenta::cuentaSegunDominio());die;
+            $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(Cuenta::cuentaSegunDominio()->id);
+            log_message('debug','Recuperando procesos expuestos: '.count($tarea));
+            $result = array();
+            $nombre_host = gethostname();
+            (isset($_SERVER['HTTPS']) ? $protocol = 'https://' : $protocol = 'http://');
+            foreach($tarea as $res ){
+                array_push($result, array(
+                    "id" => $res['id'],
+                    "nombre" => $res['nombre'],
+                    "tarea" => $res['tarea'],
+                    "version" => "1.0",
+                    "institucion" => "N/I",
+                    "descripcion" => $res['previsualizacion'],
+                    "URL" => $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']
+                ));
+            }
+            $retval["catalogo"] = $result;
+
+            $this->response($retval);
+        }catch(Exception $e){
+            $this->response(
+                array("message" => "Problemas internos al recuperar especificación de procesos",
+                    "code" => 500),500);
         }
-       $retval["catalogo"] = $result;
-       
-       $this->response($retval);
 
     }
     
@@ -46,10 +52,10 @@ class Especificacion extends REST_Controller{//MY_BackendController {
         try{
             $param = $this->get();
             $id_proceso = $param['proceso'];
-            $id_tarea = $param['etapa'];
+            $id_tarea = $param['tarea'];
 
             if($id_proceso == NULL || $id_tarea == NULL ){
-                $this->response(array('status' => false, 'error' => 'Bad Request'), 400);
+                $this->response(array('status' => false, 'error' => 'Parámetros no validos'), 400);
             }
 
             $this->load->helper('download');
@@ -79,7 +85,7 @@ class Especificacion extends REST_Controller{//MY_BackendController {
         if(!isset($param['proceso'])){
             $this->response(
                     array('codigo' => 400, 
-                        'message' => 'Parametros obligatorios no enviados'), 400);
+                        'message' => 'Parámetros obligatorios no enviados'), 400);
        
         }
         $id_proceso = $param['proceso'];
@@ -88,19 +94,19 @@ class Especificacion extends REST_Controller{//MY_BackendController {
         
         if(!is_null($id_proceso) && !is_numeric($id_proceso)){
              $this->response(array("code"=> 400,
-                "message"=> 'Proceso debe ser distinto a null y un valor numerico')
+                "message"=> 'Proceso debe ser un valor numérico')
                     ,400);
         }
         
         if(!is_null($id_tarea) && !is_numeric($id_tarea)){
             $this->response(array("code"=> 400,
-                "message"=> 'Terea debe ser distinto a null y un valor numerico')
+                "message"=> 'Terea debe ser distinto a null y un valor numérico')
                     ,400);
         }
         
         if(isset($id_paso) && !is_null($id_paso) && $id_paso < 1 ){
             $this->response(array("code"=> 400,
-                "message"=> 'El valor de paso no es valido, debe ser numero >= 1')
+                "message"=> 'El valor de paso no es válido, debe ser número >= 1')
                     ,400);
         }
         

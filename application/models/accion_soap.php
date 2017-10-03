@@ -7,8 +7,10 @@ class AccionSoap extends Accion {
         $data = Doctrine::getTable('Proceso')->find($proceso_id);
         $conf_seguridad = $data->Admseguridad;
         $display = '<p>
-            Esta accion consultara via SOAP la siguiente URL. Los resultados, seran almacenados como variables.
+            Esta accion consultara via SOAP la siguiente URL. Los resultados, seran almacenados en la variable de respuesta definida.
             </p>';
+        $display.= '<label>Variable respuesta</label>';
+        $display.='<input type="text" name="extra[var_response]" value="' . ($this->extra ? $this->extra->var_response : '') . '" />';
         $display.='
                 <div class="col-md-12">
                     <label>WSDL</label>
@@ -84,6 +86,7 @@ class AccionSoap extends Accion {
         $CI = & get_instance();
         $CI->form_validation->set_rules('extra[request]', 'Request', 'required');
         $CI->form_validation->set_rules('extra[operacion]', 'Métodos', 'required');
+        $CI->form_validation->set_rules('extra[var_response]', 'Variable de respuesta', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
@@ -130,9 +133,10 @@ class AccionSoap extends Accion {
             if ($error){
                 $error_timeout['time_out']=true;
                 $error_timeout['error']=$error;
-                $result['response_soap']= $error_timeout;
+                //$result['response_soap']= $error_timeout;
+                $result[$this->extra->var_response]= $error_timeout;
             }else{
-                $result['response_soap']= $this->utf8ize($result);
+                $result[$this->extra->var_response]= $this->utf8ize($result);
             }
 
             foreach($result as $key=>$value){

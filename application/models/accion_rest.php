@@ -8,9 +8,11 @@ class AccionRest extends Accion {
         $conf_seguridad = $data->Admseguridad;
         $display = '
             <p>
-                Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados como variables.
+                Esta accion consultara via REST la siguiente URL. Los resultados, seran almacenados en la variable de respuesta definida.
             </p>
         ';
+        $display.= '<label>Variable respuesta</label>';
+        $display.='<input type="text" name="extra[var_response]" value="' . ($this->extra ? $this->extra->var_response : '') . '" />';
         $display.= '<label>Endpoint</label>';
         $display.='<input type="text" class="input-xxlarge" placeholder="Server" name="extra[url]" value="' . ($this->extra ? $this->extra->url : '') . '" />';
         $display.= '<label>Resource</label>';
@@ -93,6 +95,7 @@ class AccionRest extends Accion {
         $CI = & get_instance();
         $CI->form_validation->set_rules('extra[url]', 'Endpoint', 'required');
         $CI->form_validation->set_rules('extra[uri]', 'Resource', 'required');
+        $CI->form_validation->set_rules('extra[var_response]', 'Variable de respuesta', 'required');
     }
 
     public function ejecutar(Etapa $etapa) {
@@ -190,7 +193,9 @@ class AccionRest extends Accion {
                     $result2 = (is_array($result)) ? get_object_vars($result[0]):get_object_vars($result);
                 }
             }
-            $response["response".$this->extra->tipoMetodo]=$result2;
+            //$response["response".$this->extra->tipoMetodo]=$result2;
+            $response[$this->extra->var_response]=$result2;
+
 
             foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);

@@ -91,7 +91,7 @@ class Acciones extends MY_BackendController {
         else if($tipo=='callback')
             $accion=new AccionCallback();
         else if($tipo=='webhook')
-            $accion=new AccionSubcriptores();
+            $accion=new AccionNotificaciones();
         else if($tipo=='iniciar_tramite')
             $accion=new AccionIniciarTramite();
         else if($tipo=='continuar_tramite')
@@ -145,7 +145,7 @@ class Acciones extends MY_BackendController {
             else if($this->input->post('tipo')=='callback')
                 $accion=new AccionCallback();
             else if($this->input->post('tipo')=='webhook')
-                $accion=new AccionSubcriptores();
+                $accion=new AccionNotificaciones();
             else if($this->input->post('tipo')=='iniciar_tramite')
                 $accion=new AccionIniciarTramite();
             else if($this->input->post('tipo')=='continuar_tramite')

@@ -30,7 +30,7 @@ class API extends REST_Controller{
         if(!isset($this->get()['tramite']) 
                 || !isset($this->get()['etapa']) 
                 || !isset($this->get()['paso'])){
-            $this->response(array( 'message' => 'Parametros insuficientes',"code" => 400), 400);
+            $this->response(array( 'message' => 'Parámetros insuficientes',"code" => 400), 400);
         }
         //Recuperar los valores
         $etapa_id = $this->get()['etapa'];
@@ -99,7 +99,7 @@ class API extends REST_Controller{
         
         if($tarea == NULL ){
             error_log("etapa debe ser una instancia de Etapa");
-            throw new Exception("Etapa no existe",500);
+            throw new Exception("Etapa no fue encontrada",404);
         }
         $body = json_decode($this->request->body,false);
         
@@ -108,7 +108,7 @@ class API extends REST_Controller{
         switch($tarea->acceso_modo){
         case 'claveunica':
             if(!isset($body->identificacion)){
-                throw new Exception('Headers Clave Unica no enviados',403);
+                throw new Exception('Identificación Clave Unica no enviada',403);
             }
             $mediator = new IntegracionMediator();
             $mediator->registerUserFromHeadersClaveUnica($body->identificacion);
@@ -247,7 +247,7 @@ class API extends REST_Controller{
                 throw new Exception("Usuario no encontrado", 412);
             }
 
-            log_message('INFO','Status: '.$this->varDump($statusTramites),FALSE);
+            //log_message('INFO','Status: '.$this->varDump($statusTramites),FALSE);
             return $statusTramites;
         }catch(Exception $e){
             throw new Exception($e->getMessage(), 500);

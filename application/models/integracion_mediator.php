@@ -155,7 +155,7 @@ class IntegracionMediator{
             return NULL;
         }
         if($etapa_id == NULL){
-            throw new Exception("Etapa no puede ser null");
+            throw new Exception("Etapa no puede ser null", 412);
         } 
         
         $formSimple = Doctrine::getTable('Formulario') ->find($form_id);
@@ -435,7 +435,7 @@ class IntegracionMediator{
         try{
             if(!is_numeric($secuencia) || !is_numeric($id_proceso) || !is_numeric($id_etapa)){
                 $data= "proc: $id_proceso; etapa: $id_etapa; sec: $secuencia";
-                throw new Exception("Error en parametros-> $data",400);
+                throw new Exception("Parámetros no validos-> $data",400);
             }
             $input = json_decode($body,true);
 
