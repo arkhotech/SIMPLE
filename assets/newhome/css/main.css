@@ -1,0 +1,641 @@
+header {
+  background-color: #fff;
+  border-bottom: 2px solid #E3E5EF;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  -webkit-transition: background-color .3s;
+  transition: background-color .3s;
+}
+
+body {
+  background-color: #fff;
+}
+
+.logo {
+  width: 90px;
+  margin: 20px 20px 0 5px;
+  float: left;
+}
+
+/*HOME*/
+.ajaxForm .ajaxLoader {
+  width: 80px;
+  height: 24px;
+  background: #000000 url("../images/ajax-loader.gif") 25px 16px no-repeat;
+  color: #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  position: absolute;
+  text-align: center;
+  padding-top: 56px;
+}
+
+.imgNoIcon {
+  width: 10%;
+  height: 10%;
+}
+
+.body_simple {
+  width: 75%;
+}
+.search-query {
+  height: 45px !important;
+}
+
+h2 {
+  font-size: 33px;
+  font-family: "Roboto", sans-serif;
+}
+
+.main {
+  min-height: 480px;
+}
+
+footer {
+  margin-bottom: 0px;
+}
+/*HOME*/
+
+.barra-superior {
+  background: #0056a8;
+}
+
+.navbar-right {
+  float: right ;
+  margin-right: 0;
+  margin-bottom: 10px;
+}
+
+.navbar-brand {
+  height: auto;
+}
+
+.navbar-header {
+  width: 100%;
+}
+
+.navbar-header h1 {
+  color: rgba(17, 17, 17, 0.6);
+  display: block;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.7em;
+  line-height: 24px;
+  margin: 14px 0 0;
+}
+
+#simple-destacados .section-header {
+  margin-top: 40px;
+}
+
+#simple-destacados .tarjeta h4 {
+  margin-top: 10px;
+}
+
+.titleComuna {
+  font-size: 1.4em;
+  display: block;
+  float: left;
+}
+
+.titleComuna p {
+  font-size: 0.6em;
+}
+
+span.title {
+  font-family: "Roboto Slab", monospace;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #000;
+}
+
+#simple-categorias .tarjeta p {
+  font-family: "Roboto Slab", monospace;
+  font-size: 16px;
+  color: #000;
+}
+
+.tarjeta:hover {
+  content: "";
+  transition: border-width 0.1s ease-in-out;
+  border-bottom: 2px solid #1978B9;
+  background: #f7f7f7;
+}
+
+.barra-superior .navbar-nav>li>a {
+  border-bottom: 0px;
+  color: #fff;
+  height: 30px;
+  padding-top: 5px;
+  text-shadow: 0px;
+  border-right: 1px solid #01417d;
+}
+
+.barra-superior .navbar-nav>li>a:hover,
+.barra-superior .navbar-nav>li>a.active {
+  background-color: #01417d;
+}
+
+header#sticker {
+  z-index: 99 !important;
+}
+
+header .container {
+  position: relative;
+  height: 100%;
+}
+
+header .banda-bicolor {
+  height: 10px;
+  left: 15px;
+  position: absolute;
+  top: 0px;
+  width: 15%;
+}
+
+header.navbar {
+  margin-bottom: 0px;
+}
+
+header .navbar-nav {
+  margin-bottom: 0px;
+}
+
+header .navbar-nav > li > a {
+  height: 90px;
+  border-bottom: 0px;
+  font-size: 1.2em;
+  padding: 35px 10px 0 10px;
+}
+
+.navbar-nav>li:last-of-type a {
+  border-right: 1px solid #e6e6e6;
+}
+
+header .navbar-nav > li:first-child a {
+  border-left: 1px solid #e6e6e6;
+}
+
+header .btn-group .btn.boton-header {
+  padding: 10px;
+  margin-top: 27px;
+  margin-left: 15px;
+  font-size: 0.9em;
+}
+
+#userMenu {
+  padding: 0px;
+  margin-top: 22px;
+  margin-left: 15px;
+}
+
+.vr {
+  border-left: 2px solid #E3E5EF;
+  height: 26px;
+  margin-top: 18px;
+  float: left;
+}
+
+#userMenu a {
+  color: #000;
+  cursor: pointer;
+}
+
+#simple-destacados .circulo {
+  width: 60px;
+  height: 60px;
+  padding: 0px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid silver;
+  color: white;
+  background-color: #1978B9;
+  font-size: 40px;
+}
+
+.row {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.row:before {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.item, .item>a {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  text-decoration: none;
+}
+
+.col-sm-12 #simple-destacados .item {
+  width: 33.3%;
+}
+
+.col-sm-9 #simple-destacados .item {
+  width: 50%;
+}
+
+.col-sm-12 .col-md-3 {
+  width: 25%;
+}
+
+.col-sm-9 .col-md-3 {
+  width: 33.3%;
+}
+
+#simple-destacados .tarjeta {
+  width: 100%;
+  min-height: 170px;
+  text-align: left;
+  padding: 30px 20px 60px 20px;
+  border: 2px solid #E3E5EF;
+  margin-bottom: 30px;
+}
+
+.enlace_cat_proc {
+  position: absolute;
+  left: 30px;
+  bottom: 60px;
+}
+
+#simple-categorias {
+  margin-top: 30px;
+}
+
+#simple-categorias .tarjeta {
+  border: 2px solid #E3E5EF;
+  width: 100%;
+}
+
+#simple-categorias .tarjeta p {
+  margin: 10px 0 5px 0;
+}
+
+#simple-categorias a {
+  width: 100%;
+}
+
+#simple-categorias .circulo {
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid silver;
+  color: white;
+  background-color: #1978B9;
+  font-size: 20px;
+}
+
+.centrado {
+  text-align: center;
+  margin: 10px auto;
+}
+
+.sidebar-nav .navbar ul, .sidebar-nav .navbar li {
+  float: left;
+  width: 100%;
+  display: block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 97%;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  width: 350px;
+  margin: 2px 0 0;
+  list-style: none;
+  background-color: #FFF;
+  border: 0 2px 2px 2px solid #E3E5EF;
+}
+
+.button {
+  border: 0px;
+}
+
+.navbar .dropdown-menu {
+  width: 368px;
+  max-width: 100%;
+  padding-right: 10px;
+  z-index: 1000;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 0 1px 1px 1px solid rgba(0,0,0,.15);
+  border-radius: 0 0 4px 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.ajaxForm {
+  position: relative;
+}
+
+.ajaxForm .ajaxLoader {
+  width: 80px;
+  height: 24px;
+  background: #000000 url("../images/ajax-loader.gif") 25px 16px no-repeat;
+  color: #fff;
+  position: absolute;
+  text-align: center;
+  padding-top: 56px;
+}
+
+#login_captcha {
+  margin-bottom: 10px;
+}
+
+#simple-categorias .tarjeta {
+  padding: 10px;
+}
+
+.alert {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-color: #fcf8e3;
+  border: 1px solid #fbeed5;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.alert-danger, .alert-error {
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48;
+}
+
+.close {
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 18px;
+  color: #000000;
+  text-shadow: 0 1px 0 #ffffff;
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+}
+a.close {
+  text-decoration: none;
+}
+
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  line-height: 18px;
+}
+
+.dropdown-menu {
+  -webkit-transition: opacity 0.2s ease-in;
+  -moz-transition: opacity 0.2s ease-in;
+  -o-transition: opacity 0.2s ease-in;
+  -ms-transition: opacity .2s ease-in;
+  transition: opacity 0.2s ease-in;
+
+  max-height: 0;
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+}
+.open .dropdown-menu {
+  max-height: 500px;
+  opacity: 1;
+}
+
+#loginView label {
+  float: left;
+}
+
+#loginView .simple .wrapper {
+  padding: 20px 20px 0 0px;
+}
+
+#loginView .claveunica {
+  background: #E1ECF6;
+  height: 70px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+#loginView input {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+#loginView .claveunica .wrapper {
+  padding: 20px;
+  margin-top:10px;
+}
+
+#loginView .claveunica .wrapper p {
+  float: left;
+  line-height: 30px;
+}
+
+#loginView .claveunica .wrapper a {
+  float: right;
+}
+
+.banda-bicolor:after {
+  background: #dd5347;
+}
+
+.img-service {
+  width: 50px;
+  height: 50px;
+}
+
+.img-categories {
+  width: 32px;
+  height: 32px;
+}
+
+/*nuevo*/
+
+.tarjeta > .text-left {
+  float: left;
+  margin-right: 10px;
+}
+
+.section-header {
+  text-align: left;
+  margin-bottom: 10px;
+  display: inline-block;
+  width: 100%;
+}
+
+.section-header h2 {
+  float: left;
+  margin-right: 10px;
+}
+
+@media (max-width: 1020px) {
+
+  .section-header, .section-header h2 {
+    margin: 15px 0 10px 0;
+    padding: 0px;
+  }
+
+  #simple-categorias .tarjeta {
+    padding: 10px;
+  }
+
+  .navbar-right {
+    margin:0 0 15px 0;
+  }
+
+  .navbar-right .btn-group {
+    float: right;
+  }
+
+  .col-sm-9 #simple-destacados .item {
+    width: 100%;
+  }
+
+  .col-sm-12 #simple-destacados .item {
+    width: 50%;
+  }
+
+  .col-sm-12 .col-md-3 {
+    width: 33.3%;
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  .col-sm-9 .col-md-3 {
+    width: 50%;
+  }
+
+  .col-sm-6 {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .col-sm-6 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 741px) {
+
+  .vr {
+    display: none;
+  }
+
+  #simple-categorias .tarjeta {
+    padding: 10px;
+  }
+
+  .navbar-header h1 {
+    font-size: 1em;
+    margin: 8px 0px;
+  }
+
+  .titleComuna p {
+    font-size: 0.6em;
+    margin: 0px;
+  }
+
+  .logo {
+    width: 100px;
+    margin: 6px 6px 0 0;
+  }
+
+  .navbar-brand {
+    padding: 12px 6px 2px 6px;
+  }
+
+  .navbar-right {
+    margin: 0 0 8px 0;
+    width: 100%;
+  }
+
+  .col-sm-9 #simple-destacados .item {
+    width: 100%;
+  }
+
+  .col-sm-12 #simple-destacados .item {
+    width: 100%;
+  }
+
+  .sidebar-nav .navbar .navbar-collapse {
+    padding: 0;
+    max-height: none;
+  }
+
+  .sidebar-nav .navbar ul {
+    float: left;
+    width: 100%;
+  }
+
+  .sidebar-nav .navbar ul:not {
+    display: block;
+  }
+
+  .sidebar-nav .navbar li {
+    float: none;
+    display: block;
+  }
+
+  .sidebar-nav .navbar li a {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .menu {
+    margin-top: 20px;
+  }
+
+  .col-sm-12 #simple-destacados .section-header {
+    margin-top: 0px;
+  }
+
+  .col-sm-9 #simple-destacados .section-header {
+    margin-top: 0px;
+  }
+
+  .col-sm-12 .col-md-3 {
+    width: 100%;
+    margin-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  .col-sm-9 .col-md-3 {
+    width: 100%;
+  }
+}
+
+.icon-clave-unica {
+  background-image: url(../images/icons/claveunica.png);
+  width: 16px;
+  height: 16px;
+}
