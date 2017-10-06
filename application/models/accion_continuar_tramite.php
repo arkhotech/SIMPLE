@@ -90,8 +90,12 @@ class AccionContinuarTramite extends Accion {
             log_message("INFO", "Continuar tramite_id: ".$tramite_id->valor, FALSE);
             log_message("INFO", "Continuar tarea_id: ".$tarea_id->valor, FALSE);
 
+            $etapa = new Etapa();
+            $etapa = $etapa->getEtapaPorTareaId($tarea_id->valor, $tramite_id->valor);
+            log_message("INFO", "id_etapa a continuar: ".$etapa->id);
+
             $integracion = new IntegracionMediator();
-            $info_continuar = $integracion->continuarProceso($tramite_id->valor, $tarea_id->valor, "0", $request);
+            $info_continuar = $integracion->continuarProceso($tramite_id->valor, $etapa->id, "0", $request);
 
             $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
 

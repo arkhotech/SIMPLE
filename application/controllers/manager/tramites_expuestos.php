@@ -28,6 +28,7 @@ class Tramites_expuestos extends CI_Controller
         $data['json'] = Doctrine::getTable('Proceso')->findProcesosExpuestos($cuenta_id);
         $data['title'] = 'Busqueda de trámites expuestos';
         $data['content'] = 'manager/tramites_expuestos/index';
+        $data['cuenta_sel'] = $cuenta_id;
         $this->load->view('manager/template', $data);
     }
 }

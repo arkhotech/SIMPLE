@@ -13,9 +13,9 @@
         <div>
             <label>Cuenta</label>
             <select id="cuenta_id" name="cuenta_id" class="AlignText">
-                <option value="">Seleccione...</option>
+                <option value="">Todas</option>
                 <?php foreach($cuentas as $c):?>
-                <option value="<?=$c->id?>" <?=$c->id==$usuario->cuenta_id?'selected':''?>><?=$c->nombre?></option>
+                <option value="<?=$c->id?>" <?=$c->id==$cuenta_sel?'selected':''?>><?=$c->nombre?></option>
                 <?php endforeach ?>
             </select>
             <button type="submit" class="btn btn-primary"><i class="icon-search icon"></i> Consultar</button>
@@ -40,7 +40,7 @@
                         <td><? echo $res['tarea'] ?></td>
                         <td><? echo $res['previsualizacion'] ?></td>
                         <td>
-                            <a class="btn btn-default" target="_blank" href="<? echo $protocol.$nombre_host.'/integracion/api/especificacion/servicio/'.$res['id'].'/'.$res['id_tarea']; ?> ">
+                            <a class="btn btn-default" target="_blank" href="<? echo $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']; ?> ">
                                 <i class="icon-upload icon"></i>Swagger
                             </a>
                         </td>

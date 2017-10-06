@@ -271,7 +271,7 @@ class Acciones extends MY_BackendController {
     public function upload_file(){
         try {
             $file_path = $_FILES['archivo']['tmp_name'];
-            $name = $_FILES['tmp_name'];
+            //$name = $_FILES['tmp_name'];
             if ($file_path) {
                 $wsdl = file_get_contents($_FILES['archivo']['tmp_name']);
                 $xml = new SimpleXMLElement($wsdl);
@@ -292,6 +292,13 @@ class Acciones extends MY_BackendController {
                 $wsdl_url="uploads/wsdl/".$file_path.".wsdl";
                 $client = new SoapClient($wsdl_url);
                 $result['caso']=2;
+
+                log_message("INFO", "endpoint: ".$this->varDump($xml->getDocNamespaces(true, true)), FALSE);
+                log_message("INFO", "certRequest: ".$this->varDump($client->certRequest), FALSE);
+                log_message("INFO", "bindingType: ".$this->varDump($client->bindingType), FALSE);
+                log_message("INFO", "curl_options: ".$this->varDump($client->curl_options), FALSE);
+                log_message("INFO", "forceEndpoint: ".$this->varDump($client->forceEndpoint), FALSE);
+
                 $result['targetNamespace'] = $xml['targetNamespace'];
                 $result['functions']=$client->__getFunctions();
                 $result['types']=$client->__getTypes();
@@ -458,5 +465,14 @@ class Acciones extends MY_BackendController {
 
         echo $respuesta;
         exit;
+    }
+
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
     }
 }

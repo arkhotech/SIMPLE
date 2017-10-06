@@ -6,17 +6,17 @@ class API extends REST_Controller{
         log_message("INFO", "inicio proceso", FALSE);
         
          if(!isset($this->get()['proceso']) 
-                || !isset($this->get()['etapa'])){
+                || !isset($this->get()['tarea'])){
             $this->response(array('message' => 'Parámetros insuficientes',"code"=> 400), 400);
         }
         try{
-            $this->checkIdentificationHeaders($this->get()['etapa']);
+            $this->checkIdentificationHeaders($this->get()['tarea']);
 
             $mediator = new IntegracionMediator();
 
-            $this->registrarAuditoria($this->get()['etapa'],"Iniciar Tramite","Tramites");
+            $this->registrarAuditoria($this->get()['tarea'],"Iniciar Tramite","Tramites");
 
-            $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['etapa'],$this->request->body);
+            $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['tarea'],$this->request->body);
             $this->response($data);
         }catch(Exception $e){
             $this->response(
@@ -119,8 +119,8 @@ class API extends REST_Controller{
             break;
         case 'registrados':
         case 'grupos_usuarios':
-            log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body->usuario_simple->user),TRUE);
-            if( !isset($body->usuario_simple)|| !UsuarioSesion::registrarUsuario($body->usuario_simple->user)){
+            log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body->identificacion->user),TRUE);
+            if( !isset($body->identificacion)|| !UsuarioSesion::registrarUsuario($body->identificacion->user)){
                 log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body),TRUE);
                 throw new Exception('No se ha enviado el usuario',403); 
             }
@@ -130,7 +130,7 @@ class API extends REST_Controller{
                 $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
                 foreach($usuarios as $user){
                     
-                    if($body->usuario_simple->user===$user->usuario){
+                    if($body->identificacion->user===$user->usuario){
                         log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
                         return TRUE;
                     }

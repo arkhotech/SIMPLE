@@ -122,13 +122,15 @@ class AccionIniciarTramite extends Accion {
             //TODO al parecer falta indicar tarea de inicio
             $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, $etapa->id, $request);
 
-            $this->registrarRetorno($info_inicio['idInstancia'], $this->extra->tareaRetornoSel);
+            log_message("INFO", "Registrando tramite: ".$info_inicio['idInstancia'], FALSE);
+            log_message("INFO", "Registrando tarea: ".$this->extra->tareaRetornoSel, FALSE);
+            $this->registrarRetorno($info_inicio['idInstancia'], $etapa->tramite_id, $this->extra->tareaRetornoSel);
 
-            $response_inicio = "{\"respuesta_inicio\": ".$info_inicio."}";
+            //$response_inicio = "{\"respuesta_inicio\": ".$info_inicio."}";
 
-            log_message("INFO", "Response: ".$response_inicio, FALSE);
+            //log_message("INFO", "Response: ".$response_inicio, FALSE);
 
-            $response["respuesta_inicio"]=$response_inicio;
+            $response["respuesta_inicio"]=$info_inicio;
 
             foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
@@ -151,14 +153,14 @@ class AccionIniciarTramite extends Accion {
         }
     }
 
-    private function registrarRetorno($tramite_id, $retorno_id){
+    private function registrarRetorno($tramite_id, $tramite_retorno, $retorno_id){
 
         $tramite = Doctrine::getTable('Tramite')->find($tramite_id);
         $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
 
         $dato = new DatoSeguimiento();
         $dato->nombre = "tramite_retorno";
-        $dato->valor = $tramite_id;
+        $dato->valor = $tramite_retorno;
         $dato->etapa_id = $etapa_id;
         $dato->save();
 
