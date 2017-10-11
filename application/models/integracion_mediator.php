@@ -78,6 +78,7 @@ class IntegracionMediator{
                     "nombre" => $campo['nombre'],
                     "tipo_control" => $campo['tipo'],
                     "tipo" => $this->mapType($campo),  //$campo['dependiente_tipo'],
+                    "descripcion" => $campo['ayuda'],
                     "obligatorio" => $obligatorio,
                     "solo_lectura" => ($campo['readonly']==0) ? false : true,
                     "dominio_valores" => ($this->mapType($campo) == "grid") ? $campo["extra"] :$campo['datos'],

@@ -14,7 +14,7 @@ class API extends REST_Controller{
 
             $mediator = new IntegracionMediator();
 
-            $this->registrarAuditoria($this->get()['tarea'],"Iniciar Tramite","Tramites");
+            $this->registrarAuditoria($this->get()['tarea'],"Iniciar Tramite","Tramites", $this->request->body);
 
             $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['tarea'],$this->request->body);
             $this->response($data);
@@ -47,7 +47,7 @@ class API extends REST_Controller{
             }
 
             $this->checkIdentificationHeaders($etapa->tarea_id);
-            $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites");
+            $this->registrarAuditoria($etapa->id,"Continuar Tramite","Tramites", $this->request->body);
        
             $data = $mediator->continuarProceso($tramite_id,$etapa_id,$secuencia,$this->request->body);
         }catch(Exception $e){
@@ -157,7 +157,7 @@ class API extends REST_Controller{
      * @param type $operacion
      * @param type $nombre_proceso
      */
-    public function registrarAuditoria($etapa_id,$operacion,$nombre_proceso = NULL){
+    public function registrarAuditoria($etapa_id,$operacion,$nombre_proceso = NULL, $body = NULL){
         $nombre_etapa = $nombre_proceso;
         $etapa = NULL;
         if($etapa_id != NULL){
@@ -173,14 +173,14 @@ class API extends REST_Controller{
             'http-Method' =>  $this->input->server('REQUEST_METHOD')) ;
 
         $data['headers'] = $new_headers;
-        
-        if(isset($headers['User']) && $nombre_etapa != NULL ){ //Comprobar que exista el header y etapa
+
+        if(isset($body) && isset($body->identificacion) && $nombre_etapa != NULL ){ //Comprobar que exista identificacion y etapa
                    
             $data['Credenciales'] = 
                     array("Metodo de acceso" => $etapa->acceso_modo,
                           "Username" =>
                         ($etapa->acceso_modo == 'claveunica') 
-                        ? $headers['Rut']:$headers['User']);
+                        ? $body->identificacion->rut:$body->identificacion->user);
         }
         //Recuperar el nombre para el regisrto
         log_message('DEBUG',"Recuperando credencial de identificación para auditoría");

@@ -399,15 +399,22 @@ class Campo extends Doctrine_Record {
                     //FIX valor
                     $filename = 'uploads/datos/'.str_replace('"','',$campo->nombre);
                     $data = file_get_contents($filename);
-                    $return[$key]=base64_encode($data);
+                    if(isset($data) && $data != ''){
+                        $return[$key]=base64_encode($data);
+                    }
                 }else if($campo->tipo == 'documento'){
                     $documento = Doctrine::getTable('Documento')->findOneByProcesoId($etapa->Tarea->proceso_id);
                     $file = $documento->generar($etapa->id);
                     $data = file_get_contents('uploads/documentos/'.$file->filename);
-                    $return[$key]= base64_encode($data);
+                    if(isset($data) && $data != '') {
+                        $return[$key] = base64_encode($data);
+                    }
                 }else{
                     log_message("INFO", "Obteniendo valor para etapa: ".$etapa->id, FALSE);
-                    $return[$key]=str_replace('"', '', $campo->displayDatoSeguimiento($etapa->id));
+                    $valor_campo = $campo->displayDatoSeguimiento($etapa->id);
+                    if(isset($valor_campo) && $valor_campo != '') {
+                        $return[$key] = str_replace('"', '', $valor_campo);
+                    }
                 }
 
             }
@@ -436,7 +443,10 @@ class Campo extends Doctrine_Record {
         foreach ($result as $value) {
             log_message("INFO", "#### key: ".$value->nombre, FALSE);
             $key= $value->extra->variable;
-            $return[$key]=str_replace('"', '',$this->getValosVariableGlobal($key,$tramite_id));
+            $valor_var = $this->getValosVariableGlobal($key,$tramite_id);
+            if(isset($valor_var) && $valor_var != ''){
+                $return[$key]=str_replace('"', '',$valor_var);
+            }
         }
         return $return;
     }

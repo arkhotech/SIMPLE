@@ -20,7 +20,7 @@ class Especificacion extends REST_Controller{//MY_BackendController {
                     "nombre" => $res['nombre'],
                     "tarea" => $res['tarea'],
                     "version" => "1.0",
-                    "institucion" => "N/I",
+                    "institucion" => $res['nombre_cuenta'],
                     "descripcion" => $res['previsualizacion'],
                     "URL" => $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']
                 ));
