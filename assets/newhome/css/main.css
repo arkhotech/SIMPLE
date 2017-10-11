@@ -60,6 +60,13 @@ legend {
 
 .ajaxForm {
   position: relative;
+  margin-bottom: 10px;
+}
+
+.ajaxForm p span {
+  margin: 5px 5px 0 0;
+  display: block;
+  float: left;
 }
 
 .ajaxForm .ajaxLoader {
@@ -184,11 +191,6 @@ header.navbar {
   float: left;
 }
 
-#userMenu a {
-  color: #000;
-  cursor: pointer;
-}
-
 .row {
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -238,11 +240,6 @@ header.navbar {
   text-align: left;
   padding: 30px 20px 60px 20px;
   border: 2px solid #E3E5EF;
-
-}
-
-.search-form_input {
-
 }
 
 .item {
@@ -389,6 +386,10 @@ a.close {
   padding: 20px 20px 0 0px;
 }
 
+#loginViewUser .dropdown-menu li {
+  padding: 10px 10px 10px 0;
+}
+
 #loginView input {
   width: 100%;
   height: 50px;
@@ -398,6 +399,30 @@ a.close {
 .img-service {
   width: 50px;
   height: 50px;
+}
+
+.icon-user {
+  width: 32px;
+  height: 32px;
+  margin-right: 5px;
+  background: #85B1F5;
+  -webkit-mask: url(../images/icons/ios-contact.svg) center / contain no-repeat;
+}
+
+.icon-lock {
+  width: 32px;
+  height: 32px;
+  margin-right: 5px;
+  background: #85B1F5;
+  -webkit-mask: url(../images/icons/locked.svg) center / contain no-repeat;
+}
+
+.icon-log-out {
+  width: 32px;
+  height: 32px;
+  margin-right: 5px;
+  background: #85B1F5;
+  -webkit-mask: url(../images/icons/log-out.svg) center / contain no-repeat;
 }
 
 /*nuevo*/

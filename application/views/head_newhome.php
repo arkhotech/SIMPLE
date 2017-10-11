@@ -3,10 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Le styles -->
-<link href="<?= base_url() ?>assets/js/bootstrap-datepicker/css/datepicker.css" rel="stylesheet">
-<link href="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.css" rel="stylesheet">
-<link href="<?= base_url() ?>assets/js/jquery.chosen/chosen.css" rel="stylesheet">
-<link href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css" rel="stylesheet">
+<link rel="stylesheet" href="<?= base_url() ?>assets/js/bootstrap-datepicker/css/datepicker.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/js/jquery.chosen/chosen.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">

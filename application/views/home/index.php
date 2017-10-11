@@ -22,7 +22,10 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/style.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
+
+    <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" href="<?= base_url() ?>assets/js/common.js"></script>
 
     <script type="text/javascript">
       var site_key = "<?= sitekey() ?>";
@@ -42,7 +45,6 @@
       };
     </script>
   </head>
-
   <body>
     <!--[if lt IE 8]>
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -62,7 +64,7 @@
           
           <div class="navbar-right">
             <div class="btn-group" role="group">
-            <div class="vr"></div>
+              <div class="vr"></div>
               <ul id="userMenu" class="nav nav-pills pull-right">
                 <?php if (!UsuarioSesion::usuario()->registrado): ?>
                   <li class="dropdown">
@@ -71,33 +73,32 @@
                       <li id="loginView">
                         <div class="simple">
                           <div class="wrapper">
-                            <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
+                            <form id="login" method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
                               <div class="validacion"></div>
                               <input type="hidden" name="redirect" value="<?= current_url() ?>" />
-                              <label for="usuario">Usuario o Correo electrónico</label>
+                              <label for="usuario">Usuario o Correo electr&oacute;nico</label>
                               <input name="usuario" id="usuario" type="text" class="input-xlarge">
-                              <label for="password">Contraseña</label>
+                              <label for="password">Contrase&ntilde;a</label>
                               <input name="password" id="password" type="password" class="input-xlarge">
                               <div id="login_captcha"></div>
-                              <button class="button button--red" type="submit" style="float: right; cursor: pointer;">Ingresar</button>
-                              <a href="<?= site_url('autenticacion/login_openid?redirect=' . current_url()) ?>" class="link" style="float: right;">Clave Única</a>
-                              <div style="clear:both;"></div>
+                              <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
+                              <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a></p>
+                              <a class="button button--red" onclick="document.getElementById('login').submit();">Ingresar</a>
                             </form>
-                            <a href="<?= site_url('autenticacion/olvido') ?>" class="link" ">¿Olvidaste tu contraseña?</a>
                           </div>
                         </div>
                       </li>
                     </ul>
                   </li>
                 <?php else: ?>
-                  <li class="dropdown">
+                  <li id="loginViewUser" class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Bienvenido/a <?= UsuarioSesion::usuario()->displayName() ?><span class="caret"></span></a>
-                    <ul class="dropdown-menu btn" style="padding: 0px !important;">
+                    <ul class="dropdown-menu btn">
                       <?php if (!UsuarioSesion::usuario()->open_id): ?> 
-                        <li><a href="<?= site_url('cuentas/editar') ?>"><i class="icon-user"></i> Mi cuenta</a></li>
+                        <li><a href="<?= site_url('cuentas/editar') ?>"><i class="icon-user"></i>Mi cuenta</a></li>
                       <?php endif; ?>
-                      <?php if (!UsuarioSesion::usuario()->open_id): ?><li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i> Cambiar contraseña</a></li><?php endif; ?>
-                      <li><a href="<?= site_url('autenticacion/logout') ?>"><i class="icon-off"></i> Cerrar sesión</a></li>
+                      <?php if (!UsuarioSesion::usuario()->open_id): ?><li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i>Cambiar contrase&ntilde;a</a></li><?php endif; ?>
+                      <li><a href="<?= site_url('autenticacion/logout') ?>"><i class="icon-log-out"></i>Cerrar sesi&oacute;n</a></li>
                     </ul>
                   </li>
                 <?php endif; ?>
@@ -189,7 +190,7 @@
             <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
             <section id="simple-destacados">
                 <div class="section-header">
-                  <h2>Otros trámites</h2>
+                  <h2>Otros tr&aacute;mites</h2>
                   <div class="line"></div>
                 </div>
                 <div class="row">
@@ -209,10 +210,10 @@
                           <h4><?= $p->nombre ?></h4>
                           <div class="enlace_cat_proc">
                             <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
-                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-file icon-white"></i> Iniciar</a>
+                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
                             <?php else: ?>
                                 <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
-                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i> Clave &Uacute;nica</a>
+                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Clave &Uacute;nica</a>
                                 <?php else: ?>
                                 <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
                                 <?php endif ?>
@@ -237,7 +238,7 @@
             <div class="col-sm-6">
               <ul class="menu">
                 <li><a href="http://www.modernizacion.gob.cl/" target="_blank">Iniciativa de la Unidad de Modernizaci&oacute;n y Gobierno Digital</a></li>
-                <li><a href="http://www.minsegpres.gob.cl/" target="_blank">Ministerio Secretaría General de la Presidencia</a></li>
+                <li><a href="http://www.minsegpres.gob.cl/" target="_blank">Ministerio Secretar&iacute;a General de la Presidencia</a></li>
               </ul>
             </div>
           </div>

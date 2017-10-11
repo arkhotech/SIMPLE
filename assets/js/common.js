@@ -6,14 +6,13 @@ $(document).ready(function() {
     $(".preventDoubleRequest").one("click", function() {
         $(this).click(function () { return false; });
     });
-    
+
     $(".datepicker:not([readonly])").datepicker({
         format: "dd-mm-yyyy",
         weekStart: 1,
         autoclose: true,
         language: "es"
     });
-
 
     $(".file-uploader").each(function(i,el) {
         var $parentDiv = $(el).parent();
@@ -35,6 +34,7 @@ $(document).ready(function() {
             }
         }); 
     });
+
     $(".file-uploader").parent().on("click","a.remove",function() {
         var $parentDiv=$(this).closest("div");
         $parentDiv.find(":input[type=hidden]").val("");
