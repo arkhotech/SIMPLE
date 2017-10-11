@@ -2,19 +2,24 @@
 
 <?php if (count($procesos) > 0): ?>
 
-<table id="mainTable" class="table" title="Tabla con listado de trámites disponibles">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($procesos as $p): ?>
-            <tr>
-                <td class="name">
+    <article class="aux-box">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-8">
+                <h2 class="heading-medium">Nombre</h2>
+            </div>
+            <div class="col-xs-12 col-sm-4 col-md-4">
+                <h2 class="heading-medium">Acciones</h2>
+            </div>
+        </div>
+    </article>
+
+    <?php foreach ($procesos as $p): ?>
+
+        <article class="aux-box">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8 col-md-8">
                     <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                    <a class="preventDoubleRequest" href="<?=site_url('tramites/iniciar/'.$p->id)?>"><?= $p->nombre ?></a>
+                        <a class="preventDoubleRequest" href="<?=site_url('tramites/iniciar/'.$p->id)?>"><?= $p->nombre ?></a>
                     <?php else: ?>
                         <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
                         <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><?= $p->nombre ?></a>
@@ -22,10 +27,10 @@
                         <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><?= $p->nombre ?></a>
                         <?php endif ?>
                     <?php endif ?>
-                </td>
-                <td class="actions">
-                    <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                    <a href="<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary preventDoubleRequest"><i class="icon-file icon-white"></i> Iniciar</a>
+                </div>
+                <div class="col-xs-12 col-sm-4 col-md-4">
+                <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
+                        <a href="<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary preventDoubleRequest"><i class="icon-file icon-white"></i> Iniciar</a>
                     <?php else: ?>
                         <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
                         <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><img style="max-width: none;" src="<?=base_url('assets/img/claveunica-medium.png')?>" alt="ClaveUnica" /></a>
@@ -33,9 +38,11 @@
                         <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary"><i class="icon-white icon-off"></i> Autenticarse</a>
                         <?php endif ?>
                     <?php endif ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
+                </div>
+            </div>
+        </article>
+
+    <?php endforeach; ?>
     </tbody>
 </table>
 

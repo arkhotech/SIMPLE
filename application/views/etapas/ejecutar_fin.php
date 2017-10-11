@@ -22,10 +22,9 @@
             <p>Este trámite no tiene una etapa donde continuar.</p>
         <?php endif; ?>
 
-
         <div class="form-actions">
-            <a class="btn" href="<?= site_url('etapas/ejecutar/' . $etapa->id . '/' . (count($etapa->getPasosEjecutables()) - 1).($qs?'?'.$qs:'')) ?>"><i class="icon-chevron-left"></i> Volver</a>
-            <?php if($tareas_proximas->estado!='sincontinuacion'):?><button class="btn btn-success" type="submit"><i class="icon-ok icon-white"></i> Finalizar</button><?php endif?>
+            <button class="button button--gray" type="button"><a href="<?= site_url('etapas/ejecutar/' . $etapa->id . '/' . (count($etapa->getPasosEjecutables()) - 1).($qs?'?'.$qs:'')) ?>">Volver</a></button>
+            <?php if($tareas_proximas->estado!='sincontinuacion'):?><button class="button" type="submit">Finalizar</button><?php endif?>
         </div>
     </fieldset>
 </form>

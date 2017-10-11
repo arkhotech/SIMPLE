@@ -1,6 +1,6 @@
 <?php
 class Migration_41 extends Doctrine_Migration_Base {
-    public function up(){
+    public function up() {
 
         $this->addColumn('proceso', 'categoria_id', 'int(10) unsigned');
         $this->addColumn('proceso', 'destacado', 'int(2)');
@@ -16,7 +16,7 @@ class Migration_41 extends Doctrine_Migration_Base {
         $this->createForeignKey( 'proceso', 'fk_categoria', $definition );
     }
 
-    public function down(){
+    public function down() {
         $this->dropForeignKey('proceso', 'fk_categoria');
         $this->removeColumn('proceso', 'categoria_id');
         $this->removeColumn('proceso', 'destacado');

@@ -3,7 +3,7 @@ if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
 class Etapas extends MY_Controller {
- 
+
     public function __construct() {
         parent::__construct();
         require_once(APPPATH.'controllers/agenda.php'); //include Agenda controller
@@ -13,82 +13,82 @@ class Etapas extends MY_Controller {
         $buscar = $this->input->get('buscar');
         $orderby=$this->input->get('orderby')?$this->input->get('orderby'):'updated_at';
         $direction=$this->input->get('direction')?$this->input->get('direction'):'desc';
-                        
-        $matches="";
-        $rowetapas="";
-        $resultotal="";
-        
-        if ($buscar) { 
+
+        $matches = "";
+        $rowetapas = "";
+        $resultotal = "";
+
+        if ($buscar) {
             $this->load->library('sphinxclient');
             $this->sphinxclient->setServer ( $this->config->item ( 'sphinx_host' ), $this->config->item ( 'sphinx_port' ) );
             $this->sphinxclient->SetLimits(0, 10000);
-            $result = $this->sphinxclient->query(json_encode($buscar), 'tramites');             
-            if($result['total'] > 0 ){            
-                $resultotal="true";          
-            }else{               
-                $resultotal="false";
+            $result = $this->sphinxclient->query(json_encode($buscar), 'tramites');
+            if ($result['total'] > 0 ) {
+                $resultotal = "true";
+            } else {
+                $resultotal = "false";
             }
         }
 
-        if($resultotal=="true"){
-            $matches = array_keys($result['matches']); 
-            $rowetapas=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$orderby,$direction, $matches, $buscar);
-        }else{
-            $rowetapas=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$orderby,$direction, "0", $buscar);
+        if ($resultotal == "true") {
+            $matches = array_keys($result['matches']);
+            $rowetapas = Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$orderby,$direction, $matches, $buscar);
+        } else {
+            $rowetapas = Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$orderby,$direction, "0", $buscar);
         }
-        
-        $data['etapas'] =$rowetapas;
-        $data['buscar']= $buscar;
-        $data['orderby']=$orderby;
-        $data['direction']=$direction;
+
+        $data['etapas'] = $rowetapas;
+        $data['buscar'] = $buscar;
+        $data['orderby'] = $orderby;
+        $data['direction'] = $direction;
         $data['sidebar'] = 'inbox';
         $data['content'] = 'etapas/inbox';
         $data['title'] = 'Bandeja de Entrada';
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
-    
-    public function sinasignar($offset=0) {                
+
+    public function sinasignar($offset=0) {
         if (!UsuarioSesion::usuario()->registrado) {
             $this->session->set_flashdata('redirect', current_url());
             redirect('autenticacion/login');
         }
-        
-        $this->load->library('pagination');        
-        $buscar = $this->input->get('query');        
-        
-        $matches="";
-        $rowetapas="";
-        $resultotal=false;
-        $contador="0";        
-        $perpage=50;
-        
-        if ($buscar) { 
+
+        $this->load->library('pagination');
+        $buscar = $this->input->get('query');
+
+        $matches = "";
+        $rowetapas = "";
+        $resultotal = false;
+        $contador = "0";
+        $perpage = 50;
+
+        if ($buscar) {
             $this->load->library('sphinxclient');
             $this->sphinxclient->setServer ( $this->config->item ( 'sphinx_host' ), $this->config->item ( 'sphinx_port' ) );
             $this->sphinxclient->SetLimits($offset, 10000);
             $result = $this->sphinxclient->query(json_encode($buscar), 'tramites');             
-            if($result['total'] > 0 ){            
-                $resultotal=true;
-            }else{               
-                $resultotal=false;
+            if ($result['total'] > 0 ) {
+                $resultotal = true;
+            } else {
+                $resultotal = false;
             }
         }
 
-        if($resultotal==true){
-            $matches = array_keys($result['matches']); 
+        if ($resultotal == true) {
+            $matches = array_keys($result['matches']);
             $contador = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$matches,$buscar,0,$perpage)->count();
             $rowetapas=Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),$matches,$buscar,0,$perpage);
             error_log("true" . " cantidad " .$contador);
-            
-        }else{            
+
+        } else {
             $contador = Doctrine::getTable('Etapa')->findAllSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
             $rowetapas= Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio(),"0",$buscar,$offset,$perpage);
             error_log("false" . " cantidad " .$contador);
         }
-        
+
         $config['base_url'] = site_url('etapas/sinasignar');
-        $config['total_rows'] = $contador;  
-        $config['per_page'] = $perpage;       
+        $config['total_rows'] = $contador;
+        $config['per_page'] = $perpage;
         $config['full_tag_open'] = '<div class="pagination pagination-centered"><ul>';
         $config['full_tag_close'] = '</ul></div>';
         $config['page_query_string']=false;
@@ -108,22 +108,22 @@ class Etapas extends MY_Controller {
         $config['cur_tag_open'] = '<li class="active"><a href="#">';
         $config['cur_tag_close'] = '</a></li>';
         $config['num_tag_open'] = '<li>';
-        $config['num_tag_close'] = '</li>';     
-        $this->pagination->initialize($config);        
+        $config['num_tag_close'] = '</li>';
+        $this->pagination->initialize($config);
         //$data['etapas'] = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio());
-        $data['links'] = $this->pagination->create_links(); 
-        $data['etapas'] =$rowetapas;        
+        $data['links'] = $this->pagination->create_links();
+        $data['etapas'] =$rowetapas;
         $data['query'] = $buscar;
         $data['sidebar'] = 'sinasignar';
         $data['content'] = 'etapas/sinasignar';
-        $data['title'] = 'Sin Asignar';        
+        $data['title'] = 'Sin Asignar';
         $this->load->view('template', $data);
     }
 
     public function ejecutar($etapa_id, $secuencia = 0) {
         $iframe = $this->input->get('iframe');
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
-        if(!$etapa){
+        if (!$etapa) {
             show_404();
         }
         if ($etapa->usuario_id != UsuarioSesion::usuario()->id) {
@@ -151,12 +151,12 @@ class Etapas extends MY_Controller {
         $paso = $etapa->getPasoEjecutable($secuencia);
         if (!$paso) {
             redirect('etapas/ejecutar_fin/' . $etapa->id . ($qs ? '?' . $qs : ''));
-        } else if (($etapa->Tarea->final || !$etapa->Tarea->paso_confirmacion) && $paso->getReadonly() && end($etapa->getPasosEjecutables()) == $paso) { //No se requiere mas input
+        } else if (($etapa->Tarea->final || !$etapa->Tarea->paso_confirmacion) && $paso->getReadonly() && end($etapa->getPasosEjecutables()) == $paso) { // No se requiere mas input
             $etapa->iniciarPaso($paso);
             $etapa->finalizarPaso($paso);
             $etapa->avanzar();
             redirect('etapas/ver/' . $etapa->id . '/' . (count($etapa->getPasosEjecutables())-1));
-        }else{
+        } else {
             $etapa->iniciarPaso($paso);
 
             $data['secuencia'] = $secuencia;
@@ -169,7 +169,7 @@ class Etapas extends MY_Controller {
             $data['title'] = $etapa->Tarea->nombre;
             $template = $this->input->get('iframe') ? 'template_iframe' : 'template';
 
-            $this->load->view('template', $data);
+            $this->load->view('template_newhome', $data);
         }
     }
 
@@ -237,7 +237,7 @@ class Etapas extends MY_Controller {
                         if (!$dato)
                             $dato = new DatoSeguimiento();
                         $dato->nombre = $c->nombre;
-                        $dato->valor = $this->input->post($c->nombre)=== false?'' :  $this->input->post($c->nombre);
+                        $dato->valor = $this->input->post($c->nombre)=== false?'' : $this->input->post($c->nombre);
 
                         if (!is_object($dato->valor) && !is_array($dato->valor)) {
                             if (preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)) {
@@ -252,7 +252,7 @@ class Etapas extends MY_Controller {
                 $etapa->save();
 
                 $etapa->finalizarPaso($paso);
-                
+
                 $respuesta->validacion = TRUE;
 
                 $qs = $this->input->server('QUERY_STRING');
@@ -325,7 +325,7 @@ class Etapas extends MY_Controller {
             exit;
         }
 
-        //if($etapa->Tarea->asignacion!='manual'){
+        //if ($etapa->Tarea->asignacion!='manual') {
         //    $etapa->Tramite->avanzarEtapa();
         //    redirect();
         //    exit;
@@ -338,9 +338,9 @@ class Etapas extends MY_Controller {
         $data['sidebar'] = UsuarioSesion::usuario()->registrado ? 'inbox' : 'disponibles';
         $data['content'] = 'etapas/ejecutar_fin';
         $data['title'] = $etapa->Tarea->nombre;
-        $template = $this->input->get('iframe') ? 'template_iframe' : 'template';
+        $template = $this->input->get('iframe') ? 'template_iframe' : 'template_newhome';
 
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
 
     public function ejecutar_fin_form($etapa_id) {
@@ -365,11 +365,11 @@ class Etapas extends MY_Controller {
         try{
             $agenda = new agenda();  
             $appointments=$agenda->obtener_citas_de_tramite($etapa_id);
-            if(isset($appointments) && is_array($appointments) && (count($appointments)>=1) ){
+            if (isset($appointments) && is_array($appointments) && (count($appointments)>=1) ) {
                 $json='{"ids":[';
                 $i=0;
-                foreach($appointments as $item){
-                    if($i==0){
+                foreach($appointments as $item) {
+                    if ($i==0) {
                         $json=$json.'"'.$item.'"';
                     }else{
                         $json=$json.',"'.$item.'"';
@@ -382,13 +382,13 @@ class Etapas extends MY_Controller {
             }else{
                 $etapa->avanzar($this->input->post('usuarios_a_asignar'));    
             }
-        }catch(Exception $err){
+        }catch(Exception $err) {
             $respuesta->validacion = false;
             $respuesta->errores = '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>'.$err->getMessage().'</div>';
             log_message('error',$err->getMessage());
         }
         
-        if ($this->input->get('iframe')){
+        if ($this->input->get('iframe')) {
             $respuesta->redirect = site_url('etapas/ejecutar_exito');
         }
         else {
@@ -421,21 +421,21 @@ class Etapas extends MY_Controller {
         $data['sidebar'] = 'participados';
         $data['title'] = 'Historial - ' . $etapa->Tarea->nombre;
         $data['content'] = 'etapas/ver';
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
 
-    public function descargar($tramites){
+    public function descargar($tramites) {
         $data['tramites'] = $tramites;
         $this->load->view ('etapas/descargar',$data);
     }
-    
-    public function descargar_form(){
-        if(!Cuenta::cuentaSegunDominio()->descarga_masiva){
+
+    public function descargar_form() {
+        if (!Cuenta::cuentaSegunDominio()->descarga_masiva) {
             echo 'Servicio no tiene permisos para descargar.';
             exit;
         }
 
-        if(!UsuarioSesion::usuario()->registrado){
+        if (!UsuarioSesion::usuario()->registrado) {
             echo 'Usuario no tiene permisos para descargar.';
             exit;
         }
@@ -458,35 +458,35 @@ class Etapas extends MY_Controller {
                 break;
         }
 
-        //Recorriendo los trámites
+        // Recorriendo los trámites
         $this->load->library('zip');
-        foreach ($tramites as $t){
+        foreach ($tramites as $t) {
 
-            if(empty($tipoDocumento)){
-                $files =Doctrine::getTable('File')->findByTramiteId($t);
-            }else{
-                $files =Doctrine::getTable('File')->findByTramiteIdAndTipo($t,$tipoDocumento);
+            if (empty($tipoDocumento)) {
+                $files = Doctrine::getTable('File')->findByTramiteId($t);
+            } else {
+                $files = Doctrine::getTable('File')->findByTramiteIdAndTipo($t,$tipoDocumento);
             }
-            if(count($files) > 0){
-                //Recorriendo los archivos
+            if (count($files) > 0) {
+                // Recorriendo los archivos
                 foreach ($files as $f) {
                     $tr = Doctrine::getTable('Tramite')->find($t);
                     $participado = $tr->usuarioHaParticipado(UsuarioSesion::usuario()->id);
-                    if(!$participado){
+                    if (!$participado) {
                         echo 'Usuario no ha participado en el trámite.';
                         exit;
                     }
                     $nombre_documento = $tr->id;
                     $tramite_nro ='';
-                    foreach ($tr->getValorDatoSeguimiento() as $tra_nro){
-                        if($tra_nro->valor == $f->filename){
+                    foreach ($tr->getValorDatoSeguimiento() as $tra_nro) {
+                        if ($tra_nro->valor == $f->filename) {
                             $nombre_documento = $tra_nro->nombre;
                         }
-                        if($tra_nro->nombre == 'tramite_ref'){
+                        if ($tra_nro->nombre == 'tramite_ref') {
                             $tramite_nro = $tra_nro->valor;
                         }
                     }
-                    if($f->tipo == 'documento' && !empty($nombre_documento)){
+                    if ($f->tipo == 'documento' && !empty($nombre_documento)) {
                         $path = $ruta_documentos.$f->filename;
                         $tramite_nro = $tramite_nro != '' ? $tramite_nro : $tr->Proceso->nombre;
                         $tramite_nro = str_replace(" ","",$tramite_nro);
@@ -497,16 +497,16 @@ class Etapas extends MY_Controller {
                         $this->zip->read_file($new_file);
                         //Eliminación del archivo para no ocupar espacio en disco
                         unlink($new_file);
-                    }elseif ($f->tipo == 'dato' && !empty($nombre_documento)){
+                    }elseif ($f->tipo == 'dato' && !empty($nombre_documento)) {
                         $path = $ruta_generados.$f->filename;
                         $this->zip->read_file($path);
                     }
                 }
-                if(count($tramites) > 1){
+                if (count($tramites) > 1) {
                     $tr = Doctrine::getTable('Tramite')->find($t);
-                    $tramite_nro ='';
-                    foreach ($tr->getValorDatoSeguimiento() as $tra_nro){
-                        if($tra_nro->nombre == 'tramite_ref'){
+                    $tramite_nro = '';
+                    foreach ($tr->getValorDatoSeguimiento() as $tra_nro) {
+                        if ($tra_nro->nombre == 'tramite_ref') {
                             $tramite_nro = $tra_nro->valor;
                         }
                     }
@@ -518,12 +518,12 @@ class Etapas extends MY_Controller {
                 }
             }
         }
-        if(count($tramites) > 1){
-            foreach ($tramites as $t){
+        if (count($tramites) > 1) {
+            foreach ($tramites as $t) {
                 $tr = Doctrine::getTable('Tramite')->find($t);
                 $tramite_nro ='';
-                foreach ($tr->getValorDatoSeguimiento() as $tra_nro){
-                   if($tra_nro->nombre == 'tramite_ref'){
+                foreach ($tr->getValorDatoSeguimiento() as $tra_nro) {
+                   if ($tra_nro->nombre == 'tramite_ref') {
                         $tramite_nro = $tra_nro->valor;
                     }                              
                 }                         
@@ -533,11 +533,11 @@ class Etapas extends MY_Controller {
             }
             
             //Eliminando los archivos antes de descargar
-            foreach ($tramites as $t){;
+            foreach ($tramites as $t) {;
                 $tr = Doctrine::getTable('Tramite')->find($t);
                 $tramite_nro ='';
-                foreach ($tr->getValorDatoSeguimiento() as $tra_nro){
-                   if($tra_nro->nombre == 'tramite_ref'){
+                foreach ($tr->getValorDatoSeguimiento() as $tra_nro) {
+                   if ($tra_nro->nombre == 'tramite_ref') {
                         $tramite_nro = $tra_nro->valor;
                     }                              
                 }                         
@@ -549,8 +549,8 @@ class Etapas extends MY_Controller {
         }else{
             $tr = Doctrine::getTable('Tramite')->find($tramites);
             $tramite_nro ='';
-            foreach ($tr->getValorDatoSeguimiento() as $tra_nro){
-               if($tra_nro->nombre == 'tramite_ref'){
+            foreach ($tr->getValorDatoSeguimiento() as $tra_nro) {
+               if ($tra_nro->nombre == 'tramite_ref') {
                     $tramite_nro = $tra_nro->valor;
                 }                              
             }                         

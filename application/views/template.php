@@ -6,10 +6,10 @@
     </head>
 
     <body>
-    <ul class="saltar">
-    <li><a href="#main" tabindex="1">Ir al contenido</a>
-    </li>
-</ul>
+        <ul class="saltar">
+            <li><a href="#main" tabindex="1">Ir al contenido</a>
+            </li>
+        </ul>
         <header>
             <div class="container">
                 <div class="row">
