@@ -12,6 +12,9 @@
         <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
         <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
         <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/login.css">
+        <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js"></script>
+        <script src="<?= base_url() ?>assets/js/bootstrap.min.js"></script>
+
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
@@ -30,13 +33,65 @@
                     });
                 }
             };
+
+            $(document).ready(function() {
+
+                $("#login .submit").click(function() {
+
+                    var form = $("#login");
+                    console.log("form.action: " + $(form).action);
+                    if (!$(form).prop("submitting")) {
+                        $(form).prop("submitting", true);
+                        $('#login .ajaxLoader').show();
+                        $.ajax({
+                            url: $(form).prop("action"),
+                            data: $(form).serialize(),
+                            type: $(form).prop("method"),
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.validacion) {
+                                    if (response.redirect) {
+                                        window.location = response.redirect;
+                                    } else {
+                                        var f = window[$(form).data("onsuccess")];
+                                        f(form);
+                                    }
+                                } else {
+                                    if ($('#login_captcha').length > 0) {
+                                        if ($('#login_captcha').is(':empty')) {
+                                            grecaptcha.render('login_captcha', {
+                                                'sitekey' : site_key
+                                            });
+                                        } else {
+                                            grecaptcha.reset();
+                                        }
+                                    }
+
+                                    $(form).prop("submitting", false);
+                                    $('#login .ajaxLoader').hide();
+
+                                    $(".validacion").html(response.errores);
+                                    $('html, body').animate({
+                                        scrollTop: $(".validacion").offset().top - 10
+                                    });
+                                }
+                            },
+                            error: function() {
+                                $(form).prop("submitting", false);
+                                $('#login .ajaxLoader').hide();
+                            }
+                        });
+                    }
+                    return false;
+                });
+            });
         </script>
     </head>
     <body>
         <div class="container">
             <div class="row" style="margin-top: 100px;">
                 <div class="span6 offset3">
-                    <form method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
+                    <form id="login" method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
                         <fieldset>
                             <legend>Autenticación</legend>
                             <?php $this->load->view('messages') ?>
@@ -47,15 +102,19 @@
                             <input name="password" id="password" type="password" class="input-xlarge">
                             <div id="login_captcha"></div>
                             <input type="hidden" name="redirect" value="<?=$redirect?>" />
-                            
-                            <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
-                            <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="https://claveunica.gob.cl/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a></p>
-
+                            <p>
+                                <a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a>
+                            </p>
+                            <p>
+                                <span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>">
+                                <img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a>
+                            </p>
                             <div class="form-actions">
-                                <a class="button button--lightgray" href="#" onclick="javascript:history.back();">Volver</a>
-                                <a class="button" type="submit" href="#"  onclick="javascript:this.form.submit();">Ingresar</a>
+                                <a class="button button--lightgray submit" href="#">Volver</a>
+                                <a class="button submit" href="#">Ingresar</a>
                             </div>
                         </fieldset>
+                        <div class='ajaxLoader'>Cargando</div>
                     </form>
                 </div>
             </div>

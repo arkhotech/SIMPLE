@@ -8,3 +8,20 @@ p span {
     float: left;
     display: block;
 }
+
+.ajaxLoader {
+    width: 156px;
+    height: 156px;
+    background-size: cover;
+    background-image: url("../images/ajax-loader.gif");
+    background-repeat: no-repeat;
+    color: #ccc;
+    position: absolute;
+    text-align: center;
+    z-index: 99999999;
+    top: 40%;
+    left: 49%;
+    -webkit-transform: translate(-40%, -49%);
+    transform: translate(-40%, -49%);
+    padding-top: 140px;
+  }
