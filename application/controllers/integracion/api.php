@@ -19,6 +19,8 @@ class API extends REST_Controller{
             $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['tarea'],$this->request->body);
             $this->response($data);
         }catch(Exception $e){
+            log_message("INFO", "Recupera exception: ".$e->getMessage(), FALSE);
+            log_message("INFO", "Recupera getCode: ".$e->getCode(), FALSE);
             $this->response(
                 array("message" => $e->getMessage(),
                 "code" => $e->getCode()),$e->getCode());
@@ -95,61 +97,61 @@ class API extends REST_Controller{
      */
     private function checkIdentificationHeaders($id_tarea){
         log_message('INFO','checkIdentificationHeaders',FALSE);
-        $tarea = Doctrine::getTable('Tarea')->findOneById($id_tarea);
-        
-        if($tarea == NULL ){
-            error_log("etapa debe ser una instancia de Etapa");
-            throw new Exception("Etapa no fue encontrada",404);
-        }
-        $body = json_decode($this->request->body,false);
-        
-        log_message('DEBUG','Check modo',FALSE);
+        try{
+            $tarea = Doctrine::getTable('Tarea')->findOneById($id_tarea);
 
-        switch($tarea->acceso_modo){
-        case 'claveunica':
-            if(!isset($body->identificacion)){
-                throw new Exception('Identificación Clave Unica no enviada',403);
+            if($tarea == NULL ){
+                error_log("etapa debe ser una instancia de Etapa");
+                throw new ApiException("Etapa no fue encontrada",404);
             }
-            $mediator = new IntegracionMediator();
-            $mediator->registerUserFromHeadersClaveUnica($body->identificacion);
-            if(UsuarioSesion::usuario()==NULL){
-                log_message('ERROR','No se pudo registrar el usuario Open ID',FALSE);
-                throw new Exception('No se pudo registrar el usuario Open ID',500);    
-            };
-            break;
-        case 'registrados':
-        case 'grupos_usuarios':
-            log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body->identificacion->user),TRUE);
-            if( !isset($body->identificacion)|| !UsuarioSesion::registrarUsuario($body->identificacion->user)){
-                log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body),TRUE);
-                throw new Exception('No se ha enviado el usuario',403); 
-            }
-            log_message('DEBUG','recuperando usuarios',FALSE);
-            if( $tarea->acceso_modo==='grupos_usuarios'){
-                log_message('DEBUG',$tarea->id);
-                $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
-                foreach($usuarios as $user){
-                    
-                    if($body->identificacion->user===$user->usuario){
-                        log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
+            $body = json_decode($this->request->body,false);
+
+            log_message('DEBUG','Check modo',FALSE);
+
+            switch($tarea->acceso_modo){
+                case 'claveunica':
+                    if(!isset($body->identificacion)){
+                        throw new ApiException('Identificación Clave Unica no enviada',403);
+                    }
+                    $mediator = new IntegracionMediator();
+                    $mediator->registerUserFromHeadersClaveUnica($body->identificacion);
+                    if(UsuarioSesion::usuario()==NULL){
+                        log_message('ERROR','No se pudo registrar el usuario Open ID',FALSE);
+                        throw new ApiException('No se pudo registrar el usuario Open ID',500);
+                    }
+                    break;
+                case 'registrados':
+                case 'grupos_usuarios':
+                    log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body->identificacion->user),TRUE);
+                    if( !isset($body->identificacion)|| !UsuarioSesion::registrarUsuario($body->identificacion->user)){
+                        log_message('DEBUG',"No existe el usuario o no viene el header ".$this->varDump($body),TRUE);
+                        throw new ApiException('No se ha enviado el usuario',403);
+                    }
+                    log_message('DEBUG','recuperando usuarios',FALSE);
+                    if( $tarea->acceso_modo==='grupos_usuarios'){
+                        log_message('DEBUG',$tarea->id);
+                        $usuarios = $tarea->getUsuariosFromGruposDeUsuarioDeCuenta($id_tarea);
+                        foreach($usuarios as $user){
+
+                            if($body->identificacion->user===$user->usuario){
+                                log_message('DEBUG','Validando usuario clave unica: '.$user->usuario,FALSE);
+                                return TRUE;
+                            }
+                        }
+                    }else{
                         return TRUE;
                     }
-                }      
-                //si no
-               
-            }else{
-                return TRUE;
+                    throw new ApiException('Usuario no existe',403);
+                case 'publico':
+                    if( !UsuarioSesion::usuario() ) {
+                        //crear un usuario para sesion anonima
+                        UsuarioSesion::createAnonymousSession();
+                    }
+                    break;
             }
-            throw new Exception('Usuario no existe',403);
-            break;
-        case 'publico':
-            if( !UsuarioSesion::usuario() ) {
-                //crear un usuario para sesion anonima
-                UsuarioSesion::createAnonymousSession();
-            }
-            break;
+        }catch(Exception $e){
+            throw new ApiException($e->errorMessage(),$e->getCode());
         }
-          
     }
     /**
      * 
@@ -158,35 +160,39 @@ class API extends REST_Controller{
      * @param type $nombre_proceso
      */
     public function registrarAuditoria($etapa_id,$operacion,$nombre_proceso = NULL, $body = NULL){
-        $nombre_etapa = $nombre_proceso;
-        $etapa = NULL;
-        if($etapa_id != NULL){
-            $etapa = Doctrine::getTable('Tarea')->findOneById($etapa_id);
-            $nombre_etapa = ($etapa!= NULL) ? $etapa->nombre : "Catalogo";
-            
-        }
-        $headers = $this->input->request_headers();
-        $new_headers = array('host' => $headers['Host'],
-            'Origin' => isset($headers['Origin'])? $headers['Origin'] : '',
-            'largo-mensaje' => isset($headers['Content-Length']) ? $headers['Content-Length'] : '',
-            'Content-type' => isset($headers['Content-type']) ? $headers['Content-type'] : '',
-            'http-Method' =>  $this->input->server('REQUEST_METHOD')) ;
+        try{
+            $nombre_etapa = $nombre_proceso;
+            $etapa = NULL;
+            if($etapa_id != NULL){
+                $etapa = Doctrine::getTable('Tarea')->findOneById($etapa_id);
+                $nombre_etapa = ($etapa!= NULL) ? $etapa->nombre : "Catalogo";
 
-        $data['headers'] = $new_headers;
+            }
+            $headers = $this->input->request_headers();
+            $new_headers = array('host' => $headers['Host'],
+                'Origin' => isset($headers['Origin'])? $headers['Origin'] : '',
+                'largo-mensaje' => isset($headers['Content-Length']) ? $headers['Content-Length'] : '',
+                'Content-type' => isset($headers['Content-type']) ? $headers['Content-type'] : '',
+                'http-Method' =>  $this->input->server('REQUEST_METHOD')) ;
 
-        if(isset($body) && isset($body->identificacion) && $nombre_etapa != NULL ){ //Comprobar que exista identificacion y etapa
-                   
-            $data['Credenciales'] = 
+            $data['headers'] = $new_headers;
+
+            if(isset($body) && isset($body->identificacion) && $nombre_etapa != NULL ){ //Comprobar que exista identificacion y etapa
+
+                $data['Credenciales'] =
                     array("Metodo de acceso" => $etapa->acceso_modo,
-                          "Username" =>
-                        ($etapa->acceso_modo == 'claveunica') 
-                        ? $body->identificacion->rut:$body->identificacion->user);
-        }
-        //Recuperar el nombre para el regisrto
-        log_message('DEBUG',"Recuperando credencial de identificación para auditoría");
+                        "Username" =>
+                            ($etapa->acceso_modo == 'claveunica')
+                                ? $body->identificacion->rut:$body->identificacion->user);
+            }
+            //Recuperar el nombre para el regisrto
+            log_message('DEBUG',"Recuperando credencial de identificación para auditoría");
 
-        AuditoriaOperaciones::registrarAuditoria($nombre_etapa,$operacion, 
+            AuditoriaOperaciones::registrarAuditoria($nombre_etapa,$operacion,
                 "Auditoria de llamados a API REST", json_encode($data));
+        }catch(Exception $e){
+            throw new ApiException($e->errorMessage(),500);
+        }
     }
 
     private function obtenerStatusPorTramite($id_tramite){
@@ -203,13 +209,13 @@ class API extends REST_Controller{
                 $status = $this->obtenerInfoTramite($tramite);
 
             }else{
-                throw new Exception("Trámite no encontrado", 412);
+                throw new ApiException("Trámite no encontrado", 412);
             }
 
             log_message('INFO','Status: '.$this->varDump($status),FALSE);
             return $status;
         }catch(Exception $e){
-            throw new Exception($e->getMessage(), 500);
+            throw new ApiException($e->getMessage(), $e->getCode());
         }
 
     }
@@ -244,13 +250,13 @@ class API extends REST_Controller{
                 }
 
             }else{
-                throw new Exception("Usuario no encontrado", 412);
+                throw new ApiException("Usuario no encontrado", 412);
             }
 
             //log_message('INFO','Status: '.$this->varDump($statusTramites),FALSE);
             return $statusTramites;
         }catch(Exception $e){
-            throw new Exception($e->getMessage(), 500);
+            throw new ApiException($e->getMessage(), $e->getCode());
         }
     }
 
@@ -295,7 +301,7 @@ class API extends REST_Controller{
             }
             return $status;
         }catch(Exception $e){
-            throw new Exception("Problema al recuperar información del trámite");
+            throw new ApiException("Problema al recuperar información del trámite", 500);
         }
     }
 

@@ -46,7 +46,7 @@ class IntegracionMediator{
     function normalizarFormulario($json,$form,$etapa_id=NULL,$value_list=NULL){
         
         if($form==NULL || !is_object($form)){
-            throw new Exception("El formulario viene sin ID",500);
+            throw new ApiException("El formulario viene sin ID",500);
         }
         $pasos = array();
        
@@ -121,7 +121,7 @@ class IntegracionMediator{
             
             if(!$tarea){
                 log_message("error", 'Id de tarea no existe', FALSE);
-                throw new Exception("Id de Tarea no existe",404);
+                throw new ApiException("Id de Tarea no existe",404);
             }
             log_message("INFO", "Comprobando proceso id: ".$tarea->proceso_id, FALSE);
             if( $tarea->proceso_id === $proceso_id ){  //Si pertenece al proceso
@@ -138,7 +138,7 @@ class IntegracionMediator{
                     array_push($result,$this->normalizarFormulario($json,$paso->Formulario));
                 }
                 if(empty($result)){
-                    throw new Exception("Paso $id_paso no  ha sido encontrado",404);
+                    throw new ApiException("Paso $id_paso no  ha sido encontrado",404);
                 }
                 return $result;
             }
@@ -156,13 +156,13 @@ class IntegracionMediator{
             return NULL;
         }
         if($etapa_id == NULL){
-            throw new Exception("Etapa no puede ser null", 412);
+            throw new ApiException("Etapa no puede ser null", 412);
         } 
         
         $formSimple = Doctrine::getTable('Formulario') ->find($form_id);
         
         if($formSimple == NULL){
-            throw new Exception("Formulario $form_id no existe",404);
+            throw new ApiException("Formulario $form_id no existe",404);
         }
         $value_list = array();
         foreach( $formSimple->Campos as $campo ){
@@ -185,7 +185,7 @@ class IntegracionMediator{
         //validar la entrada
         
         if($proceso_id == NULL || $id_tarea == NULL){
-            throw new Exception('Parametros no validos',400);
+            throw new ApiException('Parametros no validos',400);
         }
 
         try{
@@ -193,7 +193,7 @@ class IntegracionMediator{
             log_message("DEBUG", "Input: ".$this->varDump($input), FALSE);
             //Validar entrada
             if(array_key_exists('callback',$input) && !array_key_exists('callback-id',$input)){
-                throw new Exception('Callback y callback-id son valores opcionales pero deben ir juntos',400);
+                throw new ApiException('Callback y callback-id son valores opcionales pero deben ir juntos',400);
             }
 
             log_message("DEBUG", "inicio proceso", FALSE);
@@ -217,7 +217,7 @@ class IntegracionMediator{
              return $result['result'];
         }catch(Exception $e){
            log_message('ERROR',$e->getMessage());
-           throw $e;
+           throw new ApiException($e->getMessage(), $e->getCode());
         }
 
     }
@@ -245,7 +245,7 @@ class IntegracionMediator{
             return "NE";
         }catch(Exception $e){
             log_message('error',$e->getMessage());
-            throw new Exception("Error interno", 500);
+            throw new ApiException("Error interno", 500);
         }
     }
     /**
@@ -261,22 +261,22 @@ class IntegracionMediator{
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
 
         if (!$etapa) {
-            throw new Exception("Etapa no fue encontrada", 404);
+            throw new ApiException("Etapa no fue encontrada", 404);
         }
         
         log_message("INFO", "Tramite id desde etapa: ".$etapa->tramite_id, FALSE);
 
         if ($etapa->tramite_id != $id_proceso) {
-            throw new Exception("Etapa no pertenece al proceso ingresado", 412);
+            throw new ApiException("Etapa no pertenece al proceso ingresado", 412);
         }
         if (!$etapa->pendiente) {
-            throw new Exception("Esta etapa ya fue completada", 412);
+            throw new ApiException("Esta etapa ya fue completada", 412);
         }
         if (!$etapa->Tarea->activa()) {
-            throw new Exception("Esta etapa no se encuentra activa", 412);
+            throw new ApiException("Esta etapa no se encuentra activa", 412);
         }
         if ($etapa->vencida()) {
-            throw new Exception("Esta etapa se encuentra vencida", 412);
+            throw new ApiException("Esta etapa se encuentra vencida", 412);
         }
 
         try{
@@ -315,9 +315,9 @@ class IntegracionMediator{
         }catch(Exception $e){
             log_message('ERROR',$e->getTraceAsString());
             if($e->getCode() === 400 ){
-                throw $e;
+                throw new ApiException($e->getMessage(), $e->getCode());
             }
-            throw new Exception("Error interno", 500);
+            throw new ApiException("Error interno", 500);
         }
         return $result;
 
@@ -372,7 +372,7 @@ class IntegracionMediator{
         }
         
         if($error){
-            throw new Exception('Faltan parametros de entrada obligatorios: '.  json_encode($campos_faltantes),400);
+            throw new ApiException('Faltan parametros de entrada obligatorios: '.  json_encode($campos_faltantes),400);
         }
         
     } 
@@ -406,7 +406,7 @@ class IntegracionMediator{
             $user->rut = $body->rut;
             $apellidos = explode(";",$body->apellidos);
             if(count($apellidos)< 2 ){
-                throw new Exception("Credenciales incompletas",403);
+                throw new ApiException("Credenciales incompletas",403);
             }
             $user->nombres = $body->nombres;
             $user->apellido_paterno = $apellidos[0]; 
@@ -436,7 +436,7 @@ class IntegracionMediator{
         try{
             if(!is_numeric($secuencia) || !is_numeric($id_proceso) || !is_numeric($id_etapa)){
                 $data= "proc: $id_proceso; etapa: $id_etapa; sec: $secuencia";
-                throw new Exception("Parámetros no validos-> $data",400);
+                throw new ApiException("Parámetros no validos-> $data",400);
             }
             $input = json_decode($body,true);
 
@@ -455,7 +455,7 @@ class IntegracionMediator{
             return $response;
         }catch(Exception $e){
             log_message('error',$e->getMessage());
-            throw $e;
+            throw new ApiException($e->getMessage(), $e->getCode());
         }
 
     }

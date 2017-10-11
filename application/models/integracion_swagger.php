@@ -20,7 +20,7 @@ class Swagger {
      */
     public function generar_swagger($formulario, $id_tramite, $id_etapa){
         if(!isset($formulario)){
-            throw new Exception("Formulario no se puede recuper",404);
+            throw new ApiException("Formulario no se puede recuper",404);
         }
         //log_message("info", "Input Generar Swagger: ".$this->varDump($formulario), FALSE);
         log_message("info", "Id trámite: ".$id_tramite, FALSE);

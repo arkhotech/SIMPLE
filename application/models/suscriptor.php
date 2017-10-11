@@ -119,7 +119,7 @@ class Suscriptor extends Doctrine_Record {
                     $suscriptor->{$keyp} = $p_attr;
             }
         } catch (Exception $ex) {
-            throw new Exception($ex->getMessage(), $ex->getCode());
+            throw new ApiException($ex->getMessage(), $ex->getCode());
         }
 
         return $suscriptor;

@@ -376,7 +376,7 @@ class Campo extends Doctrine_Record {
 
         log_message("INFO", "getListaExportables", FALSE);
         if( !is_object($etapa) ){
-            throw new Exception('Se esperaba una instancia del "Objeto" de "Etapa"');
+            throw new ApiException('Se esperaba una instancia del "Objeto" de "Etapa"');
         }
         $campos = null;
         foreach($etapa->Tarea->Pasos as $paso){
