@@ -24,4 +24,5 @@ p span {
     -webkit-transform: translate(-40%, -49%);
     transform: translate(-40%, -49%);
     padding-top: 140px;
+    display: none;
   }
