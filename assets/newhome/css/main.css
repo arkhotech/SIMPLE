@@ -582,6 +582,10 @@ a.close {
   text-align: left;
 }
 
+.input-group {
+  margin-top: 20px;
+}
+
 #sideMenu .active .link:after {
   background: url(../images/icons/arrow-right-white.svg);
   content: "";

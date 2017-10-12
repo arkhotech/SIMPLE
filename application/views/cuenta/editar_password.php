@@ -2,16 +2,22 @@
     <fieldset>
         <legend>Edita la información de tu cuenta</legend>
         <div class="validacion"></div>
-        <label>Contraseña antigua</label>
-        <input type="password" name="password_old" value="" />
+        <div class="input-group">
+            <label>Contraseña antigua</label>
+            <input type="password" name="password_old" value="" />
+        </div>
+        <div class="input-group">
         <label>Contraseña nueva</label>
         <input type="password" name="password_new" value="" />
+        </div>
+        <div class="input-group">
         <label>Confirmar contraseña nueva</label>
         <input type="password" name="password_new_confirm" value="" />
+        </div>
         <input type="hidden" name="redirect" value="<?=$redirect?>" />
-        <div class="form-actions">
-            <button class="btn btn-primary" type="submit">Guardar</button>
-            <button class="btn" type="button" onclick="javascript:history.back()">Cancelar</button>
+        <div class="form-actions input-group">
+            <button class="button button--lightgray" type="button" onclick="javascript:history.back()">Cancelar</button>
+            <button class="button" type="submit">Guardar</button>
         </div>
     </fieldset>
 </form>
