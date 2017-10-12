@@ -35,6 +35,8 @@
     <thead>
         <tr>
             <th>Proceso</th>
+            <th>Tipo</th>
+            <th>Version</th>
             <th>Acciones
                 <a href="/assets/ayuda/simple/backend/export-import.html" target="_blank">
                     <span class="glyphicon glyphicon-info-sign"></span>
@@ -46,6 +48,8 @@
         <?php foreach($procesos as $p): ?>
         <tr>
             <td><?=$p->nombre?></td>
+            <td><?=$p->publicado == 1?'Publicado':'Draft'?></td>
+            <td><?=$p->version?></td>
             <td>
                 <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
                 <a class="btn btn-default" href="<?=site_url('backend/procesos/exportar/'.$p->id)?>"><i class="icon icon-share"></i> Exportar</a>
@@ -62,6 +66,7 @@
         <thead>
             <tr>
                 <th>Procesos Eliminados</th>
+                <th>Version</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -69,6 +74,7 @@
             <?php foreach($procesos_eliminados as $pe): ?>
             <tr>
                 <td><?=$pe->nombre?></td>
+                <td><?=$p->version?></td>
                 <td>
                     <a class="btn btn-primary" href="#" onclick="return activarProceso(<?=$pe->id?>);"><i class="icon-white icon-share"></i> Activar</a>
                 </td>

@@ -7,7 +7,7 @@ class ProcesoTable extends Doctrine_Table {
 
         $query=Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c, p.Tareas t')
-                ->where('p.activo=1 AND t.inicial = 1')
+                ->where('p.activo=1 AND p.publicado=1 AND t.inicial = 1')
                 //Si el usuario tiene permisos de acceso
                 //->andWhere('(t.acceso_modo="grupos_usuarios" AND u.id = ?) OR (t.acceso_modo = "registrados") OR (t.acceso_modo = "claveunica") OR (t.acceso_modo="publico")',$usuario->id)
                 //Si la tarea se encuentra activa
@@ -142,8 +142,6 @@ class ProcesoTable extends Doctrine_Table {
 
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)->fetchAll();
-
-        log_message('info','Result: '.$this->varDump($result), FALSE);
 
         return $result;
     }

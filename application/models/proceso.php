@@ -10,6 +10,9 @@ class Proceso extends Doctrine_Record {
         $this->hasColumn('cuenta_id');
         $this->hasColumn('proc_cont');
         $this->hasColumn('activo');
+        $this->hasColumn('version');
+        $this->hasColumn('root');
+        $this->hasColumn('publicado');
     }
 
     function setUp() {
@@ -454,7 +457,7 @@ class Proceso extends Doctrine_Record {
     }
 
     // Elimina los procesos de manera logica
-    public function delete($proceso_id) {
+    public function delete_logico($proceso_id) {
 
         log_message('info', 'delete test ($proceso_id [' . $proceso_id . '])');
 
@@ -462,6 +465,30 @@ class Proceso extends Doctrine_Record {
             ->update('Proceso')->set('activo', 0)
             ->where('id = ?', $proceso_id)
             ->execute();
+    }
+
+    public function findIdProcesoActivo($root){
+        $sql = "select p.id from proceso p where p.root = $root and p.publicado=1;";
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+            ->fetchAll();
+        return $result;
+    }
+
+    public function findDraftProceso($root){
+        log_message("INFO", "en findDraftProceso", FALSE);
+        log_message("INFO", "root: *".$root."*", FALSE);
+        if(!isset($root) || strlen($root) == 0){
+            $sql = "select p.id from proceso p where p.root = 0 and p.publicado=0;";
+        }else{
+            $sql = "select p.id from proceso p where p.root = $root and p.publicado=0;";
+        }
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+            ->fetchAll();
+        return $result;
     }
 
 }

@@ -77,7 +77,12 @@ class Procesos extends MY_BackendController {
 
 	        $registro_auditoria->detalles = json_encode($proceso_array);
 	        $registro_auditoria->save();
-        	$proceso->delete($proceso_id);
+
+            if($proceso->publicado != 1){
+                $proceso->delete();
+            }else{
+                $proceso->delete_logico($proceso_id);
+            }
 
         	$respuesta->validacion = TRUE;
         	$respuesta->redirect = site_url('backend/procesos/index/');
@@ -94,6 +99,12 @@ class Procesos extends MY_BackendController {
         log_message('info', 'editar ($proceso_id [' . $proceso_id . '])');
 
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
+
+        //Verificar si es draft o un proceso publicado
+        if($proceso->publicado == 1){ //no es draft
+            //Se crea Draft
+            $proceso = $this->crearDraft($proceso);
+        }
 
         log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
 
@@ -493,6 +504,47 @@ class Procesos extends MY_BackendController {
 
         redirect($_SERVER['HTTP_REFERER']);
 
+
+    }
+
+    public function publicar($proceso_id){
+
+        $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
+
+            $proceso->save();
+
+    }
+
+    private function crearDraft($proceso){
+
+        $proceso_id = $proceso->id;
+
+        log_message("INFO", "Buscando si proceso ya tiene draft creado", FALSE);
+
+        if(!isset($root) || strlen($root) == 0) {
+            $draft = $proceso->findDraftProceso($proceso_id);
+        }else{
+            $draft = $proceso->findDraftProceso($proceso->root);
+        }
+
+        if(!isset($draft) || count($draft) == 0){
+            $proceso=Proceso::importComplete($proceso->exportComplete());
+
+            $proceso->version = $proceso->version+1;
+            $proceso->publicado = 0;
+
+            if(!isset($proceso->root) || strlen($proceso->root) == 0){
+                $proceso->root = $proceso_id;
+            }
+
+            $proceso->save();
+
+        }else{
+            log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft[0]["id"], FALSE);
+            $proceso=Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+        }
+
+        return $proceso;
 
     }
 
