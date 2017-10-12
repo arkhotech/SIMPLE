@@ -2,14 +2,14 @@
 class Migration_45 extends Doctrine_Migration_Base {
 
     public function up() {
-        $this->addColumn('proceso', 'version', 'int', 10, array('notnull'=>1,'default'=>1));
-        $this->addColumn('proceso', 'root', 'int', 10, array('notnull'=>1,'default'=>1));
+        $this->addColumn('proceso', 'version', 'integer', null, array('notnull'=>1,'default'=>1));
+        $this->addColumn('proceso', 'root', 'integer', null, array());
         $this->addColumn('proceso', 'publicado', 'boolean', null, array('notnull'=>1,'default'=>1));
     }
 
     public function postUp() {
         $q = Doctrine_Manager::getInstance()->getCurrentConnection();
-        $q->execute("UPDATE proceso p SET p.version=1, p.root=p.id, p.publicado=1");
+        $q->execute("UPDATE proceso p SET p.version=1, p.publicado=1");
     }
 
     public function down() {
