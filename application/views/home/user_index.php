@@ -23,6 +23,12 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="<?= base_url() ?>assets/home/js/gobstrap.min.js"></script>
+    <script src="<?= base_url() ?>assets/home/js/jquery.sticky.js"></script>
+    <script src="<?= base_url() ?>assets/newhome/js/home.js" type="text/javascript" ></script>
 
     <script type="text/javascript">
       var site_key = "<?= sitekey() ?>";
@@ -85,7 +91,8 @@
                                 <span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>">
                                 <img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a>
                               </p>
-                              <a class="button button--red" onclick="document.getElementById('login').submit();">Ingresar</a>
+                              <a class="button button--red submit" href="#">Ingresar</a>
+                              <div class='ajaxLoader'>Cargando</div>
                             </form>
                           </div>
                         </div>
@@ -266,11 +273,6 @@
       </div>
     </footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/gobstrap.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/jquery.sticky.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/main.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/home.js"></script>
     <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit&hl=es"></script>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. 

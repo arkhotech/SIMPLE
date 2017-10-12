@@ -69,14 +69,22 @@ legend {
   float: left;
 }
 
-.ajaxForm .ajaxLoader {
-  width: 80px;
-  height: 24px;
-  background: #000000 url("../images/ajax-loader.gif") 25px 16px no-repeat;
-  color: #fff;
+.ajaxLoader {
+  width: 96px;
+  height: 96px;
+  padding-top: 104px;
+  background-size: cover;
+  background-image: url("../images/ajax-loader.gif");
+  background-repeat: no-repeat;
+  color: rgb(75, 75, 75);
   position: absolute;
   text-align: center;
-  padding-top: 56px;
+  z-index: 99999999;
+  top: 35%;
+  left: 49%;
+  -webkit-transform: translate(-40%, -49%);
+  transform: translate(-40%, -49%);
+  display: none;
 }
 
 .imgNoIcon {
