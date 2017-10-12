@@ -23,7 +23,6 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="<?= base_url() ?>assets/home/js/gobstrap.min.js"></script>
@@ -124,7 +123,7 @@
           <div class="col-xs-12 col-md-3">
             <aside class="aside is_stuck" id="sidebar" style="position: fixed; top: 53px; width: 264px;">
               <ul id="sideMenu" class="nav nav-list">  
-                <li class=" <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a href="<?= site_url('home/index') ?>" class="button button--block button--gray-dark" style="color: #fff; text-align: left;">Inicio</a></li>
+                <li class=" <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a href="<?= site_url('home/index') ?>" class="link link--medium goTo">Inicio</a></li>
                 <?php if (UsuarioSesion::usuario()->registrado): ?>
                     <?php
                       $npendientes=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
@@ -170,10 +169,10 @@
                         <h4><?= $p->nombre ?></h4>
                         <div class="enlace_cat_proc">
                           <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-file icon-white"></i> Iniciar</a>
+                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
                           <?php else: ?>
                             <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                            <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i> Clave &Uacute;nica</a>
+                            <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
                             <?php else:?>
                             <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
                             <?php endif ?>
@@ -235,14 +234,14 @@
                             </div>
                           <?php endif ?>
                         <h4><?= $p->nombre ?></h4>
-                        <div class="btn_derecha">
+                        <div class="enlace_cat_proc">
                           <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                          <a href="<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary preventDoubleRequest"><i class="icon-file icon-white"></i> Iniciar</a>
+                          <a href="<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary preventDoubleRequest">Iniciar</a>
                           <?php else: ?>
                               <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                              <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><img style="max-width: none;" src="<?=base_url('assets/img/claveunica-medium.png')?>" alt="ClaveUnica" /></a>
+                              <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
                               <?php else:?>
-                              <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary"><i class="icon-white icon-off"></i> Autenticarse</a>
+                              <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
                               <?php endif ?>
                           <?php endif ?>
                         </div>

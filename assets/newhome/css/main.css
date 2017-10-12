@@ -257,7 +257,7 @@ header.navbar {
 .enlace_cat_proc {
   position: absolute;
   left: 30px;
-  bottom: 60px;
+  bottom: 30px;
 }
 
 #simple-categorias {
@@ -573,8 +573,27 @@ a.close {
   background-image: url(../images/icons/claveunica.png);
   width: 16px;
   height: 16px;
+  margin-left: 5px;
 }
 
+.active .link {
+  background-color: #A8B7C7;
+  color: #fff;
+  text-align: left;
+}
+
+#sideMenu .active .link:after {
+  background: url(../images/icons/arrow-right-white.svg);
+  content: "";
+  display: block;
+  margin-top: -3px;
+  margin-right: 16px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  height: 7px;
+  width: 13px;
+}
 
 /* Tables */
 

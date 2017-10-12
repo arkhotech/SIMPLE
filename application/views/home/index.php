@@ -84,7 +84,7 @@
                               <input name="password" id="password" type="password" class="input-xlarge">
                               <div id="login_captcha"></div>
                               <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
-                              <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a></p>
+                              <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="clave&uacute;nica" width="96" height="32"/></a></p>
                               <a class="button button--red submit" href="#">Ingresar</a>
                               <div class='ajaxLoader'>Cargando</div>
                             </form>
@@ -145,10 +145,10 @@
                               <h4><?= $p->nombre ?></h4>
                               <div class="enlace_cat_proc">
                                 <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                                  <a href="<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-file icon-white"></i> Iniciar</a>
+                                  <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
                                 <?php else: ?>
                                   <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                                  <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i> Clave &Uacute;nica</a>
+                                  <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
                                   <?php else:?>
                                   <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
                                   <?php endif ?>
@@ -216,7 +216,7 @@
                             <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
                             <?php else: ?>
                                 <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
-                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Clave &Uacute;nica</a>
+                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
                                 <?php else: ?>
                                 <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
                                 <?php endif ?>
