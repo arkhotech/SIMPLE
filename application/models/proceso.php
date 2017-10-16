@@ -12,7 +12,7 @@ class Proceso extends Doctrine_Record {
         $this->hasColumn('activo');
         $this->hasColumn('version');
         $this->hasColumn('root');
-        $this->hasColumn('publicado');
+        $this->hasColumn('estado');
     }
 
     function setUp() {
@@ -468,7 +468,7 @@ class Proceso extends Doctrine_Record {
     }
 
     public function findIdProcesoActivo($root){
-        $sql = "select p.id from proceso p where p.root = $root and p.publicado=1;";
+        $sql = "select p.id from proceso p where (p.root = $root or p.id = $root) and p.estado='public';";
 
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
@@ -480,9 +480,9 @@ class Proceso extends Doctrine_Record {
         log_message("INFO", "en findDraftProceso", FALSE);
         log_message("INFO", "root: *".$root."*", FALSE);
         if(!isset($root) || strlen($root) == 0){
-            $sql = "select p.id from proceso p where p.root = 0 and p.publicado=0;";
+            $sql = "select p.id from proceso p where p.root = 0 and p.estado='draft';";
         }else{
-            $sql = "select p.id from proceso p where p.root = $root and p.publicado=0;";
+            $sql = "select p.id from proceso p where p.root = $root and p.estado='draft';";
         }
 
         $stmn = Doctrine_Manager::getInstance()->connection();

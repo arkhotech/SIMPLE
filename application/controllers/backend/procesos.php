@@ -20,13 +20,13 @@ class Procesos extends MY_BackendController {
     public function index() {
         $data['procesos'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('p.activo=1 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=1 AND p.estado!="arch" AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
                 ->orderBy('p.nombre asc')
                 ->execute();
 
         $data['procesos_eliminados'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('p.activo=0 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=0 AND p.estado!="arch" AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
                 ->orderBy('p.nombre asc')
                 ->execute();
 
@@ -78,7 +78,7 @@ class Procesos extends MY_BackendController {
 	        $registro_auditoria->detalles = json_encode($proceso_array);
 	        $registro_auditoria->save();
 
-            if($proceso->publicado != 1){
+            if($proceso->estado != 'public'){
                 $proceso->delete();
             }else{
                 $proceso->delete_logico($proceso_id);
@@ -101,7 +101,7 @@ class Procesos extends MY_BackendController {
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
         //Verificar si es draft o un proceso publicado
-        if($proceso->publicado == 1){ //no es draft
+        if($proceso->estado == 'public'){ //no es draft
             //Se crea Draft
             $proceso = $this->crearDraft($proceso);
         }
@@ -507,11 +507,28 @@ class Procesos extends MY_BackendController {
 
     }
 
-    public function publicar($proceso_id){
+    public function publicar($proceso_draft_id){
 
-        $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
+        log_message("INFO", "ID Draft: ".$proceso_draft_id, FALSE);
 
-            $proceso->save();
+        $proceso_draft = Doctrine::getTable('Proceso')->find($proceso_draft_id);
+
+        log_message("INFO", "Root Draft: ".$proceso_draft->root, FALSE);
+
+        $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root);
+
+        log_message("INFO", "Recuperado activo: ".$this->varDump($activo), FALSE);
+
+        $proceso = Doctrine::getTable('Proceso')->find($activo[0]['id']);
+        $proceso->estado = 'arch';
+        $proceso->save();
+
+        $proceso_draft->estado = 'public';
+        $proceso_draft->save();
+
+        log_message("INFO", "Proceso actualizado", FALSE);
+
+        redirect('backend/procesos/index');
 
     }
 
@@ -531,7 +548,7 @@ class Procesos extends MY_BackendController {
             $proceso=Proceso::importComplete($proceso->exportComplete());
 
             $proceso->version = $proceso->version+1;
-            $proceso->publicado = 0;
+            $proceso->estado = 'draft';
 
             if(!isset($proceso->root) || strlen($proceso->root) == 0){
                 $proceso->root = $proceso_id;
