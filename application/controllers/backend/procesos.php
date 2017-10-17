@@ -24,6 +24,23 @@ class Procesos extends MY_BackendController {
                 ->orderBy('p.nombre asc')
                 ->execute();
 
+        for ($i = 0; count($data['procesos']) > $i; $i++){
+            $proceso = $data['procesos'][$i];
+            log_message("INFO", "Proceso id: ".$proceso->id, FALSE);
+            if($proceso->estado == 'public'){
+                if(!isset($proceso->root) || strlen($proceso->root) == 0) {
+                    $draft = $proceso->findDraftProceso($proceso->id);
+                }else{
+                    $draft = $proceso->findDraftProceso($proceso->root);
+                }
+                log_message("INFO", "Draft id: ".$this->varDump($draft), FALSE);
+                if(isset($draft) && count($draft) > 0){
+                    log_message("INFO", "Eliminando Proceso id: ".$data['procesos'][$i]->id, FALSE);
+                    unset($data['procesos'][$i]);
+                }
+            }
+        }
+
         $data['procesos_eliminados'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
                 ->where('p.activo=0 AND p.estado!="arch" AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
@@ -538,13 +555,13 @@ class Procesos extends MY_BackendController {
 
         log_message("INFO", "Buscando si proceso ya tiene draft creado", FALSE);
 
-        if(!isset($root) || strlen($root) == 0) {
+        if(!isset($proceso->root) || strlen($proceso->root) == 0) {
             $draft = $proceso->findDraftProceso($proceso_id);
         }else{
             $draft = $proceso->findDraftProceso($proceso->root);
         }
 
-        if(!isset($draft) || count($draft) == 0){
+        if(!isset($draft) || count($draft) == 0){ //No existe draft
             $proceso=Proceso::importComplete($proceso->exportComplete());
 
             $proceso->version = $proceso->version+1;
