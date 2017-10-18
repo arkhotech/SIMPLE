@@ -45,7 +45,7 @@
                                                         <input name="password" id="password" type="password" class="input-xlarge">
                                                         <div id="login_captcha"></div>
                                                         <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
-                                                        <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a></p>
+                                                        <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect=' . $redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a></p>
                                                         <a class="button button--red submit" href="#">Ingresar</a>
                                                     </form>
                                                 </div>

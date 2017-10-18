@@ -10,6 +10,12 @@
 <script src="<?= base_url() ?>assets/js/collapse.js"></script>
 <script src="<?= base_url() ?>assets/js/transition.js"></script>
 
+<ul class="steps">
+    <?php for ($i = 0; $i < $num_pasos; $i++): ?>
+    <li style="width: 25%;" class="<?=($i <= $secuencia) ? 'active' :'' ?>">Paso <?=$i+1?></li>
+	<?php endfor; ?>
+</ul>
+
 <?php if ($etapa->Tarea->vencimiento): ?>
 <div class="alert alert-warning">Atención. Esta etapa <?=$etapa->getFechaVencimientoAsString()?>.</div>
 <?php endif ?>
@@ -50,7 +56,7 @@
                 }
                 var m = '';
                 if (d.getMinutes() <= 9) {
-                    m = '0'+d.getMinutes();
+                    m = '0' + d.getMinutes();
                 } else {
                     m = d.getMinutes();
                 }

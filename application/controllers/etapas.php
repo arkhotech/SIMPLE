@@ -110,7 +110,7 @@ class Etapas extends MY_Controller {
         $config['num_tag_open'] = '<li>';
         $config['num_tag_close'] = '</li>';
         $this->pagination->initialize($config);
-        //$data['etapas'] = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio());
+        // $data['etapas'] = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio());
         $data['links'] = $this->pagination->create_links();
         $data['etapas'] =$rowetapas;
         $data['query'] = $buscar;
@@ -121,11 +121,16 @@ class Etapas extends MY_Controller {
     }
 
     public function ejecutar($etapa_id, $secuencia = 0) {
+
         $iframe = $this->input->get('iframe');
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
+        
+        $data['num_pasos'] = self::num_pasos($etapa->Tarea->id);
+
         if (!$etapa) {
             show_404();
         }
+
         if ($etapa->usuario_id != UsuarioSesion::usuario()->id) {
             if (!UsuarioSesion::usuario()->registrado) {
                 $this->session->set_flashdata('redirect', current_url());
@@ -134,14 +139,17 @@ class Etapas extends MY_Controller {
             echo 'Usuario no tiene permisos para ejecutar esta etapa.';
             exit;
         }
+
         if (!$etapa->pendiente) {
             echo 'Esta etapa ya fue completada';
             exit;
         }
+
         if (!$etapa->Tarea->activa()) {
             echo 'Esta etapa no se encuentra activa';
             exit;
         }
+
         if ($etapa->vencida()) {
             echo 'Esta etapa se encuentra vencida';
             exit;
@@ -149,6 +157,8 @@ class Etapas extends MY_Controller {
 
         $qs = $this->input->server('QUERY_STRING');
         $paso = $etapa->getPasoEjecutable($secuencia);
+        log_message('debug', 'paso [' . $paso . ']');
+
         if (!$paso) {
             redirect('etapas/ejecutar_fin/' . $etapa->id . ($qs ? '?' . $qs : ''));
         } else if (($etapa->Tarea->final || !$etapa->Tarea->paso_confirmacion) && $paso->getReadonly() && end($etapa->getPasosEjecutables()) == $paso) { // No se requiere mas input
@@ -173,6 +183,18 @@ class Etapas extends MY_Controller {
         }
     }
 
+    function num_pasos($tarea_id) {
+        log_message('debug', '$etapa->Tarea->id [' . $tarea_id . ']');
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $sql_pasos = "SELECT COUNT(*) AS total FROM paso WHERE tarea_id=" . $tarea_id;
+        $result = $stmn->prepare($sql_pasos);
+        $result->execute();
+        $num_pasos = $result->fetchAll();
+        log_message('debug', '$num_pasos [' . $num_pasos[0][0] . ']');
+        return $num_pasos[0][0];
+    }
+
     function validate_captcha() {
         $CI = & get_instance();
         $captcha = $this->input->post('g-recaptcha-response');
@@ -194,14 +216,17 @@ class Etapas extends MY_Controller {
             echo 'Usuario no tiene permisos para ejecutar esta etapa.';
             exit;
         }
+
         if (!$etapa->pendiente) {
             echo 'Esta etapa ya fue completada';
             exit;
         }
+
         if (!$etapa->Tarea->activa()) {
             echo 'Esta etapa no se encuentra activa';
             exit;
         }
+
         if ($etapa->vencida()) {
             echo 'Esta etapa se encuentra vencida';
             exit;
@@ -360,29 +385,29 @@ class Etapas extends MY_Controller {
         }
 
         $respuesta = new stdClass();
-        //$etapa->avanzar($this->input->post('usuarios_a_asignar'));
+        // $etapa->avanzar($this->input->post('usuarios_a_asignar'));
         $respuesta->validacion = TRUE;
-        try{
-            $agenda = new agenda();  
-            $appointments=$agenda->obtener_citas_de_tramite($etapa_id);
+        try {
+            $agenda = new agenda();
+            $appointments = $agenda->obtener_citas_de_tramite($etapa_id);
             if (isset($appointments) && is_array($appointments) && (count($appointments)>=1) ) {
-                $json='{"ids":[';
-                $i=0;
-                foreach($appointments as $item) {
-                    if ($i==0) {
-                        $json=$json.'"'.$item.'"';
-                    }else{
-                        $json=$json.',"'.$item.'"';
+                $json = '{"ids":[';
+                $i = 0;
+                foreach ($appointments as $item) {
+                    if ($i == 0) {
+                        $json = $json . '"' . $item . '"';
+                    } else {
+                        $json = $json . ',"' . $item . '"';
                     }
                     $i++;
                 }
-                $json=$json.']}';
+                $json = $json.']}';
                 $agenda->confirmar_citas_grupo($json);
                 $etapa->avanzar($this->input->post('usuarios_a_asignar'));
-            }else{
-                $etapa->avanzar($this->input->post('usuarios_a_asignar'));    
+            } else {
+                $etapa->avanzar($this->input->post('usuarios_a_asignar'));
             }
-        }catch(Exception $err) {
+        } catch (Exception $err) {
             $respuesta->validacion = false;
             $respuesta->errores = '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>'.$err->getMessage().'</div>';
             log_message('error',$err->getMessage());
@@ -390,8 +415,7 @@ class Etapas extends MY_Controller {
         
         if ($this->input->get('iframe')) {
             $respuesta->redirect = site_url('etapas/ejecutar_exito');
-        }
-        else {
+        } else {
             $respuesta->redirect = site_url();
         }
         echo json_encode($respuesta);

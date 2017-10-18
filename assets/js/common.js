@@ -42,7 +42,6 @@ $(document).ready(function() {
         $parentDiv.find(".qq-upload-list").empty();
         prepareDynaForm(".dynaForm");
     });
-    
 
     $(".ajaxForm :submit").attr("disabled", false);
     $(document).on("submit", ".ajaxForm", function() {
@@ -175,11 +174,9 @@ $(document).ready(function() {
         	
         });
         
-        
         $(form).find(":input.enabled-temp").each(function(i,el) {
             $(el).prop("disabled", false);
-            $(el).removeClass("disabled-temp");
-        	
+            $(el).removeClass("disabled-temp");        	
         });
 
         $(form).find(".file-uploader ~ input[type=text]").prop("type","hidden");
@@ -190,10 +187,8 @@ $(document).ready(function() {
     $(".dynaForm").on("change",":input",function(event) {
         prepareDynaForm($(event.target).closest(".dynaForm"))
     });
-    
-    
-    
 });
+
 function buscarAgenda() {
     if (jQuery.trim($('.js-pertenece').val())!="") {
         var base_url=$('#base_url').val();
@@ -207,6 +202,7 @@ function buscarAgenda() {
         $('.validacion').html('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>Debe ingresar un nombre de agenda o pertence. si quiere listar todas digite \'%\'</div>');              
     }
 }
+
 function calendarioFront(idagenda,idobject,idcita,tramite,etapa) {
     var site_url=$('#urlbase').val();
     if (idcita==0) {

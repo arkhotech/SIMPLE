@@ -513,7 +513,7 @@ class Agenda extends MY_Controller {
             $data['title'] = 'Mi Agenda';
             $data['sidebar']='miagenda';
             $data['content'] = 'agenda/miagenda';
-            $this->load->view('template', $data);
+            $this->load->view('template_newhome', $data);
         }
     }  
 

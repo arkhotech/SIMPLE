@@ -24,16 +24,13 @@ $(document).ready(function() {
               f (form);
             }
           } else {
-            console.log("error validation");
             if ($('#login_captcha').length > 0) {
               if ($('#login_captcha').is(':empty')) {
                   grecaptcha.render('login_captcha', {
-                      'sitekey' : site_key
+                    'sitekey' : site_key
                   });
-                  console.log("grecaptcha");
               } else {
                   grecaptcha.reset();
-                  console.log("reset grecaptcha");
               }
             }
 
@@ -49,7 +46,7 @@ $(document).ready(function() {
         },
         error: function() {
           form.submitting = false;
-          $(ajaxLoader).remove();                
+          $(ajaxLoader).remove();
           $(form).find(":submit").attr("disabled", false);
         }
       });

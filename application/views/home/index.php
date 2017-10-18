@@ -41,7 +41,7 @@
 
         if ($('#form_captcha').length) {
           grecaptcha.render("form_captcha", {
-            sitekey : site_key
+            'sitekey' : site_key
           });
         }
       };
@@ -100,7 +100,9 @@
                       <?php if (!UsuarioSesion::usuario()->open_id): ?> 
                         <li><a href="<?= site_url('cuentas/editar') ?>"><i class="icon-user"></i>Mi cuenta</a></li>
                       <?php endif; ?>
-                      <?php if (!UsuarioSesion::usuario()->open_id): ?><li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i>Cambiar contrase&ntilde;a</a></li><?php endif; ?>
+                      <?php if (!UsuarioSesion::usuario()->open_id): ?>
+                        <li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i>Cambiar contrase&ntilde;a</a></li>
+                      <?php endif; ?>
                       <li><a href="<?= site_url('autenticacion/logout') ?>"><i class="icon-log-out"></i>Cerrar sesi&oacute;n</a></li>
                     </ul>
                   </li>
@@ -118,119 +120,132 @@
           <div class="col-sm-12">
             <?php if ($num_destacados > 0 || $sidebar == 'categorias'): ?>
               <section id="simple-destacados">
-                  <div class="section-header">
-                    <?php if($sidebar == 'disponibles'):?>
-                      <h2>Tr&aacute;mites destacados</h2>
-                    <?php else: ?>
-                      <h2>Tr&aacute;mites - <?= $categoria->nombre ?></h2>
-                      <a href="<?=site_url('home/index/')?>" class="btn btn-primary preventDoubleRequest" style="float: right;">
-                        <i class="icon-file icon-white"></i> Volver
-                        </a>
-                    <?php endif ?>
-                  </div>
-                  <div class="row">
-                      <?php foreach ($procesos as $p): ?>
-                        <?php if($p->destacado == 1 || $sidebar == 'categorias'):?>
-                          <div class="col-md-4 item">
-                            <div class="tarjeta">
-                              <?php if($p->icon_ref):?>
-                                <div class="text-left">
-                                  <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
-                                </div>
-                              <?php else:?>
-                                <div class="text-left">
-                                  <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
-                                </div>
-                              <?php endif ?>
-                              <h4><?= $p->nombre ?></h4>
-                              <div class="enlace_cat_proc">
-                                <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                                  <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
-                                <?php else: ?>
-                                  <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                                  <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
-                                  <?php else:?>
-                                  <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
-                                  <?php endif ?>
-                                <?php endif ?>
-                              </div>
+                <div class="section-header">
+                  <?php if ($sidebar == 'disponibles'): ?>
+                    <h2>Tr&aacute;mites destacados</h2>
+                  <?php else: ?>
+                    <h2>Tr&aacute;mites - <?= $categoria->nombre ?></h2>
+                    <a href="<?=site_url('home/index/')?>" class="btn btn-primary preventDoubleRequest" style="float: right;">
+                      <i class="icon-file icon-white"></i> Volver
+                    </a>
+                  <?php endif ?>
+                </div>
+                <div class="row">
+                  <?php foreach ($procesos as $p): ?>
+                    <?php if ($p->destacado == 1 || $sidebar == 'categorias'): ?>
+                      <div class="col-md-4 item">
+                        <div class="tarjeta">
+                          <?php if ($p->icon_ref): ?>
+                            <div class="text-left">
+                              <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
                             </div>
+                          <?php else: ?>
+                            <div class="text-left">
+                              <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
+                            </div>
+                          <?php endif ?>
+                          <h4><?= $p->nombre ?></h4>
+                          <div class="enlace_cat_proc">
+                            <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                              <a href="<?=site_url('tramites/iniciar/' . $p->id)?>">Iniciar</a>
+                            <?php else: ?>
+                              <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
+                              <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">
+                                <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
+                              </a>
+                              <?php else: ?>
+                              <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">Autenticarse</a>
+                              <?php endif ?>
+                            <?php endif ?>
                           </div>
-                        <?php $count++ ?>
-                        <?php endif ?>
-                      <?php endforeach; ?>
-                  </div>
+                        </div>
+                      </div>
+                      <?php $count++ ?>
+                    <?php endif ?>
+                  <?php endforeach; ?>
+                </div>
               </section>
             <?php endif ?>
 
             <?php if (count($categorias) > 0): ?>
               <section id="simple-categorias">
-                  <div class="section-header">
-                    <h2>Categor&iacute;as</h2>
-                  </div>
-                  <div class="row">
-                    <?php foreach ($categorias as $c): ?>
-                      <div class="col-md-3 item">
-                        <a href="<?=site_url('home/procesos/'.$c->id)?>">
-                          <div class="tarjeta">
-                            <div class="text-left">
-                              <?php if($c->icon_ref):?>
-                                <img src="<?= base_url('uploads/logos/' . $c->icon_ref) ?>" class="img-service">
-                              <?php else:?>
-                                <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
-                              <?php endif ?>
-                            </div>
-                            <span class="title"><?= $c->nombre ?></span>
-                            <p><?= $c->descripcion ?></p>
+                <div class="section-header">
+                  <h2>Categor&iacute;as</h2>
+                </div>
+                <div class="row">
+                  <?php foreach ($categorias as $c): ?>
+                    <div class="col-md-3 item">
+                      <a href="<?=site_url('home/procesos/' . $c->id)?>">
+                        <div class="tarjeta">
+                          <div class="text-left">
+                            <?php if ($c->icon_ref): ?>
+                              <img src="<?= base_url('uploads/logos/' . $c->icon_ref) ?>" class="img-service">
+                            <?php else: ?>
+                              <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
+                            <?php endif ?>
                           </div>
-                        </a>
-                      </div>
-                    <?php endforeach; ?>
-                  </div>
+                          <span class="title"><?= $c->nombre ?></span>
+                          <p><?= $c->descripcion ?></p>
+                        </div>
+                      </a>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
               </section>
             <?php endif; ?>
 
             <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
-            <section id="simple-destacados">
+              <section id="simple-destacados">
                 <div class="section-header">
                   <h2>Otros tr&aacute;mites</h2>
                   <div class="line"></div>
                 </div>
                 <div class="row">
                   <?php foreach ($procesos as $p): ?>
-                    <?php if($p->destacado == 0 || $p->categoria_id == 0):?>
+                    <?php if ($p->destacado == 0 || $p->categoria_id == 0): ?>
                       <div class="col-md-4 item">
-                        <div class="tarjeta">
-                            <?php if($p->icon_ref):?>
+                        <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                          <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">
+                        <?php else: ?>
+                          <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
+                            <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">
+                          <?php else: ?>
+                            <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">
+                          <?php endif ?>
+                        <?php endif ?>
+                          <div class="tarjeta">
+                            <?php if ($p->icon_ref): ?>
                               <div class="text-left">
                                 <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
                               </div>
-                            <?php else:?>
+                            <?php else: ?>
                               <div class="text-left">
                                 <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
                               </div>
                             <?php endif ?>
-                          <h4><?= $p->nombre ?></h4>
-                          <div class="enlace_cat_proc">
-                            <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
-                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
-                            <?php else: ?>
+                            <h4><?= $p->nombre ?></h4>
+                            <div class="enlace_cat_proc">
+                              <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                                Iniciar
+                              <?php else: ?>
                                 <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
-                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
+                                  <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
                                 <?php else: ?>
-                                <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
+                                Autenticarse
                                 <?php endif ?>
-                            <?php endif ?>
+                              <?php endif ?>
+                            </div>
                           </div>
-                        </div>
+                        </a>
                       </div>
                     <?php endif ?>
                   <?php endforeach; ?>
                 </div>
-            </section>
+              </section>
             <?php endif; ?>
           </div>
         </div>
+      </div>
     </main>
 
     <footer class="site-footer">

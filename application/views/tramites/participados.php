@@ -1,27 +1,26 @@
 <script>
     $(document).ready(function() {
-    $('#select_all').click(function(event) {
-        var checked = [];
-        $('#tramites').val();
-        if (this.checked) {
-            $('.checkbox1').each(function() {
-                this.checked = true;
-            });
-        } else {
-            $('.checkbox1').each(function() {
-                this.checked = false;
-            });
-        }
-        $('#tramites').val(checked);
-    });
+        $('#select_all').click(function(event) {
+            var checked = [];
+            $('#tramites').val();
+            if (this.checked) {
+                $('.checkbox1').each(function() {
+                    this.checked = true;
+                });
+            } else {
+                $('.checkbox1').each(function() {
+                    this.checked = false;
+                });
+            }
+            $('#tramites').val(checked);
+        });
     });
 
     function descargarDocumentos(tramiteId) {
-        $("#modal").load(site_url + "etapas/descargar/" +tramiteId);
+        $("#modal").load(site_url + "etapas/descargar/" + tramiteId);
         $("#modal").modal();
         return false;
     }
-
 
     function descargarSeleccionados() {
         var numberOfChecked = $('.checkbox1:checked').length;
@@ -128,12 +127,10 @@
                     <td class="actions">
                         <?php $etapas = $t->getEtapasParticipadas(UsuarioSesion::usuario()->id) ?>
                         <?php if (count($etapas) == 3e4354) : ?>
-                            <a href="<?= site_url('etapas/ver/' . $etapas[0]->id) ?>" class="btn btn-primary">Ver historial</a>
+                            <a href="<?= site_url('etapas/ver/' . $etapas[0]->id) ?>" class="historial">&nbsp;</a>
                         <?php else: ?>
                             <div class="btn-group">
-                                <a class="button button--block" data-toggle="dropdown" href="#">
-                                    Ver historial
-                                </a>
+                                <a class="historial" data-toggle="dropdown" href="#">&nbsp;</a>
                                 <ul class="dropdown-menu">
                                     <?php foreach ($etapas as $e): ?>
                                         <li><a href="<?= site_url('etapas/ver/' . $e->id) ?>"><?= $e->Tarea->nombre ?></a></li>
@@ -141,9 +138,9 @@
                                 </ul>
                             </div>
                         <?php endif ?>
-                        <?php if(Cuenta::cuentaSegunDominio()->descarga_masiva): ?>
-                          <?php if($file): ?>
-                          <a href="#" onclick="return descargarDocumentos(<?=$t->id?>);" class="button button--block button--lightgray">Descargar</a>
+                        <?php if (Cuenta::cuentaSegunDominio()->descarga_masiva): ?>
+                          <?php if ($file): ?>
+                          <a href="#" onclick="return descargarDocumentos(<?=$t->id?>);" class="descargar" alt="Descargar">&nbsp;</a>
                           <?php endif; ?>
                         <?php endif; ?>
                     </td>
@@ -153,13 +150,13 @@
     </table>
 
     <?php if (Cuenta::cuentaSegunDominio()->descarga_masiva): ?>
-        <?php if($registros): ?>
+        <?php if ($registros): ?>
             <div class="pull-right">
                 <div class="checkbox">
                     <input type="hidden" id="tramites" name="tramites" />
                     <label>
                         <input type="checkbox" id="select_all" name="select_all" /> Seleccionar todos
-                        <a href="#" onclick="return descargarSeleccionados();" class="btn btn-success preventDoubleRequest"><i class="icon-download icon-white"></i> Descargar seleccionados</a>
+                        <a href="#" onclick="return descargarSeleccionados();" class="button preventDoubleRequest"><i class="icon-download icon-white"></i> Descargar seleccionados</a>
                     </label>
                 </div>
             </div>

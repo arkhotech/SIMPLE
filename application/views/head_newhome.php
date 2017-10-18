@@ -7,12 +7,14 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/jquery.chosen/chosen.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap2-toggle.min.css" rel="stylesheet">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/style.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
+<link href="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -27,6 +29,7 @@
 <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/bootstrap-datepicker.js" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js" type="text/javascript" ></script>
+<script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
 <script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php //JS para hacer grillas     ?>
 <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js" type="text/javascript" ></script> <?php //Soporte para selects con multiple choices    ?>
 <script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js" type="text/javascript" ></script> <?php //Soporte para subir archivos con ajax    ?>

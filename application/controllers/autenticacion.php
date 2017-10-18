@@ -15,20 +15,20 @@ class Autenticacion extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->authConfig = array(
-               'client_info' => array(
-                   'client_id' => Cuenta::cuentaSegunDominio()->client_id,
-                   'redirect_uri' => site_url('autenticacion/callback'),
-                   'authorization_endpoint' => 'https://www.claveunica.gob.cl/openid/authorize',
-                   'token_endpoint' => 'https://www.claveunica.gob.cl/openid/token',
-                   'user_info_endpoint' => 'https://www.claveunica.gob.cl/openid/userinfo',
-                   'authentication_info' => array(
-                       'method' => 'client_secret_post',
-                       'params' => array(
-                           'client_secret' => Cuenta::cuentaSegunDominio()->client_secret
-                       )
-                   )
-               )
-           );
+            'client_info' => array(
+                'client_id' => Cuenta::cuentaSegunDominio()->client_id,
+                'redirect_uri' => site_url('autenticacion/callback'),
+                'authorization_endpoint' => 'https://www.claveunica.gob.cl/openid/authorize',
+                'token_endpoint' => 'https://www.claveunica.gob.cl/openid/token',
+                'user_info_endpoint' => 'https://www.claveunica.gob.cl/openid/userinfo',
+                'authentication_info' => array(
+                    'method' => 'client_secret_post',
+                    'params' => array(
+                        'client_secret' => Cuenta::cuentaSegunDominio()->client_secret
+                    )
+                )
+            )
+        );
     }
     
     public function login_openid() {
@@ -45,7 +45,7 @@ class Autenticacion extends MY_Controller {
         setcookie('redirectlogin', '', time()-3600);
         setcookie("redirectlogin", $redirectlogin, time()+3600);
         $flow = new Basic($this->authConfig);
-        if (! isset($_GET['code'])) {
+        if (!isset($_GET['code'])) {
             try {
                 $uri = $flow->getAuthorizationRequestUri('openid nombre');
                 redirect($uri);
@@ -68,8 +68,8 @@ class Autenticacion extends MY_Controller {
         $apellidoMaterno = $infoPersonal['name']['apellidos'][1];
 
         $CI = & get_instance();
-        $CI->session->set_flashdata('openidcallback',1);
-        $CI->session->set_flashdata('rut',$rut);
+        $CI->session->set_flashdata('openidcallback', 1);
+        $CI->session->set_flashdata('rut', $rut);
         $CI->session->set_flashdata('nombres', $nombres);
         $CI->session->set_flashdata('apellidoPaterno', $apellidoPaterno);
         $CI->session->set_flashdata('apellidoMaterno', $apellidoMaterno);
@@ -309,7 +309,7 @@ class Autenticacion extends MY_Controller {
         echo json_encode($respuesta);
     }
     
-    public function reestablecer(){
+    public function reestablecer() {
         $id=$this->input->get('id');
         $reset_token=$this->input->get('reset_token');
         
@@ -337,7 +337,7 @@ class Autenticacion extends MY_Controller {
         $this->load->view('autenticacion/reestablecer',$data);  
     }
     
-    public function reestablecer_form(){
+    public function reestablecer_form() {
         $id=$this->input->get('id');
         $reset_token=$this->input->get('reset_token');
         
