@@ -43,6 +43,8 @@ class Procesos extends MY_BackendController {
         $proceso->nombre='Proceso';
         $proceso->cuenta_id=UsuarioBackendSesion::usuario()->cuenta_id;
 
+        $proceso->estado = 'draft';
+
         $proceso->save();
 
         redirect('backend/procesos/editar/'.$proceso->id);
@@ -104,12 +106,12 @@ class Procesos extends MY_BackendController {
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
         //Verificar si es draft o un proceso publicado
-        if($proceso->estado != 'arch'){ //no es draft
+        if ($proceso->estado != 'arch') { //no es draft
             //Se crea Draft
             $proceso = $this->crearDraft($proceso);
-        }else{
+        } else {
             $root = $proceso_id;
-            if(isset($proceso->root) && strlen($proceso->root) > 0) {
+            if (isset($proceso->root) && strlen($proceso->root) > 0) {
                 $root = $proceso->root;
             }
             //$draft = $proceso->findDraftProceso($root);
@@ -535,11 +537,14 @@ class Procesos extends MY_BackendController {
 
         $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root);
 
-        log_message("INFO", "Recuperado activo: ".$activo->id, FALSE);
+        log_message("INFO", "Recuperado activo: *".$activo->id."*", FALSE);
 
-        //$proceso = Doctrine::getTable('Proceso')->find($activo[0]['id']);
-        $activo->estado = 'arch';
-        $activo->save();
+        if(strlen($activo->id) > 0) { //Existe proceso activo
+            $activo->estado = 'arch';
+            $activo->save();
+        }else{
+            $proceso_draft->root = $proceso_draft->id;
+        }
 
         $proceso_draft->estado = 'public';
         $proceso_draft->save();

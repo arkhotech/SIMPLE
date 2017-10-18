@@ -503,7 +503,7 @@ class Proceso extends Doctrine_Record {
 
         $draft = Doctrine_Query::create()
             ->from('Proceso p')
-            ->where('p.root = ? AND p.estado="draft"', $root)
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="draft"', array($root, $root))
             ->execute();
 
         return $draft[0];

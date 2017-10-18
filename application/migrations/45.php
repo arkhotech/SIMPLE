@@ -9,7 +9,7 @@ class Migration_45 extends Doctrine_Migration_Base {
 
     public function postUp() {
         $q = Doctrine_Manager::getInstance()->getCurrentConnection();
-        $q->execute("UPDATE proceso p SET p.version=1, p.publicado=1");
+        $q->execute("UPDATE proceso p SET p.version=1, p.publicado=1, p.root=p.id");
     }
 
     public function down() {

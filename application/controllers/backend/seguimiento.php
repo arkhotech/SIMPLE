@@ -22,6 +22,9 @@ class Seguimiento extends MY_BackendController {
 		$this->load->view ( 'backend/template', $data );
 	}
 	public function index_proceso($proceso_id) {
+
+        log_message("INFO", "Detalle de seguimiento para proceso id: ".$proceso_id, FALSE);
+
 		$proceso = Doctrine::getTable ( 'Proceso' )->find ( $proceso_id );
 
         $procesos_archivados = $proceso->findProcesosArchivados($proceso->root);
@@ -57,7 +60,7 @@ class Seguimiento extends MY_BackendController {
         log_message("INFO", "Creando query", FALSE);
 		$doctrine_query = Doctrine_Query::create ()->from ( 'Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d' )
             ->where ('p.activo=1')
-            ->andWhereIn('p.id', $id_archivados)->orWhereIn('p.root', $id_archivados)
+            ->andWhereIn('p.root', $id_archivados)
             ->having ( 'COUNT(d.id) > 0 OR COUNT(e.id) > 1' )-> // Mostramos solo los que se han avanzado o tienen datos
 groupBy ( 't.id' )->orderBy ( $order . ' ' . $direction )->limit ( $per_page )->offset ( $offset );
 		
