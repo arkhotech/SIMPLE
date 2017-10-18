@@ -12,7 +12,7 @@
 
 <ul class="steps">
     <?php for ($i = 0; $i < $num_pasos; $i++): ?>
-    <li style="width: 25%;" class="<?=($i <= $secuencia) ? 'active' :'' ?>">Paso <?=$i+1?></li>
+    <li style="width: <?=100/$num_pasos?>%;" class="<?=($i <= $secuencia) ? 'active' :'' ?>">Paso <?=$i+1?></li>
 	<?php endfor; ?>
 </ul>
 
