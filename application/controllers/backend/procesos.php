@@ -20,26 +20,12 @@ class Procesos extends MY_BackendController {
     public function index() {
         $data['procesos'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('p.activo=1 AND p.estado!="arch" AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=1 AND p.estado!="arch" AND c.id = ? 
+                AND ((SELECT COUNT(proc.id) FROM Proceso proc WHERE (proc.root = p.id OR proc.root = p.root) AND proc.estado = "draft") = 0 
+                OR p.estado = "draft")
+                ',UsuarioBackendSesion::usuario()->cuenta_id)
                 ->orderBy('p.nombre asc')
                 ->execute();
-
-        for ($i = 0; count($data['procesos']) > $i; $i++){
-            $proceso = $data['procesos'][$i];
-            log_message("INFO", "Proceso id: ".$proceso->id, FALSE);
-            if($proceso->estado == 'public'){
-                if(!isset($proceso->root) || strlen($proceso->root) == 0) {
-                    $draft = $proceso->findDraftProceso($proceso->id);
-                }else{
-                    $draft = $proceso->findDraftProceso($proceso->root);
-                }
-                log_message("INFO", "Draft id: ".$this->varDump($draft), FALSE);
-                if(isset($draft) && count($draft) > 0){
-                    log_message("INFO", "Eliminando Proceso id: ".$data['procesos'][$i]->id, FALSE);
-                    unset($data['procesos'][$i]);
-                }
-            }
-        }
 
         $data['procesos_eliminados'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
