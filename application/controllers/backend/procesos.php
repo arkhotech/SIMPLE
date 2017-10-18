@@ -118,9 +118,20 @@ class Procesos extends MY_BackendController {
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
         //Verificar si es draft o un proceso publicado
-        if($proceso->estado == 'public'){ //no es draft
+        if($proceso->estado != 'arch'){ //no es draft
             //Se crea Draft
             $proceso = $this->crearDraft($proceso);
+        }else{
+            $root = $proceso_id;
+            if(isset($proceso->root) && strlen($proceso->root) > 0) {
+                $root = $proceso->root;
+            }
+            $draft = $proceso->findDraftProceso($root);
+            $proceso_draft = Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+            $proceso_draft->estado = 'arch';
+            $proceso_draft->save();
+            $proceso->estado = 'draft';
+            $proceso->save();
         }
 
         log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
@@ -129,6 +140,9 @@ class Procesos extends MY_BackendController {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
+
+        $procesosArchivados = $proceso->findProcesosArchivados($proceso->root);
+        $data['procesos_arch'] = $procesosArchivados;
 
         $data['proceso'] = $proceso;
 
@@ -555,11 +569,11 @@ class Procesos extends MY_BackendController {
 
         log_message("INFO", "Buscando si proceso ya tiene draft creado", FALSE);
 
-        if(!isset($proceso->root) || strlen($proceso->root) == 0) {
-            $draft = $proceso->findDraftProceso($proceso_id);
-        }else{
-            $draft = $proceso->findDraftProceso($proceso->root);
+        $root = $proceso_id;
+        if(isset($proceso->root) && strlen($proceso->root) > 0) {
+            $root = $proceso->root;
         }
+        $draft = $proceso->findDraftProceso($root);
 
         if(!isset($draft) || count($draft) == 0){ //No existe draft
             $proceso=Proceso::importComplete($proceso->exportComplete());
@@ -635,6 +649,25 @@ class Procesos extends MY_BackendController {
         //print_r(json_encode($modelo));
         //exit;
         echo json_encode($modelo);
+    }
+
+    public function obtener_procesos_archivados($proceso_id) {
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p')
+            ->where('(p.root = ? or p.id = ?) AND p.estado="arch" AND c.id = ?',
+                $proceso_id, $proceso_id, UsuarioBackendSesion::usuario()->cuenta_id)
+            ->orderBy('p.version desc')
+            ->execute();
+
+        $data = array();
+        foreach ($procesos as $proceso){
+            $data[] = array(
+                "id" => $proceso->id,
+                "nombre" => $proceso->nombre,
+                "version" => $proceso->version
+            );
+        }
+        echo json_encode($data);
     }
 
     function varDump($data){

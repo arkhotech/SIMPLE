@@ -110,7 +110,10 @@ class Formularios extends MY_BackendController {
         
         $data['formulario']=$formulario;
         $data['proceso']=$formulario->Proceso;
-        
+
+        $procesosArchivados = $data['proceso']->findProcesosArchivados($data['proceso']->root);
+        $data['procesos_arch'] = $procesosArchivados;
+
         $data['title']=$formulario->nombre;
         $data['content']='backend/formularios/editar';
         

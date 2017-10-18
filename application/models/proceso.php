@@ -476,6 +476,28 @@ class Proceso extends Doctrine_Record {
         return $result;
     }
 
+    public function findProcesosArchivados($root){
+        log_message('Info', 'Buscando archivados para proceso root: '.$root);
+
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p')
+            ->where('(p.root = ? OR p.id = ?)', array($root, $root))
+            ->orderBy('p.version desc')
+            ->execute();
+
+        log_message('Info', 'Se ejecuta query procesos archivados');
+
+        $data = array();
+        foreach ($procesos as $proceso_rel){
+            $data[] = array(
+                "id" => $proceso_rel->id,
+                "nombre" => $proceso_rel->nombre.'-'.$proceso_rel->estado,
+                "version" => $proceso_rel->version
+            );
+        }
+        return $data;
+    }
+
     public function findDraftProceso($root){
         log_message("INFO", "en findDraftProceso", FALSE);
         log_message("INFO", "root: *".$root."*", FALSE);

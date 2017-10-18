@@ -119,6 +119,8 @@
 <script type="text/javascript" src="<?= base_url() ?>assets/js/modelador-procesos.js"></script>
 <?php endif ?>
 
+<script type="text/javascript" src="<?= base_url() ?>assets/js/editar.js"></script>
+
 <script type="text/javascript">
     $(document).ready(function(){
         procesoId=<?= $proceso->id ?>;
@@ -155,6 +157,14 @@
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
     <li><a href="<?= site_url('backend/suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
+<form id="procArchivadoForm" method="POST" action="/backend/procesos/editar/">
+    Versiones anteriores
+    <select id="proc_arch_id" name="proc_arch_id" class="AlignText">
+        <?php foreach($procesos_arch as $proceso_arch):?>
+            <option value="<?=$proceso_arch['id']?>" <?=$proceso_arch['id']==$proceso->id?'selected':''?>><?=$proceso_arch['nombre'].'-'.$proceso_arch['version']?></option>
+        <?php endforeach ?>
+    </select>
+</form>
 
 
 <div id="areaDibujo">

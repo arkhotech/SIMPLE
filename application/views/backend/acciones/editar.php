@@ -13,7 +13,7 @@
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
     <li><a href="<?= site_url('backend/Suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
-  
+
 
 
 <form id="plantillaForm" class="ajaxForm" method="POST" onsubmit="return ()" action="<?=site_url('backend/acciones/editar_form/'.($edit?$accion->id:''))?>">

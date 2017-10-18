@@ -14,6 +14,7 @@
     <li><a href="<?= site_url('backend/suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
 
+
 <script>
     $(document).ready(function() {
         handleRadio();
