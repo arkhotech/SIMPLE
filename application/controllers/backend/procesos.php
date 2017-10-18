@@ -112,15 +112,16 @@ class Procesos extends MY_BackendController {
             if(isset($proceso->root) && strlen($proceso->root) > 0) {
                 $root = $proceso->root;
             }
-            $draft = $proceso->findDraftProceso($root);
-            $proceso_draft = Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+            //$draft = $proceso->findDraftProceso($root);
+            //$proceso_draft = Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+            $proceso_draft = $proceso->findDraftProceso($root);
             $proceso_draft->estado = 'arch';
             $proceso_draft->save();
             $proceso->estado = 'draft';
             $proceso->save();
         }
 
-        log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
+        log_message('INFO', '$proceso->id [' . $proceso->id . '])', FALSE);
 
         if($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id || $proceso->activo != true) {
             echo 'Usuario no tiene permisos para editar este proceso';
@@ -534,11 +535,11 @@ class Procesos extends MY_BackendController {
 
         $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root);
 
-        log_message("INFO", "Recuperado activo: ".$this->varDump($activo), FALSE);
+        log_message("INFO", "Recuperado activo: ".$activo->id, FALSE);
 
-        $proceso = Doctrine::getTable('Proceso')->find($activo[0]['id']);
-        $proceso->estado = 'arch';
-        $proceso->save();
+        //$proceso = Doctrine::getTable('Proceso')->find($activo[0]['id']);
+        $activo->estado = 'arch';
+        $activo->save();
 
         $proceso_draft->estado = 'public';
         $proceso_draft->save();
@@ -559,12 +560,23 @@ class Procesos extends MY_BackendController {
         if(isset($proceso->root) && strlen($proceso->root) > 0) {
             $root = $proceso->root;
         }
+
+        log_message("INFO", "Buscando draft con root: ".$root, FALSE);
+
         $draft = $proceso->findDraftProceso($root);
 
-        if(!isset($draft) || count($draft) == 0){ //No existe draft
+        log_message("INFO", "Draft: *".$draft->id."*", FALSE);
+        //log_message("INFO", "Draft2: ".$draft[0]->id, FALSE);
+
+        if(strlen($draft->id) == 0){ //No existe draft
+            log_message("INFO", "Draft no existe", FALSE);
             $proceso=Proceso::importComplete($proceso->exportComplete());
 
-            $proceso->version = $proceso->version+1;
+            log_message("INFO", "Buscando última version", FALSE);
+            $max_version = $proceso->findMaxVersion($root);
+            log_message("INFO", "Ultima version recuperada. ".$max_version, FALSE);
+
+            $proceso->version = $max_version+1;
             $proceso->estado = 'draft';
 
             if(!isset($proceso->root) || strlen($proceso->root) == 0){
@@ -574,8 +586,8 @@ class Procesos extends MY_BackendController {
             $proceso->save();
 
         }else{
-            log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft[0]["id"], FALSE);
-            $proceso=Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+            log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);
+            $proceso = $draft;//Doctrine::getTable('Proceso')->find($draft[0]["id"]);
         }
 
         return $proceso;
@@ -635,25 +647,6 @@ class Procesos extends MY_BackendController {
         //print_r(json_encode($modelo));
         //exit;
         echo json_encode($modelo);
-    }
-
-    public function obtener_procesos_archivados($proceso_id) {
-        $procesos = Doctrine_Query::create()
-            ->from('Proceso p')
-            ->where('(p.root = ? or p.id = ?) AND p.estado="arch" AND c.id = ?',
-                $proceso_id, $proceso_id, UsuarioBackendSesion::usuario()->cuenta_id)
-            ->orderBy('p.version desc')
-            ->execute();
-
-        $data = array();
-        foreach ($procesos as $proceso){
-            $data[] = array(
-                "id" => $proceso->id,
-                "nombre" => $proceso->nombre,
-                "version" => $proceso->version
-            );
-        }
-        echo json_encode($data);
     }
 
     function varDump($data){

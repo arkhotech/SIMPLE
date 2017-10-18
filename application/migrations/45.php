@@ -4,7 +4,7 @@ class Migration_45 extends Doctrine_Migration_Base {
     public function up() {
         $this->addColumn('proceso', 'version', 'integer', null, array('notnull'=>1,'default'=>1));
         $this->addColumn('proceso', 'root', 'integer', null, array());
-        $this->addColumn('proceso', 'publicado', 'boolean', null, array('notnull'=>1,'default'=>1));
+        $this->addColumn('proceso', 'estado', 'boolean', null, array('notnull'=>1,'default'=>'public'));
     }
 
     public function postUp() {
@@ -15,7 +15,7 @@ class Migration_45 extends Doctrine_Migration_Base {
     public function down() {
         $this->removeColumn('proceso', 'version');
         $this->removeColumn('proceso', 'root');
-        $this->removeColumn('proceso', 'publicado');
+        $this->removeColumn('proceso', 'estado');
     }
 }
 ?>

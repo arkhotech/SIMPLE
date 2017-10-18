@@ -33,8 +33,6 @@
                     <span class="glyphicon glyphicon-info-sign"></span>
                 </a>
 			</th>
-			<th>Estado</th>
-			<th>Version</th>
 			<th>Acciones</th>
 		</tr>
 	</thead>
@@ -44,15 +42,11 @@
         <?php  if(is_null((UsuarioBackendSesion::usuario()->procesos))): ?>
         <tr>
 			<td><?=$p->nombre?></td>
-			<td><?=$p->estado == 'public'?'Publicado':($p->estado == 'draft'?'Draft':'Archivado')?></td>
-			<td><?=$p->version?></td>
 			<td><a class="btn btn-primary" href="<?=site_url('backend/seguimiento/index_proceso/'.$p->id)?>"><i class="icon-eye-open icon-white"></i> Ver seguimiento</a></td>
 		</tr>
         <?php elseif( in_array( $p->id,explode(',',UsuarioBackendSesion::usuario()->procesos))): ?>
         <tr>
 			<td><?=$p->nombre?></td>
-			<td><?=$p->estado == 'public'?'Publicado':($p->estado == 'draft'?'Draft':'Archivado')?></td>
-			<td><?=$p->version?></td>
 			<td><a class="btn btn-primary" href="<?=site_url('backend/seguimiento/index_proceso/'.$p->id)?>"><i class="icon-eye-open icon-white"></i> Ver seguimiento</a></td>
 		</tr>	
 		<?php endif; ?>

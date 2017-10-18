@@ -468,12 +468,13 @@ class Proceso extends Doctrine_Record {
     }
 
     public function findIdProcesoActivo($root){
-        $sql = "select p.id from proceso p where (p.root = $root or p.id = $root) and p.estado='public';";
 
-        $stmn = Doctrine_Manager::getInstance()->connection();
-        $result = $stmn->execute($sql)
-            ->fetchAll();
-        return $result;
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p')
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="public"', array($root, $root))
+            ->execute();
+
+        return $procesos[0];
     }
 
     public function findProcesosArchivados($root){
@@ -499,18 +500,23 @@ class Proceso extends Doctrine_Record {
     }
 
     public function findDraftProceso($root){
-        log_message("INFO", "en findDraftProceso", FALSE);
-        log_message("INFO", "root: *".$root."*", FALSE);
-        if(!isset($root) || strlen($root) == 0){
-            $sql = "select p.id from proceso p where p.root = 0 and p.estado='draft';";
-        }else{
-            $sql = "select p.id from proceso p where p.root = $root and p.estado='draft';";
-        }
+
+        $draft = Doctrine_Query::create()
+            ->from('Proceso p')
+            ->where('p.root = ? AND p.estado="draft"', $root)
+            ->execute();
+
+        return $draft[0];
+    }
+
+    public function findMaxVersion($root){
+
+        $sql = "select MAX(p.version) as version from proceso p where p.root = $root or p.id = $root;";
 
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
             ->fetchAll();
-        return $result;
+        return $result[0]['version'];
     }
 
 }
