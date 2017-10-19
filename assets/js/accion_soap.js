@@ -167,7 +167,4 @@ $(document).ready(function(){
  	$('#divMetodosE').hide();
     $(document).on('click','#btn-consultar',ConsultarFunciones);
     $(document).on('click','#btn-load',CargarWsdl);
-    $("#urlsoap").keyup(function(){
-        limpiar();
-    });
 });
