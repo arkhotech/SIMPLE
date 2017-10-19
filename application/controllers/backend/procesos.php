@@ -632,7 +632,7 @@ class Procesos extends MY_BackendController {
             $element->left=$t->posx;
             $element->top=$t->posy;
             $element->start=$t->inicial;
-            //$element->stop=$t->final;
+            $element->stop=$t->final;
             $modelo->elements[]=clone $element;
         }
         //$conexiones1=  Doctrine_Query::create()->from('Conexion c, c.TareaOrigen.Proceso p')->where('p.id = ?',$proceso_id);

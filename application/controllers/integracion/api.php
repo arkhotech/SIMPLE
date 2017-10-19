@@ -288,6 +288,7 @@ class API extends REST_Controller{
 
                 $status = array("idTramite" => $tramite->id,
                     "nombreTramite" => $proceso->nombre,
+                    "version" => $proceso->version,
                     "estado" => $tramite->pendiente == 1 ? "Pendiente" : "Completado",
                     "rutUsuario" => $rut,
                     "nombreEtapaActual" => $tarea->nombre);
@@ -295,6 +296,7 @@ class API extends REST_Controller{
             } else {
                 $status = array("idTramite" => $tramite->id,
                     "nombreTramite" => $proceso->nombre,
+                    "version" => $proceso->version,
                     "estado" => "Completado",
                     "rutUsuario" => "No existe información",
                     "nombreEtapaActual" => "No existe información");

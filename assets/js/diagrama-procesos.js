@@ -38,7 +38,12 @@ function drawFromModel(model,width,height,tipoconector){
     //Creamos los elementos
     $(model.elements).each(function(i,e){
         externa = e.externa==1?"externa":"";
+        console.log("Elemento : "+e.name+" esta marcado con final: "+e.stop);
         $("#draw").append("<div id='"+e.id+"' class='box "+externa+"' style='top: "+e.top+"px; left: "+e.left+"px;'>"+e.name+(e.start==1?'<div class="inicial"></div>':'')+"</div>");
+        if(e.stop == 1){
+            $("#draw #"+e.id).append('<div class="conector secuencial"></div>');
+            $("#draw #"+e.id).append('<div class="final-secuencial"></div>');
+        }
     });
     
     //Creamos las conexiones
@@ -51,7 +56,9 @@ function drawFromModel(model,width,height,tipoconector){
         curvatura=150;
     }  
     jsPlumb.Defaults.Connector=[ tipoconector, { curviness: curvatura }];
-    
+
+    console.log("Conecciones tarea: "+$(model.connections).length);
+
     $(model.connections).each(function(i,c){
         drawConnection(c);
     });
@@ -71,6 +78,10 @@ function drawFromModelUpdate(model,width,height){
     //Creamos los elementos
     $(model.elements).each(function(i,e){
         $("#draw").append("<div id='"+e.id+"' class='box' style='top: "+e.top+"px; left: "+e.left+"px;'>"+e.name+(e.start==1?'<div class="inicial"></div>':'')+"</div>");
+        if(e.stop == 1){
+            $("#draw #"+e.id).append('<div class="conector secuencial"></div>');
+            $("#draw #"+e.id).append('<div class="final-secuencial"></div>');
+        }
     });
     
     //Creamos las conexiones
@@ -94,9 +105,13 @@ function drawConnection(c,tipoconector){
             endpoint1=paraleloEvaluacionEndpoint;
         else if(c.tipo=='union')
             endpoint2=unionEndpoint;
-     */       
-        
-        if(c.target!=null){     
+     */
+
+    console.log("Coneccion target: "+c.target);
+    console.log("Coneccion tipo: "+c.tipo);
+    console.log("Coneccion source: "+c.source);
+
+        if(c.target!=null){
             
                  var connection=jsPlumb.connect({
                     source: $('#'+c.source),

@@ -103,7 +103,7 @@ class Proceso extends Doctrine_Record {
             $element->top=$t->posy;
             $element->start=$t->inicial;
             $element->externa=$t->externa;
-            //$element->stop=$t->final;
+            $element->stop=$t->final;
             $modelo->elements[]=clone $element;
         }
         
@@ -237,7 +237,7 @@ class Proceso extends Doctrine_Record {
                                 if($ev->paso_id)$evento->Paso=$tarea->Pasos[$ev->paso_id];
                                 $tarea->Eventos[]=$evento;
                             }
-                        }elseif($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso' && $keyt != 'grupos_usuarios'){
+                        }elseif($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso'){// && $keyt != 'grupos_usuarios'){
                             $tarea->{$keyt}=$t_attr;
                         }
                     }
@@ -402,7 +402,8 @@ class Proceso extends Doctrine_Record {
     public function toPublicArray(){
         $publicArray=array(
             'id'=>(int)$this->id,
-            'nombre'=>$this->nombre
+            'nombre'=>$this->nombre,
+            'version'=>$this->version
         );
         
         return $publicArray;

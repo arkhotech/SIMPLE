@@ -30,10 +30,12 @@ class ProcesoTable extends Doctrine_Table {
     public function findProcesosExpuestos($cuenta_id){
         if (strlen($cuenta_id)>0){
             log_message('info','Si tiene id');
-            $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre_largo as nombre_cuenta from proceso p, tarea t, cuenta c where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1 and p.cuenta_id=".$cuenta_id.";";
+            $sql = "select p.id, p.nombre, p.version, p.estado, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre_largo as nombre_cuenta from proceso p, tarea t, cuenta c 
+                    where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1 and p.estado!='arch' and p.cuenta_id=".$cuenta_id.";";
         }else{
             log_message('info','No tiene id');
-            $sql = "select p.id, p.nombre, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre_largo as nombre_cuenta from proceso p, tarea t, cuenta c where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1;";
+            $sql = "select p.id, p.nombre, p.version, p.estado, t.nombre as tarea, t.id as id_tarea, t.exponer_tramite, t.previsualizacion,c.id as id_cuenta, c.nombre_largo as nombre_cuenta from proceso p, tarea t, cuenta c 
+                    where p.id = t.proceso_id and p.cuenta_id=c.id and t.exponer_tramite=1 and p.activo=1 and p.estado!='arch';";
         }
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)

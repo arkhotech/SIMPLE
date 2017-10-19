@@ -7,7 +7,9 @@
         <table class="table">
             <tr>
                 <th>Nombre del Proceso</th>
-                <th>Tarea</th>
+                <th>Estado</th>
+                <th>Version</th>
+                <th>Tarea Inicial</th>
                 <th>Descripción</th>
                 <th>Url</th>
             </tr>       
@@ -18,6 +20,8 @@
             ?>
                 <tr>
                     <td><? echo $res['nombre'] ?></td>
+                    <td><?=$res['estado'] == 'public'?'Publicado':'Draft'?></td>
+                    <td><? echo $res['version'] ?></td>
                     <td><? echo $res['tarea'] ?></td>
                     <td><? echo $res['previsualizacion'] ?></td>
                     <td>
