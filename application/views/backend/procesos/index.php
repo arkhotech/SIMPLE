@@ -51,7 +51,9 @@
             <td><?=$p->estado == 'public'?'Publicado':'Draft'?></td>
             <td><?=$p->version?></td>
             <td>
-                <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
+                <?php if($editar_proceso){ ?>
+                    <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
+                <?php } ?>
                 <a class="btn btn-default" href="<?=site_url('backend/procesos/exportar/'.$p->id)?>"><i class="icon icon-share"></i> Exportar</a>
                 <a class="btn btn-danger" href="#" onclick="return eliminarProceso(<?=$p->id?>);"><i class="icon-white icon-remove"></i> Eliminar</a>
                 <?php if($p->estado == 'draft'){?>

@@ -2,7 +2,6 @@
     <li><a href="<?= site_url('manager/cuentas') ?>">Cuentas</a></li> /
     <li class="active"><?= $title ?></li>
 </ul>
-
 <form class="ajaxForm" method="post" action="<?= site_url('manager/cuentas/editar_form/' . $cuenta->id) ?>">
     <fieldset>
         <legend><?= $title ?></legend>
@@ -17,11 +16,26 @@
         <label>Logo</label>
         <div id="file-uploader"></div>
         <input type="hidden" name="logo" value="<?= $cuenta->logo ?>" />
-        <img class="logo" src="<?= $cuenta->logo ? base_url('uploads/logos/' . $cuenta->logo) : base_url('assets/img/simple.png') ?>" alt="logo" />        
-        
+        <img class="logo" src="<?= $cuenta->logo ? base_url('uploads/logos/' . $cuenta->logo) : base_url('assets/img/simple.png') ?>" alt="logo" />
     </fieldset>
+    </br>
     <fieldset>
-        <legend><?= $title ?> configuraci&oacute;n de agenda</legend>        
+        <legend><?= $title ?> configuración ambiente de desarrollo</legend>
+        <label>¿Es ambiente Desarrollo?</label>
+        <input name="desarrollo" id="toggle_ambiente_dev" type="checkbox" <?= ($cuenta->ambiente == 'dev') ? 'checked' : '' ?> data-toggle="toggle" data-size="normal" data-on="Si" data-off="No">
+        <div id="vinculo_prod" name="ambiente" class="<?= ($cuenta->ambiente != 'dev') ? 'hide' : '' ?>">
+            <label>Vincular Cuenta Productiva</label>
+            <select id="ambiente-prod" name="vinculo_produccion">
+                <option value="">Seleccionar ...</option>
+                <?php foreach($cuentas_productivas as $cp):?>
+                    <option value="<?=$cp[id]?>" <?= ($cp[id] == $cuenta->vinculo_produccion) ? 'selected' : '' ?>><?=$cp[nombre]?></option>
+                <?php endforeach ?>
+            </select>
+        </div>
+    </fieldset>
+    </br>
+    <fieldset>
+        <legend><?= $title ?> configuraci&oacute;n de agenda</legend>
         <label>Clave App</label>
         <input type="text" name="appkey" readonly="true" disabled="true" value="<?= $calendar->getAppkey() ?>"/>
         <label>Dominio</label>

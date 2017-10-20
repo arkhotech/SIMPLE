@@ -5,9 +5,20 @@ class ProcesoTable extends Doctrine_Table {
     public function findProcesosDisponiblesParaIniciar($usuario_id,$cuenta='localhost',$orderby='id',$direction='desc'){
         $usuario=Doctrine::getTable('Usuario')->find($usuario_id);
 
+        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
+        $estados = "public";
+        if($cuenta->ambiente == 'dev'){
+            $estados += ", draft";
+        }else{
+            $cuenta_dev = $cuenta->getAmbienteDev($cuenta->id);
+            if(count($cuenta_dev) == 0){
+                $estados += ", draft";
+            }
+        }
+
         $query=Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c, p.Tareas t')
-                ->where('p.activo=1 AND p.estado="public" AND t.inicial = 1')
+                ->where('p.activo=1 AND p.estado IN ('.$estados.') AND t.inicial = 1')
                 //Si el usuario tiene permisos de acceso
                 //->andWhere('(t.acceso_modo="grupos_usuarios" AND u.id = ?) OR (t.acceso_modo = "registrados") OR (t.acceso_modo = "claveunica") OR (t.acceso_modo="publico")',$usuario->id)
                 //Si la tarea se encuentra activa

@@ -33,6 +33,19 @@ class Procesos extends MY_BackendController {
                 ->orderBy('p.nombre asc')
                 ->execute();
 
+        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
+
+        $editar = true;
+        if($cuenta->ambiente == 'prod'){
+            $cuenta_dev = $cuenta->getAmbienteDev($cuenta->id);
+            if(count($cuenta_dev) > 0){
+                $editar = false;
+            }
+        }
+
+        $data['editar_proceso'] = $editar;
+
+
         $data['title'] = 'Listado de Procesos';
         $data['content'] = 'backend/procesos/index';
         $this->load->view('backend/template', $data);
@@ -548,6 +561,13 @@ class Procesos extends MY_BackendController {
 
         $proceso_draft->estado = 'public';
         $proceso_draft->save();
+
+        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
+        if($cuenta->ambiente == 'dev'){
+            $proceso=Proceso::importComplete($proceso_draft->exportComplete());
+            $proceso->cuenta_id = $cuenta->vinculo_produccion;
+            $proceso->save();
+        }
 
         log_message("INFO", "Proceso actualizado", FALSE);
 
