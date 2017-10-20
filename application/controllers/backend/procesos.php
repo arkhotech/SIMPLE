@@ -18,12 +18,13 @@ class Procesos extends MY_BackendController {
     }
 
     public function index() {
+        $cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
         $data['procesos'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
                 ->where('p.activo=1 AND p.estado!="arch" AND c.id = ? 
-                AND ((SELECT COUNT(proc.id) FROM Proceso proc WHERE (proc.root = p.id OR proc.root = p.root) AND proc.estado = "draft") = 0 
+                AND ((SELECT COUNT(proc.id) FROM Proceso proc WHERE proc.cuenta_id = ? AND (proc.root = p.id OR proc.root = p.root) AND proc.estado = "draft") = 0 
                 OR p.estado = "draft")
-                ',UsuarioBackendSesion::usuario()->cuenta_id)
+                ',array($cuenta_id, $cuenta_id))
                 ->orderBy('p.nombre asc')
                 ->execute();
 
@@ -127,9 +128,7 @@ class Procesos extends MY_BackendController {
             if (isset($proceso->root) && strlen($proceso->root) > 0) {
                 $root = $proceso->root;
             }
-            //$draft = $proceso->findDraftProceso($root);
-            //$proceso_draft = Doctrine::getTable('Proceso')->find($draft[0]["id"]);
-            $proceso_draft = $proceso->findDraftProceso($root);
+            $proceso_draft = $proceso->findDraftProceso($root, UsuarioBackendSesion::usuario()->cuenta_id);
             $proceso_draft->estado = 'arch';
             $proceso_draft->save();
             $proceso->estado = 'draft';
@@ -548,7 +547,7 @@ class Procesos extends MY_BackendController {
 
         log_message("INFO", "Root Draft: ".$proceso_draft->root, FALSE);
 
-        $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root);
+        $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root, UsuarioBackendSesion::usuario()->cuenta_id);
 
         log_message("INFO", "Recuperado activo: *".$activo->id."*", FALSE);
 
@@ -564,6 +563,45 @@ class Procesos extends MY_BackendController {
 
         $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
         if($cuenta->ambiente == 'dev'){
+
+            $fecha = new DateTime ();
+
+            $proc_produccion = $proceso_draft->findIdProcesoActivo($proceso_draft->root, $cuenta->vinculo_produccion);
+
+            if(strlen($proc_produccion->id) > 0) { //Existe proceso productivo
+
+                // Auditar
+                $registro_auditoria = new AuditoriaOperaciones();
+                $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+                $registro_auditoria->operacion = 'Eliminación de Proceso en cuenta productiva';
+                $registro_auditoria->motivo = "Publicación de nueva versión";
+                $usuario = UsuarioBackendSesion::usuario ();
+                $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
+                $registro_auditoria->proceso = $proc_produccion->nombre;
+                $registro_auditoria->cuenta_id = $cuenta->vinculo_produccion;
+                // Detalles
+                $proceso_array['proceso'] = $proc_produccion->toArray(false);
+                $registro_auditoria->detalles = json_encode($proceso_array);
+                $registro_auditoria->save();
+
+                $proc_produccion->delete();
+
+            }
+
+            // Auditar
+            $registro_auditoria = new AuditoriaOperaciones();
+            $registro_auditoria->fecha = $fecha->format ( "Y-m-d H:i:s" );
+            $registro_auditoria->operacion = 'Publicación de Proceso a cuenta productiva';
+            $registro_auditoria->motivo = "Publicación de nueva versión";
+            $usuario = UsuarioBackendSesion::usuario ();
+            $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
+            $registro_auditoria->proceso = $proceso_draft->nombre;
+            $registro_auditoria->cuenta_id = $cuenta->id;
+            // Detalles
+            $proceso_array['proceso'] = $proceso_draft->toArray(false);
+            $registro_auditoria->detalles = json_encode($proceso_array);
+            $registro_auditoria->save();
+
             $proceso=Proceso::importComplete($proceso_draft->exportComplete());
             $proceso->cuenta_id = $cuenta->vinculo_produccion;
             $proceso->save();
@@ -588,7 +626,7 @@ class Procesos extends MY_BackendController {
 
         log_message("INFO", "Buscando draft con root: ".$root, FALSE);
 
-        $draft = $proceso->findDraftProceso($root);
+        $draft = $proceso->findDraftProceso($root, UsuarioBackendSesion::usuario()->cuenta_id);
 
         log_message("INFO", "Draft: *".$draft->id."*", FALSE);
         //log_message("INFO", "Draft2: ".$draft[0]->id, FALSE);
@@ -598,7 +636,7 @@ class Procesos extends MY_BackendController {
             $proceso=Proceso::importComplete($proceso->exportComplete());
 
             log_message("INFO", "Buscando última version", FALSE);
-            $max_version = $proceso->findMaxVersion($root);
+            $max_version = $proceso->findMaxVersion($root, UsuarioBackendSesion::usuario()->cuenta_id);
             log_message("INFO", "Ultima version recuperada. ".$max_version, FALSE);
 
             $proceso->version = $max_version+1;

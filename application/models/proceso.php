@@ -468,11 +468,11 @@ class Proceso extends Doctrine_Record {
             ->execute();
     }
 
-    public function findIdProcesoActivo($root){
+    public function findIdProcesoActivo($root, $cuenta_id){
 
         $procesos = Doctrine_Query::create()
-            ->from('Proceso p')
-            ->where('(p.root = ? OR p.id = ?) AND p.estado="public"', array($root, $root))
+            ->from('Proceso p, p.Cuenta c')
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="public" AND c.id = ?', array($root, $root, $cuenta_id))
             ->execute();
 
         return $procesos[0];
@@ -500,19 +500,19 @@ class Proceso extends Doctrine_Record {
         return $data;
     }
 
-    public function findDraftProceso($root){
+    public function findDraftProceso($root, $cuenta_id){
 
         $draft = Doctrine_Query::create()
-            ->from('Proceso p')
-            ->where('(p.root = ? OR p.id = ?) AND p.estado="draft"', array($root, $root))
+            ->from('Proceso p, p.Cuenta c')
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="draft" AND c.id = ?', array($root, $root, $cuenta_id))
             ->execute();
 
         return $draft[0];
     }
 
-    public function findMaxVersion($root){
+    public function findMaxVersion($root, $cuenta_id){
 
-        $sql = "select MAX(p.version) as version from proceso p where p.root = $root or p.id = $root;";
+        $sql = "select MAX(p.version) as version from proceso p where p.cuenta_id = $cuenta_id and (p.root = $root or p.id = $root);";
 
         $stmn = Doctrine_Manager::getInstance()->connection();
         $result = $stmn->execute($sql)
