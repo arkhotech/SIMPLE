@@ -45,9 +45,9 @@ class Autenticacion extends MY_Controller {
         setcookie('redirectlogin', '', time()-3600);
         setcookie("redirectlogin", $redirectlogin, time()+3600);
         $flow = new Basic($this->authConfig);
-        if (! isset($_GET['code'])) {
+        if (!isset($_GET['code'])) {
             try {
-                $uri = $flow->getAuthorizationRequestUri('openid nombre');
+                $uri = $flow->getAuthorizationRequestUri('openid run name');
                 redirect($uri);
             } catch (\Exception $e) {
                 printf("Exception during authorization URI creation: [%s] %s", get_class($e), $e->getMessage());
