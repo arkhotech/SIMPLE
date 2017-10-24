@@ -318,7 +318,7 @@ class Etapa extends Doctrine_Record {
     }
 
     public function cerrar($ejecutar_eventos = TRUE) {
-        //Si ya fue cerrada, retornamos inmediatamente.
+        // Si ya fue cerrada, retornamos inmediatamente.
         if (!$this->pendiente)
             return;
 
@@ -332,7 +332,7 @@ class Etapa extends Doctrine_Record {
             $dato->save();
         }
 
-        //Ejecutamos los eventos
+        // Ejecutamos los eventos
         if($ejecutar_eventos){
             $eventos=Doctrine_Query::create()->from('Evento e')
                     ->where('e.tarea_id = ? AND e.instante = ? AND e.paso_id IS NULL',array($this->Tarea->id,'despues'))
@@ -344,7 +344,7 @@ class Etapa extends Doctrine_Record {
             }
         }
 
-        //Cerramos la etapa
+        // Cerramos la etapa
         $this->pendiente = 0;
         $this->ended_at = date('Y-m-d H:i:s');
         $this->save();
@@ -353,7 +353,7 @@ class Etapa extends Doctrine_Record {
     //Retorna el paso correspondiente a la secuencia, dado los datos ingresados en el tramite hasta el momento.
     //Es decir, tomando en cuenta las condiciones para que se ejecute cada paso.
     public function getPasoEjecutable($secuencia) {
-        $pasos = $this->getPasosEjecutables();
+        $pasos = $this->getPasosEjecutables($this->tramite_id);
 
         if (isset($pasos[$secuencia]))
             return $pasos[$secuencia];

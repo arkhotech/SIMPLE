@@ -42,12 +42,12 @@ class Autenticacion extends MY_Controller {
         */
 
         $redirectlogin = $this->input->get('redirect') ? $this->input->get('redirect') : site_url();
-        setcookie('redirectlogin', '', time()-3600);
-        setcookie("redirectlogin", $redirectlogin, time()+3600);
+        setcookie('redirectlogin', '', time() - 3600);
+        setcookie("redirectlogin", $redirectlogin, time() + 3600);
         $flow = new Basic($this->authConfig);
         if (!isset($_GET['code'])) {
             try {
-                $uri = $flow->getAuthorizationRequestUri('openid nombre');
+                $uri = $flow->getAuthorizationRequestUri('openid run name');
                 redirect($uri);
             } catch (\Exception $e) {
                 printf("Exception during authorization URI creation: [%s] %s", get_class($e), $e->getMessage());

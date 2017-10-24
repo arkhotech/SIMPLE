@@ -76,9 +76,11 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-md-3">
-                        <aside class="aside is_stuck" id="sidebar" style="position: fixed; top: 53px; width: 264px;">
+                        <aside class="aside is_stuck" id="sidebar">
                             <ul id="sideMenu" class="nav nav-list">    
-                                <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a class="link link--medium goTo" href="<?= site_url('home/index') ?>">Iniciar trámite</a></li>
+                                <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>">
+                                    <a class="link link--medium goTo" href="<?= site_url('home/index') ?>">Iniciar trámite</a>
+                                </li>
                                 <?php if (UsuarioSesion::usuario()->registrado): ?>
                                     <?php
                                     $npendientes=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();

@@ -47,7 +47,8 @@ class Etapas extends MY_Controller {
         $this->load->view('template_newhome', $data);
     }
 
-    public function sinasignar($offset=0) {
+    public function sinasignar($offset = 0) {
+
         if (!UsuarioSesion::usuario()->registrado) {
             $this->session->set_flashdata('redirect', current_url());
             redirect('autenticacion/login');
@@ -117,14 +118,14 @@ class Etapas extends MY_Controller {
         $data['sidebar'] = 'sinasignar';
         $data['content'] = 'etapas/sinasignar';
         $data['title'] = 'Sin Asignar';
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
 
     public function ejecutar($etapa_id, $secuencia = 0) {
 
         $iframe = $this->input->get('iframe');
         $etapa = Doctrine::getTable('Etapa')->find($etapa_id);
-        
+
         $data['num_pasos'] = self::num_pasos($etapa->Tarea->id);
 
         if (!$etapa) {

@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/style.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
+<link rel="stylesheet" href="<?= base_url() ?>assets/css/responsive.css">
 <link href="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
 
