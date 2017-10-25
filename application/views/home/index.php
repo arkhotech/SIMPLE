@@ -13,7 +13,7 @@
     <title><?=Cuenta::cuentaSegunDominio()!='localhost'?Cuenta::cuentaSegunDominio()->nombre_largo:'SIMPLE'?> - <?= $title ?></title>
     <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
     <link rel="icon" href="/favicon.png">
-
+    
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -22,13 +22,13 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/style.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
+    <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/gobstrap.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/jquery.sticky.js"></script>
+    <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js" type="text/javascript" ></script>
+    <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript" ></script>
+
+    <script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
     <script src="<?= base_url() ?>assets/newhome/js/home.js" type="text/javascript" ></script>
-
     <script type="text/javascript">
       var site_key = "<?= sitekey() ?>";
 
@@ -84,7 +84,10 @@
                               <input name="password" id="password" type="password" class="input-xlarge">
                               <div id="login_captcha"></div>
                               <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
-                              <p><span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>"><img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="clave&uacute;nica" width="96" height="32"/></a></p>
+                              <p>
+			        <span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>">
+				<img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="clave&uacute;nica" width="96" height="32"/></a>
+			      </p>
                               <a class="button button--red submit" href="#">Ingresar</a>
                               <div class='ajaxLoader'>Cargando</div>
                             </form>
@@ -114,7 +117,7 @@
       </div>
     </header>
 
-    <main class="main">
+    <div id="main">
       <div class="container">
         <div class="row">
           <div class="col-sm-12">
@@ -150,11 +153,11 @@
                               <a href="<?=site_url('tramites/iniciar/' . $p->id)?>">Iniciar</a>
                             <?php else: ?>
                               <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
-                              <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">
-                                <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
-                              </a>
+                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">
+                                  <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
+                                </a>
                               <?php else: ?>
-                              <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">Autenticarse</a>
+                                <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">Autenticarse</a>
                               <?php endif ?>
                             <?php endif ?>
                           </div>
@@ -192,13 +195,12 @@
                   <?php endforeach; ?>
                 </div>
               </section>
-            <?php endif; ?>
+            <?php endif ?>
 
             <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
               <section id="simple-destacados">
                 <div class="section-header">
-                  <h2>Otros tr&aacute;mites</h2>
-                  <div class="line"></div>
+                  <h2>Otros trámites</h2>
                 </div>
                 <div class="row">
                   <?php foreach ($procesos as $p): ?>
@@ -242,14 +244,14 @@
                   <?php endforeach; ?>
                 </div>
               </section>
-            <?php endif; ?>
+            <?php endif ?>
           </div>
         </div>
       </div>
-    </main>
-
+    </div>
     <footer class="site-footer">
-      <div class="container"><a class="site-footer_logo" href="#"><i class="icon-gob"></i></a>
+      <div class="container">
+         <a class="site-footer_logo" href="#"><i class="icon-gob"></i></a>
         <div class="row hidden-xs">
           <div class="table-lg-row">
             <div class="col-sm-2"></div>

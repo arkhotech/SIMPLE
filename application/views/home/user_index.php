@@ -24,9 +24,10 @@
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
     <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css" rel="stylesheet">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/gobstrap.min.js"></script>
-    <script src="<?= base_url() ?>assets/home/js/jquery.sticky.js"></script>
+    <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js" type="text/javascript" ></script>
+    <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript" ></script>
+
+    <script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
     <script src="<?= base_url() ?>assets/newhome/js/home.js" type="text/javascript" ></script>
 
     <script type="text/javascript">
@@ -41,7 +42,7 @@
 
         if ($('#form_captcha').length) {
           grecaptcha.render("form_captcha", {
-            sitekey : site_key
+            'sitekey' : site_key
           });
         }
       };
@@ -80,15 +81,15 @@
                             <form id="login" method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
                               <div class="validacion"></div>
                               <input type="hidden" name="redirect" value="<?= current_url() ?>" />
-                              <label for="usuario">Usuario o Correo electrónico</label>
+                              <label for="usuario">Usuario o Correo electr&oacute;nico</label>
                               <input name="usuario" id="usuario" type="text" class="input-xlarge">
-                              <label for="password">Contraseña</label>
+                              <label for="password">Contrase&ntilde;a</label>
                               <input name="password" id="password" type="password" class="input-xlarge">
                               <div id="login_captcha"></div>
                               <p><a href="<?=site_url('autenticacion/olvido')?>">¿Olvidaste tu contrase&ntilde;a?</a></p>
                               <p>
                                 <span>O utilice</span> <a href="<?=site_url('autenticacion/login_openid?redirect='.$redirect)?>">
-                                <img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a>
+                                <img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="Clave&uacute;nica" width="96" height="32"/></a>
                               </p>
                               <a class="button button--red submit" href="#">Ingresar</a>
                               <div class='ajaxLoader'>Cargando</div>
@@ -99,14 +100,16 @@
                     </ul>
                   </li>
                 <?php else: ?>
-                  <li class="dropdown" id="loginViewUser">
+                  <li id="loginViewUser" class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Bienvenido/a <?= UsuarioSesion::usuario()->displayName() ?><span class="caret"></span></a>
                     <ul class="dropdown-menu btn">
                       <?php if (!UsuarioSesion::usuario()->open_id): ?> 
                         <li><a href="<?= site_url('cuentas/editar') ?>"><i class="icon-user"></i>Mi cuenta</a></li>
                       <?php endif; ?>
-                      <?php if (!UsuarioSesion::usuario()->open_id): ?><li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i>Cambiar contraseña</a></li><?php endif; ?>
-                      <li><a href="<?= site_url('autenticacion/logout') ?>"><i class="icon-log-out"></i>Cerrar sesión</a></li>
+                      <?php if (!UsuarioSesion::usuario()->open_id): ?>
+                        <li><a href="<?= site_url('cuentas/editar_password') ?>"><i class="icon-lock"></i>Cambiar contrase&ntilde;a</a></li>
+		      <?php endif; ?>
+                      <li><a href="<?= site_url('autenticacion/logout') ?>"><i class="icon-log-out"></i>Cerrar sesi&oacute;n</a></li>
                     </ul>
                   </li>
                 <?php endif; ?>
@@ -117,78 +120,133 @@
       </div>
     </header>
 
-    <main style="min-height: 480px;">
+    <div id="main">
       <div class="container">
         <div class="row">
           <div class="col-xs-12 col-md-3">
-            <aside class="aside is_stuck" id="sidebar" style="position: fixed; top: 53px; width: 264px;">
-              <ul id="sideMenu" class="nav nav-list">  
-                <li class=" <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>"><a href="<?= site_url('home/index') ?>" class="link link--medium goTo">Inicio</a></li>
+            <aside class="aside" id="fixed-menu">
+              <ul class="side-menu nav nav-list">
+                <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>">
+                  <a class="link link--medium goTo" href="<?= site_url('home/index') ?>">Iniciar trámite</a>
+                </li>
                 <?php if (UsuarioSesion::usuario()->registrado): ?>
-                    <?php
-                      $npendientes=Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                      $nsinasignar=Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                      $nparticipados=Doctrine::getTable('Tramite')->findParticipadosALL(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
-                    ?>
-                    <li class="<?= isset($sidebar) && $sidebar == 'inbox' ? 'active' : '' ?>"><a class="link link--medium goTo" href="<?= site_url('etapas/inbox') ?>">Bandeja de Entrada (<?= $npendientes ?>)</a></li>
-                    <?php if ($nsinasignar): ?><li class="<?= isset($sidebar) && $sidebar == 'sinasignar' ? 'active' : '' ?>"><a class="link link--medium goTo" href="<?= site_url('etapas/sinasignar') ?>">Sin asignar  (<?=$nsinasignar  ?>)</a></li><?php endif ?>
-                    <li class="<?= isset($sidebar) && $sidebar == 'participados' ? 'active' : '' ?>"><a class="link link--medium goTo" href="<?= site_url('tramites/participados') ?>">Historial de Trámites  (<?= $nparticipados ?>)</a></li>
-                    <li class="<?= isset($sidebar) && $sidebar == 'miagenda' ? 'active' : '' ?>"><a class="link link--medium goTo" href="<?= site_url('agenda/miagenda') ?>">Mi Agenda</a></li>
+                  <?php
+                    $npendientes = Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                    $nsinasignar = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                    $nparticipados = Doctrine::getTable('Tramite')->findParticipadosALL(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                  ?>
+                  <li class="<?= isset($sidebar) && $sidebar == 'inbox' ? 'active' : '' ?>">
+                    <a class="link link--medium goTo" href="<?= site_url('etapas/inbox') ?>">Bandeja de Entrada (<?= $npendientes ?>)</a>
+                  </li>
+                  <?php if ($nsinasignar): ?>
+                    <li class="<?= isset($sidebar) && $sidebar == 'sinasignar' ? 'active' : '' ?>">
+                        <a class="link link--medium goTo" href="<?= site_url('etapas/sinasignar') ?>">Sin asignar  (<?=$nsinasignar  ?>)</a>
+                    </li>
+                  <?php endif ?>
+                  <li class="<?= isset($sidebar) && $sidebar == 'participados' ? 'active' : '' ?>">
+                      <a class="link link--medium goTo" href="<?= site_url('tramites/participados') ?>">Historial de Trámites (<?= $nparticipados ?>)</a>
+                  </li>
+                  <li class="<?= isset($sidebar) && $sidebar == 'miagenda' ? 'active' : '' ?>">
+                      <a class="link link--medium goTo" href="<?= site_url('agenda/miagenda') ?>">Mi Agenda</a>
+                  </li>
                 <?php endif; ?>
               </ul>
             </aside>
           </div>
 
-        <div class="col-sm-9">
-        <?php if ($num_destacados > 0 || $sidebar == 'categorias'): ?>
-        <section id="simple-destacados">
-            <div class="section-header">
-              <?php if($sidebar == 'disponibles'):?>
-                <h2>Tr&aacute;mites destacados</h2>
-              <?php else: ?>
-                <h2>Tr&aacute;mites - <?= $categoria->nombre ?></h2>
-                <a href="<?=site_url('home/index/')?>" class="btn btn-primary preventDoubleRequest" style="float: right;">
-                  <i class="icon-file icon-white"></i> Volver
-                  </a>
-              <?php endif ?>
-            </div>
-            <div class="row">
-                <?php foreach ($procesos as $p): ?>
-                  <?php if($p->destacado == 1 || $sidebar == 'categorias'):?>
-                    <div class="col-md-4 item">
-                      <div class="tarjeta">
-                        <?php if($p->icon_ref):?>
-                          <div class="text-left">
-                            <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
-                          </div>
-                        <?php else:?>
-                          <div class="text-left">
-                            <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
-                          </div>
+          <div class="col-sm-9">
+
+            <nav class="navbar navbar-inverse">
+              <div class="container-fluid">
+                <div class="navbar-header">
+                  <button type="button" id="sidebar_head">
+                    <i class="icon-burguer icon--top"></i>
+                  </button>
+                </div>
+                <div class="navbar-detail">
+                  <aside class="aside" id="sidebar_detail">
+                    <ul class="side-menu nav nav-list">
+                      <li class="iniciar <?= isset($sidebar) && $sidebar == 'disponibles' ? 'active' : '' ?>">
+                        <a class="link link--medium goTo" href="<?= site_url('home/index') ?>">Iniciar trámite</a>
+                      </li>
+                      <?php if (UsuarioSesion::usuario()->registrado): ?>
+                        <?php
+                          $npendientes = Doctrine::getTable('Etapa')->findPendientes(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                          $nsinasignar = Doctrine::getTable('Etapa')->findSinAsignar(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                          $nparticipados = Doctrine::getTable('Tramite')->findParticipadosALL(UsuarioSesion::usuario()->id, Cuenta::cuentaSegunDominio())->count();
+                        ?>
+                        <li class="<?= isset($sidebar) && $sidebar == 'inbox' ? 'active' : '' ?>">
+                          <a class="link link--medium goTo" href="<?= site_url('etapas/inbox') ?>">Bandeja de Entrada (<?= $npendientes ?>)</a>
+                        </li>
+                        <?php if ($nsinasignar): ?>
+                          <li class="<?= isset($sidebar) && $sidebar == 'sinasignar' ? 'active' : '' ?>">
+                            <a class="link link--medium goTo" href="<?= site_url('etapas/sinasignar') ?>">Sin asignar  (<?=$nsinasignar  ?>)</a>
+                          </li>
                         <?php endif ?>
-                        <h4><?= $p->nombre ?></h4>
-                        <div class="enlace_cat_proc">
-                          <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                            <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
+                        <li class="<?= isset($sidebar) && $sidebar == 'participados' ? 'active' : '' ?>">
+                          <a class="link link--medium goTo" href="<?= site_url('tramites/participados') ?>">Historial de Trámites (<?= $nparticipados ?>)</a>
+                        </li>
+                        <li class="<?= isset($sidebar) && $sidebar == 'miagenda' ? 'active' : '' ?>">
+                          <a class="link link--medium goTo" href="<?= site_url('agenda/miagenda') ?>">Mi Agenda</a>
+                        </li>
+                      <?php endif; ?>
+                    </ul>
+                  </aside>
+                </div>
+              </div>
+            </nav>
+
+            <?php if ($num_destacados > 0 || $sidebar == 'categorias'): ?>
+              <section id="simple-destacados">
+                <div class="section-header">
+                  <?php if ($sidebar == 'disponibles'): ?>
+                    <h2>Tr&aacute;mites destacados</h2>
+                  <?php else: ?>
+                    <h2>Tr&aacute;mites - <?= $categoria->nombre ?></h2>
+                    <a href="<?=site_url('home/index/')?>" class="btn btn-primary preventDoubleRequest" style="float: right;">
+                      <i class="icon-file icon-white"></i> Volver
+                    </a>
+                  <?php endif ?>
+                </div>
+                <div class="row">
+                  <?php foreach ($procesos as $p): ?>
+                    <?php if ($p->destacado == 1 || $sidebar == 'categorias'):?>
+                      <div class="col-md-4 item">
+                        <div class="tarjeta">
+                          <?php if ($p->icon_ref): ?>
+                            <div class="text-left">
+                              <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
+                            </div>
                           <?php else: ?>
-                            <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                            <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
-                            <?php else:?>
-                            <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
-                            <?php endif ?>
+                            <div class="text-left">
+                              <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
+                            </div>
                           <?php endif ?>
+                          <h4><?= $p->nombre ?></h4>
+                          <div class="enlace_cat_proc">
+                            <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                              <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">Iniciar</a>
+                            <?php else: ?>
+                              <?php if ($p->getTareaInicial()->acceso_modo=='claveunica'): ?>
+                                <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">
+                                  <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
+                                </a>
+                              <?php else: ?>
+                                <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
+                              <?php endif ?>
+                            <?php endif ?>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  <?php $count++ ?>
-                  <?php endif ?>
-                <?php endforeach; ?>
-            </div>
-        </section>
-      <?php endif ?>
+                      <?php $count++ ?>
+                    <?php endif ?>
+                  <?php endforeach; ?>
+                </div>
+              </section>
+            <?php endif ?>
 
-          <?php if (count($categorias) > 0): ?>
-            <section id="simple-categorias">
+            <?php if (count($categorias) > 0): ?>
+              <section id="simple-categorias">
                 <div class="section-header">
                   <h2>Categor&iacute;as</h2>
                 </div>
@@ -198,9 +256,9 @@
                       <a href="<?=site_url('home/procesos/'.$c->id)?>">
                         <div class="tarjeta">
                           <div class="text-left">
-                            <?php if($c->icon_ref):?>
+                            <?php if ($c->icon_ref): ?>
                               <img src="<?= base_url('uploads/logos/' . $c->icon_ref) ?>" class="img-service">
-                            <?php else:?>
+                            <?php else: ?>
                                 <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
                             <?php endif ?>
                           </div>
@@ -211,60 +269,71 @@
                     </div>
                   <?php endforeach; ?>
                 </div>
-            </section>
-          <?php endif ?>
+              </section>
+            <?php endif ?>
 
-          <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
-          <section id="simple-destacados">
-              <div class="section-header">
-                  <h2 style="width:40%">Otros trámites</h2>
-              </div>
-              <div class="row">
-                <?php foreach ($procesos as $p): ?>
-                  <?php if($p->destacado == 0 || $p->categoria_id == 0):?>
-                    <div class="col-md-4 item">
-                      <div class="tarjeta">
-                          <?php if($p->icon_ref):?>
+            <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
+              <section id="simple-destacados">
+                <div class="section-header">
+                  <h2>Otros trámites</h2>
+                </div>
+                <div class="row">
+                  <?php foreach ($procesos as $p): ?>
+                    <?php if ($p->destacado == 0 || $p->categoria_id == 0): ?>
+                      <div class="col-md-4 item">
+                        <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                          <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">
+                        <?php else: ?>
+                          <?php if ($p->getTareaInicial()->acceso_modo == 'claveunica'): ?>
+                            <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">
+                          <?php else: ?>
+                            <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/' . $p->id)?>">
+                          <?php endif ?>
+                        <?php endif ?>
+                        <div class="tarjeta">
+                          <?php if ($p->icon_ref): ?>
                             <div class="text-left">
                               <img src="<?= base_url('assets/img/icons/' . $p->icon_ref) ?>" class="img-service">
                             </div>
-                          <?php else:?>
+                          <?php else: ?>
                             <div class="text-left">
                               <img src="<?= base_url('assets/img/icons/nologo.png') ?>" class="img-service">
                             </div>
                           <?php endif ?>
-                        <h4><?= $p->nombre ?></h4>
-                        <div class="enlace_cat_proc">
-                          <?php if($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)):?>
-                          <a href="<?=site_url('tramites/iniciar/'.$p->id)?>" class="btn btn-primary preventDoubleRequest">Iniciar</a>
-                          <?php else: ?>
-                              <?php if($p->getTareaInicial()->acceso_modo=='claveunica'):?>
-                              <a href="<?=site_url('autenticacion/login_openid')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>"><i class="icon-white icon-clave-unica"></i>clave&uacute;nica</a>
-                              <?php else:?>
-                              <a href="<?=site_url('autenticacion/login')?>?redirect=<?=site_url('tramites/iniciar/'.$p->id)?>">Autenticarse</a>
+                          <h4><?= $p->nombre ?></h4>
+                          <div class="enlace_cat_proc">
+                            <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
+                                Iniciar
+                            <?php else: ?>
+                              <?php if ($p->getTareaInicial()->acceso_modo=='claveunica'): ?>
+                                  <i class="icon-white icon-clave-unica"></i>clave&uacute;nica
+                              <?php else: ?>
+                                Autenticarse
                               <?php endif ?>
-                          <?php endif ?>
+                            <?php endif ?>
+                          </div>
                         </div>
+                        </a>
                       </div>
-                    </div>
-                  <?php endif ?>
-              <?php endforeach; ?>
-              </div>
-          </section>
-          <?php endif ?>
+                    <?php endif ?>
+                  <?php endforeach; ?>
+                </div>
+              </section>
+            <?php endif ?>
+          </div>
         </div>
       </div>
-    </main>
-
+    </div>
     <footer class="site-footer">
-      <div class="container"><a class="site-footer_logo" href="#"><i class="icon-gob"></i></a>
+      <div class="container">
+        <a class="site-footer_logo" href="#"><i class="icon-gob"></i></a>
         <div class="row hidden-xs">
           <div class="table-lg-row">
             <div class="col-sm-2"></div>
             <div class="col-sm-6">
               <ul class="menu">
                 <li><a href="http://www.modernizacion.gob.cl/" target="_blank">Iniciativa de la Unidad de Modernizaci&oacute;n y Gobierno Digital</a></li>
-                <li><a href="http://www.minsegpres.gob.cl/" target="_blank">Ministerio Secretaría General de la Presidencia</a></li>
+                <li><a href="http://www.minsegpres.gob.cl/" target="_blank">Ministerio Secretar&iacute;a General de la Presidencia</a></li>
               </ul>
             </div>
           </div>

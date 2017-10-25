@@ -1,6 +1,16 @@
 $(document).ready(function() {
 
-    $("[data-toggle=popover]").popover();
+    $('.navbar-detail').hide();
+    $("#main").css("margin-top", $("header").height());
+
+    $('#sidebar_head').click(function () {
+        $('.navbar-detail').toggle();
+    });
+
+    $(window).resize(function() {
+        $('.navbar-detail').hide();
+        $("#main").css("margin-top", $("header").height());
+    });
 
     $("#login .submit").click(function() {
         console.log("submit");

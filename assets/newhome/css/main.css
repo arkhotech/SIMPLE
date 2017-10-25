@@ -10,6 +10,23 @@ header {
   transition: background-color .3s;
 }
 
+.section-header h2 {
+  margin: 8px 0 10px 0;
+}
+
+.container-fluid .navbar-header {
+  display: none;
+}
+
+.container-fluid .navbar-detail {
+  display: block;
+}
+
+
+#fixed-menu {
+  display: block;
+}
+
 body {
   background-color: #fff;
 }
@@ -19,7 +36,8 @@ footer .container {
 }
 
 #main {
-  margin: 80px 0 50px 0;
+  margin: 70px 0 50px 0;
+  padding: 10px 0 0 0;
   min-height: 500px;
 }
 
@@ -128,10 +146,6 @@ footer {
   font-size: 0.7em;
   line-height: 24px;
   margin: 14px 0 0;
-}
-
-#simple-destacados .section-header {
-  margin-top: 40px;
 }
 
 #simple-destacados .tarjeta h4 {
@@ -264,10 +278,6 @@ header.navbar {
   bottom: 30px;
 }
 
-#simple-categorias {
-  margin-top: 30px;
-}
-
 #simple-categorias .tarjeta {
   border: 2px solid #E3E5EF;
   width: 100%;
@@ -385,6 +395,7 @@ a.close {
   overflow: hidden;
   opacity: 0;
 }
+
 .open .dropdown-menu {
   max-height: 500px;
   opacity: 1;
@@ -438,7 +449,6 @@ a.close {
 }
 
 /*nuevo*/
-
 .tarjeta > .text-left {
   float: left;
   margin-right: 10px;
@@ -446,25 +456,45 @@ a.close {
 
 .section-header {
   text-align: left;
-  margin-bottom: 10px;
   display: inline-block;
   width: 100%;
 }
 
 .section-header h2 {
   float: left;
-  margin-right: 10px;
 }
 
 .aside {
-  display: block;
+  position: fixed;
+  margin-top: 200px;
+}
+
+@media (min-width: 1021px) {
+  .container-fluid .navbar-header {
+    display: none;
+  }
+  
+  .container-fluid .navbar-detail {
+    display: none;
+  }
+
+  #fixed-menu {
+    display: block;
+  }
 }
 
 @media (max-width: 1020px) {
 
-  .section-header, .section-header h2 {
-    margin: 15px 0 10px 0;
-    padding: 0px;
+  .container-fluid .navbar-header {
+    display: block;
+  }
+  
+  .container-fluid .navbar-detail {
+    display: none;
+  }
+
+  #fixed-menu {
+    display: none;
   }
 
   #simple-categorias .tarjeta {
@@ -506,14 +536,9 @@ a.close {
   .col-sm-6 {
     width: 100%;
   }
-
 }
 
 @media (max-width: 741px) {
-
-  .aside {
-    display: none;
-  }
 
   .vr {
     display: none;
@@ -599,7 +624,7 @@ a.close {
   margin-top: 20px;
 }
 
-#sideMenu .active .link:after {
+.side-menu .active .link:after {
   background: url(../images/icons/arrow-right-white.svg);
   content: "";
   display: block;
@@ -674,22 +699,6 @@ a.close {
   margin-bottom: 50px;
 }
 
-@media screen and (max-width: 600px) {
-
-  .aside {
-    display: none;
-  }
-
-  .aside.responsive {position: relative;}
-  .aside.responsive .icon {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .aside.responsive a {
-    float: none;
-    display: block;
-    text-align: left;
-  }
-
+#sidebar_head {
+  padding-top: 8px;
 }
