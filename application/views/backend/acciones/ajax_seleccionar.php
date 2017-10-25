@@ -19,6 +19,7 @@
             <option value="iniciar_tramite">Iniciar Trámite</option>
             <option value="continuar_tramite">Continuar Trámite</option>
             <option value="webhook">Notificaciones</option>
+            <option value="descarga_documento">Descargar Documento</option>
         </select>
     </form>
 </div>

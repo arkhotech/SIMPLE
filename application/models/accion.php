@@ -20,7 +20,8 @@ class Accion extends Doctrine_Record     {
                 'AccionCallback'  => array('tipo' => 'callback'),
                 'AccionNotificaciones'  => array('tipo' => 'webhook'),
                 'AccionIniciarTramite'  => array('tipo' => 'iniciar_tramite'),
-                'AccionContinuarTramite'  => array('tipo' => 'continuar_tramite')
+                'AccionContinuarTramite'  => array('tipo' => 'continuar_tramite'),
+                'AccionDescargaDocumento'  => array('tipo' => 'descarga_documento')
             )
         );
     }

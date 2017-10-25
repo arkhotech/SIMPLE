@@ -77,7 +77,6 @@ class Acciones extends MY_BackendController {
         }
 
         log_message("INFO", "Creando formulario para trámite", FALSE);
-
         if($tipo=='enviar_correo')
             $accion=new AccionEnviarCorreo();
         else if($tipo=='webservice')
@@ -96,7 +95,8 @@ class Acciones extends MY_BackendController {
             $accion=new AccionIniciarTramite();
         else if($tipo=='continuar_tramite')
             $accion=new AccionContinuarTramite();
-
+        else if($tipo=='descarga_documento')
+            $accion=new AccionDescargaDocumento();
 
         $data['edit']=FALSE;
         $data['proceso']=$proceso;
@@ -150,6 +150,8 @@ class Acciones extends MY_BackendController {
                 $accion=new AccionIniciarTramite();
             else if($this->input->post('tipo')=='continuar_tramite')
                 $accion=new AccionContinuarTramite();
+            else if($this->input->post('tipo')=='descarga_documento')
+                $accion=new AccionDescargaDocumento();
             $accion->proceso_id=$this->input->post('proceso_id');
             $accion->tipo=$this->input->post('tipo');
         }
