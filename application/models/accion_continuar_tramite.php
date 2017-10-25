@@ -93,15 +93,26 @@ class AccionContinuarTramite extends Accion {
             $etapa = new Etapa();
             $etapa = $etapa->getEtapaPorTareaId($tarea_id->valor, $tramite_id->valor);
             log_message("INFO", "id_etapa a continuar: ".$etapa->id);
+            if(strlen($etapa->id) != 0){ //Existe etapa para continuar el proceso
+                $integracion = new IntegracionMediator();
+                $info_continuar = $integracion->continuarProceso($tramite_id->valor, $etapa->id, "0", $request);
 
-            $integracion = new IntegracionMediator();
-            $info_continuar = $integracion->continuarProceso($tramite_id->valor, $etapa->id, "0", $request);
+                $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
 
-            $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
+                log_message("INFO", "Response: ".$response_continuar, FALSE);
 
-            log_message("INFO", "Response: ".$response_continuar, FALSE);
+                $response["respuesta_continuar"]=$response_continuar;
 
-            $response["respuesta_continuar"]=$response_continuar;
+            }else{
+                //Se encola continuar proceso hasta que etapa se cree
+                $cola = new ColaContinuarTramite();
+                $cola->tramite_id = $tramite_id->valor;
+                $cola->tarea_id = $tarea_id->valor;
+                $cola->request = $request;
+                $cola->procesado = 0;
+                $cola->save();
+                $response["respuesta_continuar"]="Se encola continuación trámite id:".$tramite_id->valor." en tarea id: ".$tarea_id->valor;
+            }
 
             foreach($response as $key=>$value){
                 $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);

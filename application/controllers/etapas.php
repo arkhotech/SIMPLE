@@ -386,6 +386,20 @@ class Etapas extends MY_Controller {
             }else{
                 $etapa->avanzar($this->input->post('usuarios_a_asignar'));    
             }
+
+            $proximas = $etapa->getTareasProximas();
+
+            log_message("INFO", "###Id etapa despues de avanzar: ".$etapa->id, FALSE);
+            log_message("INFO", "###Id tarea despues de avanzar: ".$etapa->tarea_id, FALSE);
+            $cola = new ColaContinuarTramite();
+            $tareas_encoladas = $cola->findTareasEncoladas($etapa->tramite_id);
+            if($proximas->estado === 'pendiente') {
+                log_message("debug", "pendiente");
+                foreach ($proximas->tareas as $tarea) {
+                    log_message('debug', 'Ejecutando continuar de etapa ' . $tarea->id . " en trámite " . $etapa->tramite_id);
+                    $etapa = $etapa->ejecutarColaContinuarTarea($tarea->id, $tareas_encoladas);
+                }
+            }
         }catch(Exception $err){
             $respuesta->validacion = false;
             $respuesta->errores = '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a>'.$err->getMessage().'</div>';

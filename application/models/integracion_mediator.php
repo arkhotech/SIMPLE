@@ -181,7 +181,7 @@ class IntegracionMediator{
      * @param type $body
      * @return type
      */
-    public function iniciarProceso($proceso_id, $id_tarea, $body){
+    public function iniciarProceso($proceso_id, $id_tarea, $body, $tramite_ret_id=null, $tarea_ret_id=null){
         //validar la entrada
         
         if($proceso_id == NULL || $id_tarea == NULL){
@@ -202,6 +202,13 @@ class IntegracionMediator{
             $tramite->iniciar($proceso_id);
             
             log_message("INFO", "Iniciando trámite: ".$proceso_id, FALSE);
+
+            //Esto para el caso que sea un inicio entre trámites de simple
+            if(isset($tramite_ret_id) && isset($tarea_ret_id)){
+                log_message("INFO", "Registrando tramite retorno: ".$tramite_ret_id, FALSE);
+                log_message("INFO", "Registrando tarea retorno: ".$tarea_ret_id, FALSE);
+                $this->registrarRetorno($tramite->id, $tramite_ret_id, $tarea_ret_id);
+            }
             //Recuper la priemra etapa
             $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
 
@@ -280,6 +287,7 @@ class IntegracionMediator{
         }
 
         try{
+
             //obtener el primer paso de la secuencia o el pasado por parámetro
             $paso = $etapa->getPasoEjecutable($secuencia);
             
@@ -525,6 +533,7 @@ class IntegracionMediator{
         $result['result']['proximoFormulario']=array();
         $form_norm=array();
         $etapas = array();
+        $resultCola = array();
         $forms = null;
         $estado = 'undefined';
         $etapa_id = $etapa->id;
@@ -534,18 +543,33 @@ class IntegracionMediator{
         if($next_step == NULL){ //Si es nulo, entonces termino la etapa
             //Finlaizar etapa
             $etapa->avanzar();
+
+            //Si hay acciones de continuar proceso encoladas se ejecutan
+            //$etapa->ejecutarColaContinuarTarea($etapa);
+
             $next = $etapa->getTareasProximas();
             
             log_message("INFO", "###Id etapa despues de avanzar: ".$etapa->id, FALSE);
+            $cola = new ColaContinuarTramite();
+            $tareas_encoladas = $cola->findTareasEncoladas($id_proceso);
             if($next->estado === 'pendiente'){
                 log_message("debug","pendiente");
                     foreach($next->tareas as $tarea){
                         log_message('debug','***** Revisando una etapa '.$tarea->id." ".$id_proceso);
+                        $resultCola[] = $etapa->ejecutarColaContinuarTarea($tarea->id, $tareas_encoladas);
                         $etapas[] = $etapa->getEtapaPorTareaId($tarea->id, $id_proceso);
                     }
-                    
+
+                log_message('debug','***** mas etapas '.count($etapas));
                     //Si no hay mas etapas, es el fin
-                    if(count($etapas) > 0 ){
+                if(isset($resultCola) && count($resultCola) > 0 && isset($resultCola[0])){
+                    log_message("debug", "Result desde cola: ".$this->varDump($resultCola), FALSE);
+
+                    $result['result'] = $resultCola[0];
+
+                    return $result;
+                }
+                if(count($etapas) > 0 ){
                         $forms = $this->getFormulariosFromEtapa($etapas,$id_proceso); //etapas sin formulario
                         if($forms === NULL){  //no tiene formualrio, etapa vacia
                             //no hay formularios, entonces avanzar al siguiente
@@ -563,11 +587,12 @@ class IntegracionMediator{
                             $estado = 'activo';
                         }
                     }
+
             
             }else if($next->estado == 'completado'){
                 log_message("debug","completado");
                 $estado = 'finalizado';
-            }else if($next->estado == 'standby'){  //Etapas paralelas pendientes
+            }else if($next->estado == 'standby'){
                 log_message("debug","standby");
                 $estado = 'standby';
             }else{
@@ -575,7 +600,7 @@ class IntegracionMediator{
             }
             $secuencia = 0;  //debe resetarse el paso
         }else{
-            //Procesar pasos de una misma etpa
+            //Procesar pasos de una misma etapa
             $estado = 'activo';
             $paso = $etapa->getPasoEjecutable($secuencia);
             $etapa->iniciarPaso($paso);
@@ -621,7 +646,24 @@ class IntegracionMediator{
         return $etapas;
     }
 
-    
+    private function registrarRetorno($tramite_id, $tramite_retorno, $retorno_id){
+
+        $tramite = Doctrine::getTable('Tramite')->find($tramite_id);
+        $etapa_id = $tramite->getEtapasActuales()->get(0)->id;
+
+        $dato = new DatoSeguimiento();
+        $dato->nombre = "tramite_retorno";
+        $dato->valor = $tramite_retorno;
+        $dato->etapa_id = $etapa_id;
+        $dato->save();
+
+        $dato = new DatoSeguimiento();
+        $dato->nombre = "tarea_retorno";
+        $dato->valor = $retorno_id;
+        $dato->etapa_id = $etapa_id;
+        $dato->save();
+    }
+
 
 }
 

@@ -96,6 +96,7 @@ class Etapa extends Doctrine_Record {
     //Este parametro solamente es valido si la asignacion de la prox tarea es manual.
     public function avanzar($usuarios_a_asignar = null) {
         log_message('debug',"Avanzando etapa");
+
         Doctrine_Manager::connection()->beginTransaction();
         //Cerramos esta etapa
         $this->cerrar();
@@ -166,6 +167,7 @@ class Etapa extends Doctrine_Record {
             }
         }
         Doctrine_Manager::connection()->commit();
+
     }
 
     //Esta funcion entrega un listado de tareas a continuar y un estado que indica como se debe proceder con esta continuacion.
@@ -649,4 +651,41 @@ class Etapa extends Doctrine_Record {
         return $etapa[0];
     }
 
+    public function ejecutarColaContinuarTarea($tarea_id, $tareas_encoladas){
+        log_message('debug',"Verificando si existe alguna acción de continuar tarea encolada", FALSE);
+        //$cola = new ColaContinuarTramite();
+        //$tareas_proximas = $etapa_actual->getTareasProximas();
+        //$tareas_encoladas = $cola->findTareasEncoladas($tramite_id);
+        $result = null;
+        if(isset($tareas_encoladas) && count($tareas_encoladas) > 0){
+            log_message('debug',"Se encuentran ".count($tareas_encoladas)." registros encolados para este trámite", FALSE);
+            log_message('debug',"Buscando tarea id: ".$tarea_id, FALSE);
+            foreach ($tareas_encoladas as $tarea_continuar){
+                //foreach ($tareas_proximas as $tarea_proxima) {
+                if($tarea_continuar->tarea_id == $tarea_id){
+                    log_message('debug',"Continuando tarea con id ".$tarea_id, FALSE);
+                    $etapa = new Etapa();
+                    $etapa = $etapa->getEtapaPorTareaId($tarea_continuar->tarea_id, $tarea_continuar->tramite_id);
+                    log_message("debug", "id_etapa a continuar: ".$etapa->id);
+                    $tarea_continuar->procesado = 1;
+                    $tarea_continuar->save();
+                    $integracion = new IntegracionMediator();
+                    $result = $integracion->continuarProceso($tarea_continuar->tramite_id, $etapa->id, "0", $tarea_continuar->request);
+                    log_message('debug',"Result continuar: ".$this->varDump($result), FALSE);
+                    //return $etapa;
+                }
+                //}
+            }
+        }
+        return $result;
+    }
+
+    private function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 }

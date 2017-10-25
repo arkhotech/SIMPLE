@@ -120,15 +120,7 @@ class AccionIniciarTramite extends Accion {
             $integracion = new IntegracionMediator();
 
             //TODO al parecer falta indicar tarea de inicio
-            $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, $etapa->id, $request);
-
-            log_message("INFO", "Registrando tramite: ".$info_inicio['idInstancia'], FALSE);
-            log_message("INFO", "Registrando tarea: ".$this->extra->tareaRetornoSel, FALSE);
-            $this->registrarRetorno($info_inicio['idInstancia'], $etapa->tramite_id, $this->extra->tareaRetornoSel);
-
-            //$response_inicio = "{\"respuesta_inicio\": ".$info_inicio."}";
-
-            //log_message("INFO", "Response: ".$response_inicio, FALSE);
+            $info_inicio = $integracion->iniciarProceso($this->extra->tramiteSel, $etapa->id, $request, $etapa->tramite_id, $this->extra->tareaRetornoSel);
 
             $response["respuesta_inicio"]=$info_inicio;
 
