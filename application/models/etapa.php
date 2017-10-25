@@ -653,15 +653,11 @@ class Etapa extends Doctrine_Record {
 
     public function ejecutarColaContinuarTarea($tarea_id, $tareas_encoladas){
         log_message('debug',"Verificando si existe alguna acción de continuar tarea encolada", FALSE);
-        //$cola = new ColaContinuarTramite();
-        //$tareas_proximas = $etapa_actual->getTareasProximas();
-        //$tareas_encoladas = $cola->findTareasEncoladas($tramite_id);
         $result = null;
         if(isset($tareas_encoladas) && count($tareas_encoladas) > 0){
             log_message('debug',"Se encuentran ".count($tareas_encoladas)." registros encolados para este trámite", FALSE);
             log_message('debug',"Buscando tarea id: ".$tarea_id, FALSE);
             foreach ($tareas_encoladas as $tarea_continuar){
-                //foreach ($tareas_proximas as $tarea_proxima) {
                 if($tarea_continuar->tarea_id == $tarea_id){
                     log_message('debug',"Continuando tarea con id ".$tarea_id, FALSE);
                     $etapa = new Etapa();
@@ -671,10 +667,7 @@ class Etapa extends Doctrine_Record {
                     $tarea_continuar->save();
                     $integracion = new IntegracionMediator();
                     $result = $integracion->continuarProceso($tarea_continuar->tramite_id, $etapa->id, "0", $tarea_continuar->request);
-                    log_message('debug',"Result continuar: ".$this->varDump($result), FALSE);
-                    //return $etapa;
                 }
-                //}
             }
         }
         return $result;

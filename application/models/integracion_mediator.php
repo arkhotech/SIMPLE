@@ -544,9 +544,6 @@ class IntegracionMediator{
             //Finlaizar etapa
             $etapa->avanzar();
 
-            //Si hay acciones de continuar proceso encoladas se ejecutan
-            //$etapa->ejecutarColaContinuarTarea($etapa);
-
             $next = $etapa->getTareasProximas();
             
             log_message("INFO", "###Id etapa despues de avanzar: ".$etapa->id, FALSE);
