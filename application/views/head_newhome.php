@@ -1,5 +1,5 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<title><?=Cuenta::cuentaSegunDominio()!='localhost'?Cuenta::cuentaSegunDominio()->nombre_largo:'SIMPLE'?> - <?= $title ?></title>
+<title><?=Cuenta::cuentaSegunDominio() != 'localhost' ? Cuenta::cuentaSegunDominio()->nombre_largo:'SIMPLE'?> - <?= $title ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Le styles -->
@@ -34,8 +34,8 @@
 <script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php //JS para hacer grillas     ?>
 <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js" type="text/javascript" ></script> <?php //Soporte para selects con multiple choices    ?>
 <script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js" type="text/javascript" ></script> <?php //Soporte para subir archivos con ajax    ?>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/newhome/js/common.js" type="text/javascript" ></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES" type="text/javascript" ></script>
 
 <script type="text/javascript">
     var site_url = "<?= site_url() ?>";
@@ -55,5 +55,4 @@
             });
         }
     };
-
 </script>

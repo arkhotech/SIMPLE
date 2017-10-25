@@ -702,3 +702,23 @@ a.close {
 #sidebar_head {
   padding-top: 8px;
 }
+
+.qq-upload-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  font-size: 1em;
+  line-height: 24px;
+  display: inline-block;
+  margin: 0;
+  padding: 18px 25px;
+  height: 60px;
+  position: relative;
+  text-align: center;
+  text-decoration: underline;
+  -webkit-transition: .2s;
+  transition: .2s;
+  background-color: #E3E5EF;
+  color: #FE6565;
+}
