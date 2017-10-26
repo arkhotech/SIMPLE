@@ -164,4 +164,11 @@
     .aux-box_roboto_font-head {
       font-size: 0.7023319616em;
       opacity: 0.92; }
+   code{
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #0021FF;
+    background-color: #E3E5EF;
+    border-radius: 4px;
+   }
 /*# sourceMappingURL=components.css.map */

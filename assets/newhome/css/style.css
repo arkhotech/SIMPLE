@@ -6501,4 +6501,13 @@ ul.steps li a.last {
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
 }
+
+/** Framework demo **/
+
+.demo-grid [class^=col-]{
+  background: #F5F6F7;
+  border: 1px solid #A8B7C7;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
 /*# sourceMappingURL=style.css.map */

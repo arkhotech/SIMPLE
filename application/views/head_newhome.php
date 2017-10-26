@@ -15,7 +15,8 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/css/responsive.css">
-<link href="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" ref="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" >
+<link rel="stylesheet" href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->

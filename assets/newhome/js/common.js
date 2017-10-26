@@ -20,13 +20,6 @@ $(document).ready(function() {
         $(this).click(function () { return false; });
     });
 
-    $(".datepicker:not([readonly])").datepicker({
-        format: "dd-mm-yyyy",
-        weekStart: 1,
-        autoclose: true,
-        language: "es"
-    });
-
     $(".file-uploader").each(function(i, el) {
         var $parentDiv = $(el).parent();
         new qq.FileUploader({
