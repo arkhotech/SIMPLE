@@ -3,11 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Le styles -->
-<link rel="stylesheet" href="<?= base_url() ?>assets/js/bootstrap-datepicker/css/datepicker.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/jquery.chosen/chosen.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css">
-<link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap2-toggle.min.css" rel="stylesheet">
+<link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap2-toggle.min.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab">
@@ -16,7 +15,6 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/css/responsive.css">
 <link rel="stylesheet" ref="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" >
-<link rel="stylesheet" href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->

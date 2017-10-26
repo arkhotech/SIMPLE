@@ -722,3 +722,45 @@ a.close {
   background-color: #E3E5EF;
   color: #FE6565;
 }
+
+
+.icon_calendar {
+  background-image: url(../images/icons/calendar.png);
+  width: 34px;
+  height: 30px;
+  background-size: 34px 30px;
+}
+
+.handsontable thead th .relative {
+  padding: 14px 4px;
+}
+
+.handsontable td {
+  padding: 14px 4px;
+}
+
+.handsontable th {
+  background-color: #f9f9f9;
+}
+
+.handsontable th:first-child {
+  border-right: 2px solid #E3E5EF;
+  border-bottom: 2px solid #E3E5EF;
+}
+
+.handsontable tr:first-child th, .handsontable tr:first-child td{
+  border-top: 2px solid #E3E5EF;
+}
+
+.handsontable tr:last-child th, .handsontable tr:first-child td{
+  border-right: 2px solid #E3E5EF;
+}
+
+.handsontable th:first-child, .handsontable td:first-of-type, .handsontable .htNoFrame+th, .handsontable .htNoFrame+td {
+  border-left: 2px solid #E3E5EF;
+}
+
+.handsontable th, .handsontable td {
+  border-right: 2px solid #E3E5EF;
+  border-bottom: 2px solid #E3E5EF;
+}
