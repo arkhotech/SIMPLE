@@ -462,10 +462,6 @@ a.close {
   float: left;
 }
 
-.aside {
-  position: fixed;
-  margin-top: 200px;
-}
 
 @media (min-width: 1021px) {
   .container-fluid .navbar-header {
@@ -479,9 +475,14 @@ a.close {
   #fixed-menu {
     display: block;
   }
+
 }
 
 @media (max-width: 1020px) {
+
+  .aside {
+    position: fixed;
+  }
 
   .container-fluid .navbar-header {
     display: block;
