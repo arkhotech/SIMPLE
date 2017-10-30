@@ -127,10 +127,10 @@
                     <td class="actions">
                         <?php $etapas = $t->getEtapasParticipadas(UsuarioSesion::usuario()->id) ?>
                         <?php if (count($etapas) == 3e4354) : ?>
-                            <a href="<?= site_url('etapas/ver/' . $etapas[0]->id) ?>" class="historial">&nbsp;</a>
+                            <a href="<?= site_url('etapas/ver/' . $etapas[0]->id) ?>">Historial</a>
                         <?php else: ?>
                             <div class="btn-group">
-                                <a class="historial" data-toggle="dropdown" href="#">&nbsp;</a>
+                                <a data-toggle="dropdown" href="#">Historial</a>
                                 <ul class="dropdown-menu">
                                     <?php foreach ($etapas as $e): ?>
                                         <li><a href="<?= site_url('etapas/ver/' . $e->id) ?>"><?= $e->Tarea->nombre ?></a></li>
@@ -140,7 +140,7 @@
                         <?php endif ?>
                         <?php if (Cuenta::cuentaSegunDominio()->descarga_masiva): ?>
                           <?php if ($file): ?>
-                          <a href="#" onclick="return descargarDocumentos(<?=$t->id?>);" class="descargar" alt="Descargar">&nbsp;</a>
+                          <a href="#" onclick="return descargarDocumentos(<?=$t->id?>);">Descargar</a>
                           <?php endif; ?>
                         <?php endif; ?>
                     </td>

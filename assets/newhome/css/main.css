@@ -312,8 +312,6 @@ header.navbar {
 }
 
 .navbar .dropdown-menu {
-  width: 368px;
-  max-width: 100%;
   padding-right: 10px;
   z-index: 1000;
   background-color: #fff;
@@ -649,41 +647,23 @@ a.close {
 }
 
 .btn-group .dropdown-menu {
-    width: 368px;
-    max-width: 100%;
     padding-right: 10px;
     z-index: 1000;
-    background-color: #fff;
+
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 0 1px 1px 1px solid rgba(0,0,0,.15);
     border-radius: 0 0 4px 4px;
-    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+
+
+    background-color: #f5f6f7;
+    -webkit-box-shadow: 0 20px 40px 0 rgba(10, 19, 45, 0.15);
+    box-shadow: 0 20px 40px 0 rgba(10, 19, 45, 0.15);
+    z-index: 5;
 }
 
 .btn-group {
   float: left;
-}
-
-.descargar {
-  width: 48px;
-  height: 48px;
-  margin-right: 5px;
-  background: #85B1F5;
-  float: left;
-  text-decoration: none;
-  -webkit-mask: url(../images/icons/archive.svg) center / contain no-repeat;
-}
-
-.historial {
-  width: 48px;
-  height: x48px;
-  margin-right: 5px;
-  background: #85B1F5;
-  float: left;
-  text-decoration: none;
-  -webkit-mask: url(../images/icons/ios-albums-outline.svg) center / contain no-repeat;
 }
 
 .aside {
@@ -763,4 +743,20 @@ a.close {
 .handsontable th, .handsontable td {
   border-right: 2px solid #E3E5EF;
   border-bottom: 2px solid #E3E5EF;
+}
+
+.open > .dropdown-menu {
+  display: block;
+}
+
+.btn-group {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  margin: 0 4px 4px 0;
+}
+
+.dropdown-menu li {
+  padding: 10px 5px;
 }

@@ -241,6 +241,10 @@ table {
       border-bottom: 0;
     }
   }
+
+
+
+  
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -345,6 +349,13 @@ table {
   .modal-footer .btn-block + .btn-block {
     margin-left: 0;
   }
+
+
+
+
+
+
+  
   .tooltip {
     position: absolute;
     z-index: 1030;

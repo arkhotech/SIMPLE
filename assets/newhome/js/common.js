@@ -189,7 +189,7 @@ $(document).ready(function() {
                     }
             	}        	
             });
-            
+
             if (existe) {
                 if (visible) {
                     if ($(form).hasClass("debugForm"))
@@ -209,14 +209,13 @@ $(document).ready(function() {
                     $(el).find(":input").addClass("disabled-temp");
                 }
             }
-            
         });
-        
+
         $(form).find(":input.disabled-temp").each(function(i, el) {
             $(el).prop("disabled", true);
             $(el).removeClass("disabled-temp");
         });
-        
+
         $(form).find(":input.enabled-temp").each(function(i, el) {
             $(el).prop("disabled", false);
             $(el).removeClass("disabled-temp");        	
@@ -232,7 +231,7 @@ $(document).ready(function() {
         prepareDynaForm($(event.target).closest(".dynaForm"))
     });
 });
-  
+
 function buscarAgenda() {
     if (jQuery.trim($('.js-pertenece').val()) != "") {
         var base_url = $('#base_url').val();
@@ -248,6 +247,9 @@ function buscarAgenda() {
 }
 
 function calendarioFront(idagenda, idobject, idcita, tramite, etapa) {
+
+    console.log("calendarioFront");
+
     var site_url = $('#urlbase').val();
 
     if (idcita == 0) {

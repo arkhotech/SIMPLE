@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/prism-min.css">
 <link rel="stylesheet" href="<?= base_url() ?>assets/css/responsive.css">
-<link rel="stylesheet" ref="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" >
+<link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/components-bootstrap.css" >
 <link rel="stylesheet" href="<?= base_url() ?>assets/newhome/css/main.css">
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -27,12 +27,10 @@
 
 <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript" ></script>
-<script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/bootstrap-datepicker.js" type="text/javascript" ></script>
-<script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
-<script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php //JS para hacer grillas     ?>
-<script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js" type="text/javascript" ></script> <?php //Soporte para selects con multiple choices    ?>
-<script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js" type="text/javascript" ></script> <?php //Soporte para subir archivos con ajax    ?>
+<script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php // JS para hacer grillas ?>
+<script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js" type="text/javascript" ></script> <?php // Soporte para selects con multiple choices ?>
+<script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js" type="text/javascript" ></script> <?php // Soporte para subir archivos con ajax ?>
 <script src="<?= base_url() ?>assets/newhome/js/common.js" type="text/javascript" ></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES" type="text/javascript" ></script>
 
@@ -50,7 +48,7 @@
 
         if ($('#form_captcha').length) {
             grecaptcha.render("form_captcha", {
-                sitekey : site_key
+                'sitekey' : site_key
             });
         }
     };
