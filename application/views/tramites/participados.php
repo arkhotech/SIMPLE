@@ -156,7 +156,7 @@
                     <input type="hidden" id="tramites" name="tramites" />
                     <label>
                         <input type="checkbox" id="select_all" name="select_all" /> Seleccionar todos
-                        <a href="#" onclick="return descargarSeleccionados();" class="button preventDoubleRequest"><i class="icon-download icon-white"></i> Descargar seleccionados</a>
+                        <a href="#" onclick="return descargarSeleccionados();" class="button preventDoubleRequest">Descargar seleccionados</a>
                     </label>
                 </div>
             </div>
