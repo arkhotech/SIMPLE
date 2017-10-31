@@ -12,10 +12,10 @@
 
 <ul class="steps">
     <?php for ($i = 0; $i < $num_pasos; $i++): ?>
-    <li style="width: <?=100/$num_pasos?>%;" class="<?=($i <= $secuencia) ? 'active' :'' ?>">Paso <?=$i+1?></li>
+    <li style="width: <?=100/$num_pasos?>%;" class="<?=($i <= $secuencia) ? 'active' :'' ?>"><span>Paso <?=$i+1?></span></li>
 	<?php endfor; ?>
 </ul>
-
+<div style="clear: both;"></div>
 <?php if ($etapa->Tarea->vencimiento): ?>
 <div class="alert alert-warning">Atención. Esta etapa <?=$etapa->getFechaVencimientoAsString()?>.</div>
 <?php endif ?>

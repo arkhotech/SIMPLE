@@ -1,7 +1,24 @@
 <script>
     function descargarDocumentos(tramiteId) {
-        $("#modal").load(site_url + "etapas/descargar/" +tramiteId);
+        $("#modal").load(site_url + "etapas/descargar/" + tramiteId);
         $("#modal").modal();
+        $("#modal").css('display','block');
+
+        $(".closeModal").click(function() {
+            closeModal();
+            console.log("test1");
+        });
+
+        $(".modal-backdrop").click(function() {
+            closeModal();
+            console.log("test2");
+        });
+
+        $(".modal-backdrop").click(function() {
+            closeModal();
+            console.log("test3");
+        });
+
         return false;
     }
 
@@ -22,6 +39,14 @@
         });
     });
 
+    function closeModal() {
+        $("#modal").removeClass("in");
+        $(".modal-backdrop").remove();
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
+        $("#modal").hide();
+    }
+
     function descargarSeleccionados() {
         var numberOfChecked = $('.checkbox1:checked').length;
         if (numberOfChecked == 0) {
@@ -36,8 +61,9 @@
             });
             $('#tramites').val(checked);
             var tramites = $('#tramites').val();
-            $("#modal").load(site_url + "etapas/descargar/" +tramites);
+            $("#modal").load(site_url + "etapas/descargar/" + tramites);
             $("#modal").modal();
+            console.log("descargarSeleccionados.modal");
             return false;
         }
     }
@@ -146,7 +172,7 @@
                     </label>
                 </div>
             </div>
-            <div class="modal hide fade" id="modal"></div>
+            <div class="modal hide fade in" id="modal"></div>
         <?php endif; ?>
     <?php endif; ?>
 

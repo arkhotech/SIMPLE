@@ -10,6 +10,11 @@ header {
   transition: background-color .3s;
 }
 
+.validacion {
+  margin-top: 10px;
+  clear: both;
+}
+
 .section-header h2 {
   margin: 8px 0 10px 0;
 }
@@ -21,7 +26,6 @@ header {
 .container-fluid .navbar-detail {
   display: block;
 }
-
 
 #fixed-menu {
   display: block;
@@ -48,7 +52,7 @@ footer .container {
 fieldset {
   /*width: 600px;*/
   padding: 0;
-  margin: 0;
+  margin: 10px 0 0 0;
   border: 0;
 }
 
@@ -342,7 +346,7 @@ input:focus, select:focus, textarea:focus {
 #simple-categorias .tarjeta {
   padding: 10px;
 }
-
+/*
 .alert {
   padding: 8px 35px 8px 14px;
   margin-bottom: 18px;
@@ -359,6 +363,7 @@ input:focus, select:focus, textarea:focus {
   border-color: #eed3d7;
   color: #b94a48;
 }
+
 
 .close {
   float: right;
@@ -379,6 +384,19 @@ a.close {
   top: -2px;
   right: -21px;
   line-height: 18px;
+}
+*/
+
+.alert.alert-error {
+  background: #BB0000;
+  color: #fff;
+}
+
+.alert {
+  padding: 6px 12px;
+  margin-top: 10px;
+  display: block;
+  font-size: 14px;
 }
 
 .dropdown-menu {
@@ -475,7 +493,6 @@ a.close {
   #fixed-menu {
     display: block;
   }
-
 }
 
 @media (max-width: 1020px) {
@@ -677,7 +694,6 @@ a.close {
 
 .steps li {
   float: left;
-  margin-bottom: 50px;
 }
 
 #sidebar_head {
@@ -760,4 +776,15 @@ a.close {
 
 .dropdown-menu li {
   padding: 10px 5px;
+}
+
+.alert.alert-error .close {
+  float: right;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+form.ajaxForm {
+  margin-top:30px;
 }

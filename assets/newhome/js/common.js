@@ -272,3 +272,4 @@ function calendarioFront(idagenda, idobject, idcita, tramite, etapa) {
     $("#modalcalendar").load(site_url + "agenda/ajax_modal_calendar?idagenda=" + idagenda + "&object=" + idobject + "&idcita=" + idcita + "&idtramite=" + idtramite + "&etapa=" + etapa);
     $("#modalcalendar").modal();
 }
+

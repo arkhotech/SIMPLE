@@ -27,6 +27,7 @@
 
 <script src="<?= base_url() ?>assets/js/jquery/jquery-1.8.3.min.js" type="text/javascript" ></script>
 <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript" ></script>
+
 <script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
 <script src="<?= base_url() ?>assets/js/handsontable/dist/handsontable.full.min.js" type="text/javascript"></script> <?php // JS para hacer grillas ?>
 <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js" type="text/javascript" ></script> <?php // Soporte para selects con multiple choices ?>
