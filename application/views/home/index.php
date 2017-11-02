@@ -76,7 +76,7 @@
                         <div class="simple">
                           <div class="wrapper">
                             <form id="login" method="post" class="ajaxForm" action="<?= site_url('autenticacion/login_form') ?>">        
-                              <div class="validacion"></div>
+                              <div class="validacion_login"></div>
                               <input type="hidden" name="redirect" value="<?= current_url() ?>" />
                               <label for="usuario">Usuario o Correo electr&oacute;nico</label>
                               <input name="usuario" id="usuario" type="text" class="input-xlarge">

@@ -81,9 +81,9 @@ $(document).ready(function() {
                         $(form).prop("submitting", false);
                         $('#login .ajaxLoader').hide();
 
-                        $(".validacion").html(response.errores);
+                        $(".validacion_login").html(response.errores);
                         $('html, body').animate({
-                            scrollTop: $(".validacion").offset().top - 10
+                            scrollTop: $(".validacion_login").offset().top - 10
                         });
                     }
                 },

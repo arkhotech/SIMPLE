@@ -419,17 +419,23 @@ a.close {
 
 #loginView label {
   float: left;
+  margin-top: 10px;
 }
 
 #loginView .simple .wrapper {
-  padding: 20px 20px 0 0px;
+  padding: 0px 20px 0 0px;
 }
 
 #loginViewUser .dropdown-menu li {
   padding: 10px 10px 10px 0;
 }
 
+form#login {
+  margin-top: 0px;
+}
+
 #loginView input {
+  display: block;
   width: 100%;
   height: 50px;
   margin-bottom: 15px;
@@ -787,4 +793,19 @@ a.close {
 
 form.ajaxForm {
   margin-top:30px;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active .ui-tabs-anchor, .ui-tabs .ui-tabs-nav li.ui-state-disabled .ui-tabs-anchor, .ui-tabs .ui-tabs-nav li.ui-tabs-loading .ui-tabs-anchor {
+  background-color: #FE6565;
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+  border: 1px solid #FE6565 !important;
+  background: #FE6565 !important;
+  font-weight: normal;
+  color: #ffffff;
+}
+
+.ui-corner-all {
+  border: 0px !important;
 }
