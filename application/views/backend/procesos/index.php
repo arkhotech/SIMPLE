@@ -20,6 +20,12 @@
         var $link = $("#link_eliminados");
         $(this).is(":visible") ? $link.text("Ocultar Eliminados «") : $link.text("Mostrar Eliminados »");
     }
+
+    function publicarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_publicar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 </script>
 
 <ul class="breadcrumb">
@@ -57,7 +63,7 @@
                 <a class="btn btn-default" href="<?=site_url('backend/procesos/exportar/'.$p->id)?>"><i class="icon icon-share"></i> Exportar</a>
                 <a class="btn btn-danger" href="#" onclick="return eliminarProceso(<?=$p->id?>);"><i class="icon-white icon-remove"></i> Eliminar</a>
                 <?php if($p->estado == 'draft'){?>
-                    <a class="btn btn-primary" href="<?=site_url('backend/procesos/publicar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Publicar</a>
+                    <a class="btn btn-primary" href="#" onclick="return publicarProceso(<?=$p->id?>);"><i class="icon-white icon-edit"></i> Publicar</a>
                 <?php }?>
             </td>
         </tr>

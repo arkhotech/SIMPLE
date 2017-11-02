@@ -520,4 +520,13 @@ class Proceso extends Doctrine_Record {
         return $result[0]['version'];
     }
 
+    public function getTareasProceso(){
+        $tareas=Doctrine_Query::create()
+            ->from('Tarea t, t.Proceso p')
+            ->where('p.id = ?',$this->id)
+            ->execute();
+
+        return $tareas;
+
+    }
 }

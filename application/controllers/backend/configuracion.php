@@ -434,15 +434,6 @@ class Configuracion extends MY_BackendController {
         
     }
 
-    //public function modelador(){
-      //  $data['cuenta']=Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
-        //print_r($data['cuenta']);
-        //exit;
-      //  $data['title'] = 'Configuración Modelador';
-      //  $data['content'] = 'backend/configuracion/modelador';
-      //  $this->load->view('backend/template', $data);
-  //  }
-
     public function modelador($conector_id=''){
         if (!$conector_id==''){
             $cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;

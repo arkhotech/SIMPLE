@@ -44,4 +44,17 @@ class GrupoUsuarios extends Doctrine_Record {
                 $this->Usuarios[]=Doctrine::getTable('Usuario')->find($g);
     }
 
+    public function existeGrupo($id_cuenta){
+        log_message("INFO", "Revisando grupo: ".$this->nombre." para cuenta: ".$id_cuenta, FALSE);
+        $grupo = null;
+        $grupo_encontrado = Doctrine_Query::create()->from('GrupoUsuarios g')
+                                                    ->where('g.nombre=? AND g.cuenta_id=?',array($this->nombre, $id_cuenta))
+                                                    ->execute();
+        log_message("INFO", "registros encontrados: ".count($grupo_encontrado), FALSE);
+        if(count($grupo_encontrado) > 0){
+            return $grupo_encontrado[0];
+        }
+        return $grupo;
+    }
+
 }

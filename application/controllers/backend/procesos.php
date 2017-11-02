@@ -605,12 +605,65 @@ class Procesos extends MY_BackendController {
             $proceso=Proceso::importComplete($proceso_draft->exportComplete());
             $proceso->cuenta_id = $cuenta->vinculo_produccion;
             $proceso->save();
+
+            $this->migrarGrupos($proceso, $cuenta);
+
         }
 
         log_message("INFO", "Proceso actualizado", FALSE);
 
-        redirect('backend/procesos/index');
+        $respuesta = new stdClass ();
+        $respuesta->validacion = TRUE;
+        $respuesta->redirect = site_url('backend/procesos/index/');
+        echo json_encode($respuesta);
 
+    }
+
+    private function migrarGrupos($proceso, $cuenta){
+        //asignar grupos de usuario de producción por cada tarea
+        log_message("INFO", "Revisando grupos para proceso id ".$proceso->id, FALSE);
+        $tareas = $proceso->getTareasProceso($proceso->id);
+        foreach ($tareas as $tarea){
+            $idUsuarios = $tarea->grupos_usuarios;
+            if(strlen($idUsuarios) > 0){
+                $ids = explode(",", $idUsuarios);
+                if(count($ids) > 0){
+                    $ids_prod = "";
+                    foreach ($ids as $id){
+                        $grupo = Doctrine::getTable("GrupoUsuarios")->find($id);
+                        log_message("INFO", "Revisando grupo: ".$grupo->nombre, FALSE);
+                        $grupo_prod = $grupo->existeGrupo($cuenta->vinculo_produccion);
+                        if(isset($grupo_prod)){
+                            log_message("INFO", "Existe en produccion", FALSE);
+                            log_message("INFO", "Nombre: ".$grupo_prod->nombre, FALSE);
+                            if(strlen($ids_prod) > 0){
+                                $ids_prod.= ",".$grupo_prod->id;
+                            }else{
+                                $ids_prod = $grupo_prod->id;
+                            }
+                        }else{
+                            log_message("INFO", "No existe en produccion", FALSE);
+                            $grupo_usuarios = new GrupoUsuarios();
+                            $grupo_usuarios->nombre = $grupo->nombre;
+                            $grupo_usuarios->cuenta_id = $cuenta->vinculo_produccion;
+                            $grupo_usuarios->save();
+                            log_message("INFO", "Se crea grupo en produccion", FALSE);
+                            log_message("INFO", "Grupo creado: ".$grupo_usuarios->id, FALSE);
+                            if(strlen($ids_prod) > 0){
+                                $ids_prod.= ",".$grupo_usuarios->id;
+                            }else{
+                                $ids_prod = $grupo_usuarios->id;
+                            }
+                        }
+                    }
+                    log_message("INFO", "id grupos prod: ".$ids_prod, FALSE);
+                    if(strlen($ids_prod) > 0) {
+                        $tarea->grupos_usuarios = $ids_prod;
+                        $tarea->save();
+                    }
+                }
+            }
+        }
     }
 
     private function crearDraft($proceso){
@@ -712,10 +765,19 @@ class Procesos extends MY_BackendController {
         echo json_encode($modelo);
     }
 
+    public function ajax_publicar_proceso($proceso_id) {
+        if (! in_array ( 'super', explode ( ",", UsuarioBackendSesion::usuario ()->rol ) ))
+            show_error ( 'No tiene permisos', 401 );
+
+        $proceso = Doctrine::getTable("Proceso")->find($proceso_id);
+        $data['proceso'] = $proceso;
+        $this->load->view ( 'backend/procesos/ajax_publicar_proceso', $data );
+    }
+
     function varDump($data){
         ob_start();
-        //var_dump($data);
-        print_r($data);
+        var_dump($data);
+        //print_r($data);
         $ret_val = ob_get_contents();
         ob_end_clean();
         return $ret_val;
