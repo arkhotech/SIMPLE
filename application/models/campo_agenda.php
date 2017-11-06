@@ -17,7 +17,7 @@ class CampoAgenda extends Campo{
         $display.='<div class="controls">';
             $display.='<input type="hidden" name="objappointments[]" data-id-etapa="'.$etapa_id.'" value="0" id="codcita'.$this->id.'" />';
             $display.='<input type="hidden" id="'.$this->id.'" ' . ($modo == 'visualizacion' ? 'readonly' : '') . ' type="text" class="input-semi-large js-data-cita" name="' . $this->nombre . '" value="' . ($dato?htmlspecialchars($dato->valor):htmlspecialchars($valor_default)) . '" data-modo="'.$modo.'" />';
-            $display.='<div class="cont-link float-left">
+            $display.='<div class="cont-link">
             <a onclick="calendarioFront('.$this->agenda_campo.','.$this->id.',0,'.$etapa_id.');" href="#" >
                 <div class="icon_calendar"></div>
             </a>
