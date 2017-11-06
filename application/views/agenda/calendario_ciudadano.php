@@ -89,7 +89,7 @@
             merge_holidays: true,
             holidays: feriados,
             onAfterEventsLoad: function(events) {
-                if(!events) {
+                if (!events) {
                     return;
                 }
                 var list = $('#eventlist');

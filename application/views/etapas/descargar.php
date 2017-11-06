@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="close" data-dismiss="modal"><i class="icon-close icon--top"></i></button>
     <h3 id="myModalLabel">Descarga de documentos</h3>
 </div>
 <div class="modal-body">
@@ -29,6 +29,6 @@
 </div>
 
 <div class="modal-footer">
-    <a class="button closeModal">Cerrar</a>
-    <a href="#" onclick="javascript:$('#formDescargarDocumentos').submit();$('#modal').modal('hide')" class="btn btn-primary">Descargar</a>
+    <a class="button button--lightgray closeModal" data-dismiss="modal">Cerrar</a>
+    <a href="#" onclick="javascript:$('#formDescargarDocumentos').submit();$('#modal').modal('hide')" class="button btn-primary">Descargar</a>
 </div>

@@ -30,7 +30,7 @@ $(document).ready(function() {
                     if (typeof(respuesta.file_name) !== "undefined") {
                         $parentDiv.find(":input[type=hidden]").val(respuesta.file_name);
                         $parentDiv.find(".qq-upload-list").empty();
-                        $parentDiv.find(".link").html("<a target='blank' href='" + site_url + "uploader/datos_get/" + respuesta.file_name + "?id=" + respuesta.id + "&token=" + respuesta.llave + "'>" + respuesta.file_name + "</a> (<a href='#' class='remove'>X</a>)")
+                        $parentDiv.find(".link").html("<a target='blank' href='" + site_url + "uploader/datos_get/" + respuesta.file_name + "?id=" + respuesta.id + "&token=" + respuesta.llave + "'>" + respuesta.file_name + "</a> (<a href='#' class='remove'>X</a>)");
                         prepareDynaForm(".dynaForm");
                     } else {
                         $parentDiv.find(".link").html("");
@@ -118,7 +118,7 @@ $(document).ready(function() {
                             window.location = response.redirect;
                         } else {
                             var f = window[$(form).data("onsuccess")];
-                            f (form);
+                            f(form);
                         }
                     } else {
                         if ($('#login_captcha').length > 0) {
@@ -247,8 +247,6 @@ function buscarAgenda() {
 }
 
 function calendarioFront(idagenda, idobject, idcita, tramite, etapa) {
-
-    console.log("calendarioFront");
 
     var site_url = $('#urlbase').val();
 

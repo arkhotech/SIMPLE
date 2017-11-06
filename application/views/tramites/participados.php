@@ -1,5 +1,6 @@
 <script>
     $(document).ready(function() {
+
         $('#select_all').click(function(event) {
             var checked = [];
             $('#tramites').val();
@@ -14,11 +15,13 @@
             }
             $('#tramites').val(checked);
         });
-    });
 
+    });
+    
     function descargarDocumentos(tramiteId) {
         $("#modal").load(site_url + "etapas/descargar/" + tramiteId);
         $("#modal").modal();
+
         return false;
     }
 
@@ -166,6 +169,6 @@
 
     <p><?= $links ?></p>   
     <?php else: ?>
-        <p>Ud no ha participado en trámites.</p>
+        <p>Ud no ha participado en tr&aacute;mites.</p>
     <?php endif; ?>
 </div>
