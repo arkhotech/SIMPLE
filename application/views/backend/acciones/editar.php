@@ -52,6 +52,14 @@
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#webhook" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>
             </a>
+        <?php } else if ($tipo == "iniciar_tramite") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#iniciar-tramite" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
+        <?php } else if ($tipo == "continuar_tramite") { ?>
+            <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#continuar-tramite" target="_blank">
+                <span class="glyphicon glyphicon-info-sign"></span>
+            </a>
         <?php } ?>
         </legend>
         <div class="validacion"></div>

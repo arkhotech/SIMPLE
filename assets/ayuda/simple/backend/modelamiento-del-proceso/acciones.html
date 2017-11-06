@@ -40,6 +40,8 @@
 						<li class="last"><a href="reglas-de-negocio-y-reglas-de-validacion.html" title="Reglas de Negocio y Reglas de Validación" >Reglas de Negocio y Reglas de Validación</a></li>
 						<!-- Arkhotech -->
 						<li><a href="../export-import.html" title="Exportar e Importar" >Exportar e importar</a></li>
+						<li><a href="suscriptores-externos.html" title="Suscriptores Externos" >Suscriptores Externos</a></li>
+							<li><a href="suscriptores-externos.html" title="Suscriptores Externos" >Suscriptores Externos</a></li>
 						<!-- Arkhotech -->
 						</ul></li>
 						<li><a href="../seguimiento-de-procesos.html" title="Seguimiento de Procesos" >Seguimiento de Procesos</a></li>
@@ -76,7 +78,18 @@
 				  <li><a href="../../index.html">Simple</a> <span class="divider">/</span></li><li><a href="../index.html">Backend</a> <span class="divider">/</span></li><li><a href="index.html">Modelamiento del Proceso</a> <span class="divider">/</span></li><li>Acciones</li>
 				</ul>
 				<h3>2.3.3                   Acciones del proceso</h3>
-					<p>Las acciones permiten realizar eventos especiales al iniciar o finalizar una tarea del modelo de procesos, en la actualidad existen cuatro acciones predefinidas que se pueden utilizar al modelar el proceso, las cuales son envío de correos, generar variable, consumo de servicio rest y consumo de servicio soap.</p>
+					<p>Las acciones permiten realizar eventos especiales al iniciar o finalizar una tarea del modelo de procesos, en la actualidad existen nueve acciones predefinidas que se pueden utilizar al modelar el proceso, las cuales son:</p>
+					<ul>
+						<li><a href="#enviar_correo" title="Enviar Correo">Enviar Correo</a></li>
+						<li><a href="#variable" title="Generar Variable">Generar Variable</a></li>
+						<li><a href="#webservice-rest" title="Consultar Rest">Consultar Rest</a></li>
+						<li><a href="#webservice-soap" title="Consultar Soap">Consultar Soap</a></li>
+						<li><a href="#callback" title="Generar Callback">Generar Callback</a></li>
+						<li><a href="#" title="Generar Callback">Iniciar Trámite</a></li>
+						<li><a href="#" title="Generar Callback">Continuar Trámite</a></li>
+						<li><a href="#" title="Generar Callback">Notificaciones</a></li>
+						<li><a href="#" title="Generar Callback">Descargar Documento</a></li>
+					</ul>
 					<p>Para ingresar al menú de acciones simplemente haga clic sobre la pestaña <em>Acciones</em>. Como se indica en la imagen siguiente:</p>
 					<p> </p>
 					<p><img src="../../../assets/img/BackEnd/Acciones/Figura32-AC.png" alt="" width="567" height="225" /></p>
@@ -86,7 +99,7 @@
 					<ul>
 					<li>Botón <em>Nuevo </em>:
 					<ul>
-					<li>Permite añadir una acción al modelo de proceso que se encuentra trabajando, en la actualidad existen sólo dos acciones disponibles, siendo el envío de correos y la llamada hacia un WebService. Al presionar sobre el botón se abrirá una ventana que le permitirá indicar que acción desea realizar, como se ve en la imagen siguiente:</li>
+					<li>Permite añadir una acción al modelo de proceso que se encuentra trabajando. Al presionar sobre el botón se abrirá una ventana que le permitirá indicar que acción desea realizar, como se ve en la imagen siguiente:</li>
 					</ul>
 					</li>
 					</ul>
@@ -213,10 +226,12 @@
 					<p> En donde:</p>
 					<ul>
 						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em> Variable respuesta</em>: Nombre de la variable en la cual será almacenada la respuesta del servicio.</li>
 						<li>Campo<em> Endpoint</em>: Corresponde a la dirección del host que provee el servicio.</li>
 						<li>Campo<em> Resource</em>: Corresponde a la direccion del servicio propiemente tal. Considere que mediante esta url, se le podrá valores. Por ejemplo, si usted desea pasar la variable Rut como parámetro, en caso de elegir el método GET, debe escribir la URL de la siguiente forma: http://server/resource/11111111-1</li>
 						<li>Campo<em> Método</em>: Metodos HTTP disponibles para elconsumo de servicios Rest (GET, POST, PUT, DELETE)</li>
 						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout</li>
+						<li>Campo<em> Número reintentos</em>: En caso de existir un timeout, la accion tratará de consumir el servicio las veces que se indique en este campo, por defecto su valor es 3</li>
 						<li>Campo<em> Header</em>: Corresponde a la definición de parámetros a pasar en la cabecera de la petición</li>
 						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
 					</ul>
@@ -241,11 +256,12 @@
 					<p> En donde:</p>
 					<ul>
 						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em> Variable respuesta</em>: Nombre de la variable en la cual será almacenada la respuesta del servicio.</li>
 						<li>Campo<em> WSDL</em>: URL que especifica el WSDL del servicio SOAP. Opcionalmente existe la opción de cargar un archivo wsdl a través del botón "Importar".</li>
 						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout</li>
+						<li>Campo<em> Número reintentos</em>: En caso de existir un timeout, la accion tratará de consumir el servicio las veces que se indique en este campo, por defecto su valor es 3</li>
 						<li>Campo<em> Métodos</em>: Una vez consultada la URL del web service o cargado el archivo wsdl, los métodos descubiertos son presentados en este listado.</li>
 						<li>Campo<em> Request</em>: En este campo, una vez seleccionado el método a consumir, se debe completar los datos a  enviar al servicio. Una forma gfácil de hacer esto, es probar el servicio con SOAPUI y copiar el request generado dentro de este campo.</li>
-						<li>Campo<em> Response</em>: Corresponde a un ejemplo de respuesta asociado al método seleccionado.</li>
 						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
 					</ul>
 					<p> </p>
@@ -260,12 +276,12 @@
 					<p>Para configurar la seguridad en el consumo de webservices REST y SOAP, es necesario seleccionar la pestaña de Seguridad, la cual se muestra en la siguiente figura:</p>
 					<p> </p>
 					<p><img src="../../../assets/img/BackEnd/Acciones/Figura37-AC.png" alt="" width="454" height="402" /></p>
-					<p>Figura 37: "Configuración de seguridad"</p>
+					<p>Figura 36: "Configuración de seguridad"</p>
 					<p> </p>
 					<p> Al presionar el botón nuevo, se desplegará el siguiente formulario</p>
 					<p> </p>
 					<p><img src="../../../assets/img/BackEnd/Acciones/Figura38-AC.png" alt="" width="454" height="402" /></p>
-					<p>Figura 38: "Ventana para configuración de seguridad"</p>
+					<p>Figura 37: "Ventana para configuración de seguridad"</p>
 					<p> </p>
 					<p>En donde:</p>
 					<ul>
@@ -303,7 +319,7 @@
 					<p>Al iniciar un trámite a través del API REST, existe la posibilidad de que el sistema externo envíe una URL de Callback para que el trámite, una vez llegado a cierto punto acordado por las partes, informe el resultado, esta accion se puede configurar en la siguiente pantalla:</p>
 					<p> </p>
 					<p><img src="../../../assets/img/BackEnd/Acciones/callback.png" alt="" width="454" height="402" /></p>
-					<p>Figura 37: "Configuración de Callback"</p>
+					<p>Figura 38: "Configuración de Callback"</p>
 					<p> </p>
 					<p>En donde:</p>
 					<ul>
@@ -313,6 +329,67 @@
 					</ul>
 					<p> </p>
 					<p>Para mayor información sobre el uso de Callback, acérquese al área de IT a consultar.</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
+
+
+					<h4 id="iniciar-tramite">Acción Iniciar Trámite</h4>
+					<p>Esta acción permite iniciar otro trámite de SIMPLE desde la ejecución de un trámite. Con esta funcionalidad es posible crear subprocesos dentro de Simple.
+						Al seleccionar esta acción, se desplegará la siguiente imagen:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura39-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 39: "Formulario de acción Iniciar Trámite"</p>
+					<p> </p>
+					<p> En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em>Cuentas</em>: Se listan las cuentas disponibles que han otorgado permisos a mi cuenta para poder iniciar procesos.</li>
+						<li>Campo<em>Trámites disponibles</em>: Se listan los trámites disponibles para iniciar pertenecientes a la cuenta seleccionada previamente.</li>
+						<li>Campo<em>Tarea desde la cual desea continuar el proceso</em>: Se listan las tareas existente en mi proceso, en donde se debe seleccionar en cual tarea se desea que retorne la respuesta del proceso iniciado una vez que termine su ejecución.</li>
+						<li>Campo<em>Request</em>: Mensaje en formato json necesario para iniciar el trámite seleccionado.</li>
+					</ul>
+					<p> </p>
+					<p>Se debe tener en cuenta que esta acción esta muy relacionada con la acción Continuar trámite, si se desea recibir respuesta del subproceso iniciado, en el subproceso será necesario configurar una acción de Continuar trámite.
+						El comportamiento completo se puede visualizar en el siguiente diagrama de ejemplo:</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura40-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 40: "Ejemplo subproceso SIMPLE"</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
+
+
+					<h4 id="continuar-tramite">Acción Continuar Trámite</h4>
+					<p>Esta acción, se debe configurar cuando sabemos que nuestro proceso esta habilitado para ser iniciado por otro trámite de SIMPLE, ya que depende de la acción Iniciar Trámite para poder ejecutarse de forma correcta.
+						Al seleccionar esta acción, se desplegará la siguiente imagen:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura41-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 41: "Formulario de acción Continuar Trámite"</p>
+					<p> </p>
+					<p> En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em>Request</em>: Mensaje en formato json con la respuesta que será entregada al proceso padre.</li>
+					</ul>
+					<p> </p>
+					<p>Se debe tener en cuenta que los campos retornados en el request, deben existir en el formulario de entrada de la tarea que se está continuando.</p>
+					<p> </p>
+					<p>Para finalizar simplemente presione Guardar.</p>
+					<p> </p>
+
+
+					<h4 id="webhook">Acción Notificaciones</h4>
+					<p>Esta acción permite seleccionar desde el listado de suscriptores externos, a quien se quiere notificar. El contenido de la notificacion será la salida configurada para la tarea que se está editando.
+						Al seleccionar esta acción, se desplegará la siguiente imagen:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/Figura42-AC.png" alt="" width="454" height="402" /></p>
+					<p>Figura 42: "Formulario de Notificaciones"</p>
+					<p> </p>
+					<p> En donde:</p>
+					<ul>
+						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
+						<li>Campo<em>Suscriptores</em>: Listado de suscriptores disponibles para notificar, los cuales fueron configurados debidamente en la pestaña "Suscriptores Externos".</li>
+					</ul>
 					<p> </p>
 					<p>Para finalizar simplemente presione Guardar.</p>
 					<p> </p>

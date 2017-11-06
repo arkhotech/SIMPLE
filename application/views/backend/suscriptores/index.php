@@ -17,7 +17,7 @@
 </ul>
 
 <a class="btn btn-success" href="<?=site_url('backend/suscriptores/crear/'.$proceso->id)?>"><i class="icon-white icon-file"></i> Nuevo</a>
-<a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#suscriptores" target="_blank">
+<a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/suscriptores-externos.html" target="_blank">
     <span class="glyphicon glyphicon-info-sign"></span>
 </a>
 <table class="table">
