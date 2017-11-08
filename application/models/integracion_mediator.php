@@ -588,17 +588,7 @@ class IntegracionMediator{
                                 //Obtener las nuevas etapas
                             }
                         }else{
-                            $tieneCamposIN = false;
-                            foreach ($forms['form']['campos'] as $record){
-                                if($record["direccion"] == 'IN'){
-                                    $tieneCamposIN = true;
-                                    break;
-                                }
-                            }
-                            if(!$tieneCamposIN){
-
-                            }
-                            $estado = 'activo';
+                            $estado = $this->obtenerEstadoProceso($forms, $etapas[0], $id_proceso);
                         }
                     }
 
@@ -615,10 +605,10 @@ class IntegracionMediator{
             $secuencia = 0;  //debe resetarse el paso
         }else{
             //Procesar pasos de una misma etapa
-            $estado = 'activo';
             $paso = $etapa->getPasoEjecutable($secuencia);
             $etapa->iniciarPaso($paso);
             $forms[] = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
+            $estado = $this->obtenerEstadoProceso($forms, $etapa, $id_proceso);
         }
         
         $campos = new Campo();
@@ -631,6 +621,28 @@ class IntegracionMediator{
 
         
         return $result;
+    }
+
+    private function obtenerEstadoProceso($forms, $etapa, $id_proceso){
+        log_message("debug", "Verificando campos en proxima etapa", FALSE);
+        $tieneCamposIN = false;
+        foreach ($forms[0]['form']['campos'] as $record){
+            log_message("debug", "Direcccion campo: ".$record["direccion"], FALSE);
+            if($record["direccion"] == 'IN'){
+                $tieneCamposIN = true;
+                break;
+            }
+        }
+        log_message("debug", "Hay campos IN: ".$tieneCamposIN, FALSE);
+        $estado = 'activo';
+        if(!$tieneCamposIN){
+            $next_etapa = $this->obtenerProximaEtapa($etapa, $id_proceso);
+            if($next_etapa === NULL){
+                $etapa->avanzar();
+                $estado = 'finalizado';
+            }
+        }
+        return $estado;
     }
     /**
      * 
