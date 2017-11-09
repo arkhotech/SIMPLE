@@ -114,7 +114,12 @@ class AccionSoap extends Accion {
                 $request=$r->getExpresionParaOutput($etapa->id);
             }
 
-            $intentos = 1;
+            $intentos = -1;
+            //se verifica si existe numero de reintentos
+            $reintentos = 0;
+            if(isset($this->extra->timeout_reintentos)){
+                $reintentos = $this->extra->timeout_reintentos;
+            }
             do{
                 //Se EJECUTA el llamado Soap
                 $result = $client->call($this->extra->operacion, $request,null,'',false,null,'rpc','literal', true);
@@ -124,41 +129,40 @@ class AccionSoap extends Accion {
 
                 //se verifica si existe numero de reintentos
                 if(isset($error) && strpos($error, 'timed out') !== false){
-                    log_message("INFO", "Reintento Nro: ".$intentos, FALSE);
+                    log_message("INFO", "Intento Nro: ".$intentos, FALSE);
                     log_message("INFO", "Error SOAP ".$error, FALSE);
                     $intentos++;
                 }
-            }while($intentos < $this->extra->timeout_reintentos && strpos($error, 'timed out') !== false);
+            }while($intentos < $reintentos && strpos($error, 'timed out') !== false);
             
             if ($error){
-                $error_timeout['time_out']=true;
-                $error_timeout['error']=$error;
-                //$result['response_soap']= $error_timeout;
-                $result[$this->extra->var_response]= $error_timeout;
+                if(strpos($error, 'timed out') !== false){
+                    $result_soap['code']= '504';
+                    $result_soap['desc']= $error;
+                }else{
+                    $result_soap['code']= '500';
+                    $result_soap['desc']= $error;
+                }
             }else{
-                $result[$this->extra->var_response]= $this->utf8ize($result);
-            }
-
-            foreach($result as $key=>$value){
-
-                log_message('info', 'key '.$key.': '.$this->varDump($value), FALSE);
-
-                $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
-
-                if(!$dato)
-                    $dato=new DatoSeguimiento();
-                $dato->nombre=$key;
-                $dato->valor=$value;
-                $dato->etapa_id=$etapa->id;
-                $dato->save();
+                $result_soap = $this->utf8ize($result);
             }
         }catch (Exception $e){
-            log_message("INFO", "Exception: ".$this->varDump($e), FALSE);
-            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_soap",$etapa->id);
+            $result_soap['code']= $e->getCode();
+            $result_soap['desc']= $e->getMessage();
+        }
+
+        $result[$this->extra->var_response]= $result_soap;
+
+        foreach($result as $key=>$value){
+
+            log_message('info', 'key '.$key.': '.$this->varDump($value), FALSE);
+
+            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+
             if(!$dato)
                 $dato=new DatoSeguimiento();
-            $dato->nombre="error_soap";
-            $dato->valor=$e;
+            $dato->nombre=$key;
+            $dato->valor=$value;
             $dato->etapa_id=$etapa->id;
             $dato->save();
         }

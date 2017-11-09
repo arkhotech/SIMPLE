@@ -18,6 +18,8 @@ class API extends REST_Controller{
 
             $data = $mediator->iniciarProceso($this->get()['proceso'],$this->get()['tarea'],$this->request->body);
             $this->response($data);
+
+
         }catch(Exception $e){
             log_message("INFO", "Recupera exception: ".$e->getMessage(), FALSE);
             log_message("INFO", "Recupera getCode: ".$e->getCode(), FALSE);

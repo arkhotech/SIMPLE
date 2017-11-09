@@ -8,7 +8,7 @@
  */
 class SeguridadIntegracion{
 
-    public function getConfigRest($id_seguridad, $server){
+    public function getConfigRest($id_seguridad, $server, $timeout){
 
         $tipo_seguridad = "none";
         if(isset($id_seguridad) && strlen($id_seguridad) > 0 && $id_seguridad > 0){
@@ -28,7 +28,7 @@ class SeguridadIntegracion{
             case "HTTP_BASIC":
                 //Seguridad basic
                 $config = array(
-                    'timeout'         => 30,
+                    'timeout'         => $timeout,
                     'server'          => $server,
                     'http_user'       => $user,
                     'http_pass'       => $pass,
@@ -38,7 +38,7 @@ class SeguridadIntegracion{
             case "API_KEY":
                 //Seguriad api key
                 $config = array(
-                    'timeout'         => 30,
+                    'timeout'         => $timeout,
                     'server'          => $server,
                     'api_key'         => $api_key,
                     'api_name'        => $name_key
@@ -56,7 +56,7 @@ class SeguridadIntegracion{
                 $response_seg= intval($debug_seg['info']['http_code']);
                 if($response_seg >= 200 && $response_seg < 300){
                     $config = array(
-                        'timeout'         => 30,
+                        'timeout'         => $timeout,
                         'server'          => $server,
                         'api_key'         => $result->token_type.' '.$result->access_token,
                         'api_name'        => 'Authorization'
@@ -66,7 +66,7 @@ class SeguridadIntegracion{
             default:
                 //SIN SEGURIDAD
                 $config = array(
-                    'timeout'         => 30,
+                    'timeout'         => $timeout,
                     'server'          => $server
                 );
                 break;

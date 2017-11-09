@@ -107,6 +107,8 @@ class AccionRest extends Accion {
             $CI = & get_instance();
             ($this->extra->timeout ? $timeout = $this->extra->timeout : $timeout = 30);
 
+            log_message("INFO", "TimeOut: ".$timeout, FALSE);
+
             $r=new Regla($this->extra->url);
             $server=$r->getExpresionParaOutput($etapa->id);
             $caracter="/";
@@ -126,7 +128,14 @@ class AccionRest extends Accion {
             log_message("INFO", "Resource: ".$uri, FALSE);
 
             $seguridad = new SeguridadIntegracion();
-            $config = $seguridad->getConfigRest($this->extra->idSeguridad, $server);
+            $idSeguridad = null;
+            if(isset($this->extra->idSeguridad)){
+                $idSeguridad = $this->extra->idSeguridad;
+            }
+            $config = $seguridad->getConfigRest($idSeguridad, $server, $timeout);
+
+            log_message("INFO", "Config: ".$this->varDump($config), FALSE);
+
 
             if(isset($this->extra->request)){
                 $r=new Regla($this->extra->request);
@@ -151,71 +160,86 @@ class AccionRest extends Accion {
 
             $CI->rest->initialize($config);
 
-            $intentos = 1;
+            $intentos = -1;
+            //se verifica si existe numero de reintentos
+            $reintentos = 0;
+            if(isset($this->extra->timeout_reintentos)){
+                $reintentos = $this->extra->timeout_reintentos;
+            }
+
+            log_message("debug", "Numero de reintentos: ".$reintentos, FALSE);
+
             do{
 
-                // Se ejecuta la llamada segun el metodo
-                if($this->extra->tipoMetodo == "GET"){
-                    $result = $CI->rest->get($uri, array() , 'json');
-                }else if($this->extra->tipoMetodo == "POST"){
-                    $result = $CI->rest->post($uri, $request, 'json');
-                }else if($this->extra->tipoMetodo == "PUT"){
-                    $result = $CI->rest->put($uri, $request, 'json');
-                }else if($this->extra->tipoMetodo == "DELETE"){
-                    $result = $CI->rest->delete($uri, $request, 'json');
+                try{
+                    // Se ejecuta la llamada segun el metodo
+                    if($this->extra->tipoMetodo == "GET"){
+                        $result = $CI->rest->get($uri, array() , 'json');
+                    }else if($this->extra->tipoMetodo == "POST"){
+                        $result = $CI->rest->post($uri, $request, 'json');
+                    }else if($this->extra->tipoMetodo == "PUT"){
+                        $result = $CI->rest->put($uri, $request, 'json');
+                    }else if($this->extra->tipoMetodo == "DELETE"){
+                        $result = $CI->rest->delete($uri, $request, 'json');
+                    }
+
+                    log_message("debug", "Result REST: ".$this->varDump($result), FALSE);
+
+                }catch(Exception $e){
+                    if(strpos($e->getMessage(), 'timed out') !== false) {
+                        log_message("INFO", "Reintentando " . $reintentos . " veces.", FALSE);
+                        $result2['code']= '504';
+                        $result2['desc']= $e->getMessage();
+                        $intentos++;
+                    }else{
+                        throw new ApiException($e->getMessage(),$e->getCode());
+                    }
                 }
+
+                log_message("debug", "Intentos: ".$intentos, FALSE);
+                log_message("debug", "Reintentos: ".$reintentos, FALSE);
+
+            }while($intentos < $reintentos);
+
+            if($intentos != $reintentos){
                 $debug = $CI->rest->debug();
-                //se verifica si existe numero de reintentos
-                $reintentos = 0;
-                if(isset($this->extra->timeout_reintentos)){
-                    $reintentos = $this->extra->timeout_reintentos;
-                }
-                if(isset($debug['error_code']) && $debug['error_code'] == '28') {
-                    log_message("INFO", "Reintentando " . $this->extra->timeout_reintentos . " veces.", FALSE);
-                    $intentos++;
-                }
 
-            }while($intentos < $reintentos && $debug['error_code'] == '28');
-
-            if($debug['info']['http_code']=='204'){
-                $result2['code']= '204';
-                $result2['des_code']= 'No Content';
-            }else if($debug['info']['http_code']=='0'){
-                $result2['code']= $debug['error_code'];
-                $result2['des_code']= $debug['response_string'];
-            }else{
-               
-                if(!is_array($result) && !is_object($result)) {
-                    $result2['code']= '2';
-                    $result2['des_code']= $debug['response_string'];
+                if($debug['info']['http_code']=='0'){
+                    $result2['code']= '500';
+                    $result2['desc']= $debug['response_string'];
                 }else{
-                    
-                    $result2 = (is_array($result)) ? get_object_vars($result[0]):get_object_vars($result);
+                    if(!is_array($result) && !is_object($result)) {
+                        $result2['code']= '206';
+                        $result2['desc']= $debug['response_string'];
+                    }else{
+
+                        $result2 = (is_array($result)) ? get_object_vars($result[0]):get_object_vars($result);
+                    }
                 }
-            }
-            //$response["response".$this->extra->tipoMetodo]=$result2;
-            $response[$this->extra->var_response]=$result2;
 
+                log_message("debug", "Respuesta REST: ".$this->varDump($result2), FALSE);
+            }else{
 
-            foreach($response as $key=>$value){
-                $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
-                if(!$dato)
-                    $dato=new DatoSeguimiento();
-                $dato->nombre=$key;
-                $dato->valor=$value;
-                $dato->etapa_id=$etapa->id;
-                $dato->save();
             }
+
         }catch (Exception $e){
-            log_message("INFO", "Error: ".$e->getMessage(), FALSE);
-            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId("error_rest",$etapa->id);
+            log_message("INFO", "En catch de accion REST Error: ".$e->getMessage(), FALSE);
+            $result2['code']= $e->getCode();
+            $result2['desc']= $e->getMessage();
+        }
+
+        $response[$this->extra->var_response]=$result2;
+
+        foreach($response as $key=>$value){
+            $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
             if(!$dato)
                 $dato=new DatoSeguimiento();
-            $dato->nombre="error_rest";
-            $dato->valor=$e->getMessage();
+            $dato->nombre=$key;
+            $dato->valor=$value;
             $dato->etapa_id=$etapa->id;
             $dato->save();
         }
+
     }
     function varDump($data){
         ob_start();
