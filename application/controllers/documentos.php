@@ -95,9 +95,9 @@ class Documentos extends MY_Controller {
         }
         
         $file=Doctrine_Query::create()
-                ->from('File f, f.Tramite.Etapas.Usuario u')
-                ->where('f.id = ? AND f.tipo = ? AND f.llave_firma = ? AND u.id = ?',array($id,'documento',$llave_firma,UsuarioSesion::usuario()->id))
-                ->fetchOne();
+            ->from('File f, f.Tramite.Etapas.Usuario u')
+            ->where('f.id = ? AND f.tipo = ? AND f.llave_firma = ? AND u.id = ?',array($id,'documento',$llave_firma,UsuarioSesion::usuario()->id))
+            ->fetchOne();
         
         $resultado=new stdClass();
         if(!$file){

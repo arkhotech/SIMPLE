@@ -13,6 +13,9 @@ class Proceso extends Doctrine_Record {
         $this->hasColumn('destacado');
         $this->hasColumn('icon_ref');
         $this->hasColumn('activo');
+        $this->hasColumn('version');
+        $this->hasColumn('root');
+        $this->hasColumn('estado');
     }
 
     function setUp() {
@@ -44,7 +47,19 @@ class Proceso extends Doctrine_Record {
             'foreign'=>'proceso_id',
             'orderBy'=>'nombre asc'
         ));
-        
+
+        $this->hasMany('Seguridad as Admseguridad',array(
+            'local'=>'id',
+            'foreign'=>'proceso_id',
+            'orderBy'=>'institucion asc'
+        ));
+
+        $this->hasMany('Suscriptor as Suscriptores',array(
+            'local'=>'id',
+            'foreign'=>'proceso_id',
+            'orderBy'=>'institucion asc'
+        ));
+
         $this->hasMany('Documento as Documentos',array(
             'local'=>'id',
             'foreign'=>'proceso_id',
@@ -91,7 +106,7 @@ class Proceso extends Doctrine_Record {
             $element->top=$t->posy;
             $element->start=$t->inicial;
             $element->externa=$t->externa;
-            //$element->stop=$t->final;
+            $element->stop=$t->final;
             $modelo->elements[]=clone $element;
         }
         
@@ -225,7 +240,7 @@ class Proceso extends Doctrine_Record {
                                 if($ev->paso_id)$evento->Paso=$tarea->Pasos[$ev->paso_id];
                                 $tarea->Eventos[]=$evento;
                             }
-                        }elseif($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso' && $keyt != 'grupos_usuarios'){
+                        }elseif($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso'){// && $keyt != 'grupos_usuarios'){
                             $tarea->{$keyt}=$t_attr;
                         }
                     }
@@ -390,7 +405,8 @@ class Proceso extends Doctrine_Record {
     public function toPublicArray(){
         $publicArray=array(
             'id'=>(int)$this->id,
-            'nombre'=>$this->nombre
+            'nombre'=>$this->nombre,
+            'version'=>$this->version
         );
         
         return $publicArray;
@@ -451,7 +467,7 @@ class Proceso extends Doctrine_Record {
     }
 
     // Elimina los procesos de manera logica
-    public function delete($proceso_id) {
+    public function delete_logico($proceso_id) {
 
         log_message('info', 'delete test ($proceso_id [' . $proceso_id . '])');
 
@@ -461,4 +477,67 @@ class Proceso extends Doctrine_Record {
             ->execute();
     }
 
+    public function findIdProcesoActivo($root, $cuenta_id) {
+
+        log_message('info', 'findIdProcesoActivo ($root [ ' . $root . '], $cuenta_id [' . $cuenta_id . '])');
+        
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p, p.Cuenta c')
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="public" AND c.id = ?', array($root, $root, $cuenta_id))
+            ->execute();
+
+        return $procesos[0];
+    }
+
+    public function findProcesosArchivados($root){
+        log_message('Info', 'Buscando archivados para proceso root: '.$root);
+
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p')
+            ->where('(p.root = ? OR p.id = ?)', array($root, $root))
+            ->orderBy('p.version desc')
+            ->execute();
+
+        log_message('Info', 'Se ejecuta query procesos archivados');
+
+        $data = array();
+        foreach ($procesos as $proceso_rel){
+            $data[] = array(
+                "id" => $proceso_rel->id,
+                "nombre" => $proceso_rel->nombre.'-'.$proceso_rel->estado,
+                "version" => $proceso_rel->version
+            );
+        }
+        return $data;
+    }
+
+    public function findDraftProceso($root, $cuenta_id){
+
+        $draft = Doctrine_Query::create()
+            ->from('Proceso p, p.Cuenta c')
+            ->where('(p.root = ? OR p.id = ?) AND p.estado="draft" AND c.id = ?', array($root, $root, $cuenta_id))
+            ->execute();
+
+        return $draft[0];
+    }
+
+    public function findMaxVersion($root, $cuenta_id){
+
+        $sql = "select MAX(p.version) as version from proceso p where p.cuenta_id = $cuenta_id and (p.root = $root or p.id = $root);";
+
+        $stmn = Doctrine_Manager::getInstance()->connection();
+        $result = $stmn->execute($sql)
+            ->fetchAll();
+        return $result[0]['version'];
+    }
+
+    public function getTareasProceso(){
+        $tareas=Doctrine_Query::create()
+            ->from('Tarea t, t.Proceso p')
+            ->where('p.id = ?',$this->id)
+            ->execute();
+
+        return $tareas;
+
+    }
 }

@@ -18,18 +18,31 @@ class Procesos extends MY_BackendController {
     }
 
     public function index() {
+        $cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
         $data['procesos'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('p.activo=1 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=1 AND p.estado!="arch" AND c.id = ? 
+                AND ((SELECT COUNT(proc.id) FROM Proceso proc WHERE proc.cuenta_id = ? AND (proc.root = p.id OR proc.root = p.root) AND proc.estado = "draft") = 0 
+                OR p.estado = "draft")
+                ',array($cuenta_id, $cuenta_id))
                 ->orderBy('p.nombre asc')
                 ->execute();
 
         $data['procesos_eliminados'] = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c')
-                ->where('p.activo=0 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                ->where('p.activo=0 AND p.estado!="arch" AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
                 ->orderBy('p.nombre asc')
                 ->execute();
 
+        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
+        $editar = true;
+        if($cuenta->ambiente == 'prod'){
+            $cuenta_dev = $cuenta->getAmbienteDev($cuenta->id);
+            if(count($cuenta_dev) > 0){
+                $editar = false;
+            }
+        }
+        $data['editar_proceso'] = $editar;
         $data['title'] = 'Listado de Procesos';
         $data['content'] = 'backend/procesos/index';
         $this->load->view('backend/template', $data);
@@ -40,6 +53,8 @@ class Procesos extends MY_BackendController {
         $proceso->nombre='Proceso';
         $proceso->cuenta_id=UsuarioBackendSesion::usuario()->cuenta_id;
         
+        $proceso->estado = 'draft';
+
         $proceso->save();
         
         redirect('backend/procesos/editar/'.$proceso->id);
@@ -77,7 +92,12 @@ class Procesos extends MY_BackendController {
 
 	        $registro_auditoria->detalles = json_encode($proceso_array);
 	        $registro_auditoria->save();
-        	$proceso->delete($proceso_id);
+
+            if($proceso->estado != 'public') {
+                $proceso->delete();
+            } else {
+                $proceso->delete_logico($proceso_id);
+            }
 
         	$respuesta->validacion = TRUE;
         	$respuesta->redirect = site_url('backend/procesos/index/');
@@ -95,14 +115,31 @@ class Procesos extends MY_BackendController {
 
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
+        // Verificar si es draft o un proceso publicado
+        if ($proceso->estado != 'arch') { //no es draft
+            //Se crea Draft
+            $proceso = $this->crearDraft($proceso);
+        } else {
+            $root = $proceso_id;
+
+            if (isset($proceso->root) && strlen($proceso->root) > 0) {
+                $root = $proceso->root;
+            }
+            $proceso_draft = $proceso->findDraftProceso($root, UsuarioBackendSesion::usuario()->cuenta_id);
+            $proceso_draft->estado = 'arch';
+            $proceso_draft->save();
+            $proceso->estado = 'draft';
+            $proceso->save();
+        }
         log_message('debug', '$proceso->activo [' . $proceso->activo . '])');
 
         if ($proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id || $proceso->activo != true) {
             echo 'Usuario no tiene permisos para editar este proceso';
             exit;
         }
-        
-              
+
+        $procesosArchivados = $proceso->findProcesosArchivados($proceso->root);
+        $data['procesos_arch'] = $procesosArchivados;
 
         $data['proceso'] = $proceso;
 
@@ -234,7 +271,7 @@ class Procesos extends MY_BackendController {
     
     public function ajax_editar_tarea($proceso_id,$tarea_identificador){
         $tarea=Doctrine::getTable('Tarea')->findOneByProcesoIdAndIdentificador($proceso_id,$tarea_identificador);
-        
+        $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
         if($tarea->Proceso->cuenta_id!=UsuarioBackendSesion::usuario()->cuenta_id){
             echo 'Usuario no tiene permisos para editar esta tarea.';
             exit;
@@ -243,7 +280,22 @@ class Procesos extends MY_BackendController {
         $data['tarea'] = $tarea;
         $data['formularios']=Doctrine::getTable('Formulario')->findByProcesoId($proceso_id);
         $data['acciones']=Doctrine::getTable('Accion')->findByProcesoId($proceso_id);
-        
+        $data['proceso'] = $proceso;
+        $data['variablesFormularios']=Doctrine::getTable('Proceso')->findVariblesFormularios($proceso_id, $tarea['id']);
+        $data['variablesProcesos']=Doctrine::getTable('Proceso')->findVariblesProcesos($proceso_id);
+
+        $cuentas = Doctrine::getTable('Cuenta')->findAll();
+        $index = 0;
+        foreach ($cuentas as $cuenta) {
+            if($tarea->Proceso->cuenta_id == $cuenta->id){
+                unset($cuentas[$index]);
+                break;
+            }
+            $index++;
+        }
+        $data['cuentas'] = $cuentas;
+        $proceso_cuenta = new ProcesoCuenta();
+        $data['cuentas_con_permiso'] = $proceso_cuenta->findCuentasProcesos($proceso_id);
         $this->load->view('backend/procesos/ajax_editar_tarea',$data);
     }
     
@@ -477,7 +529,197 @@ class Procesos extends MY_BackendController {
 
 
     }
-    
+
+    public function publicar($proceso_draft_id){
+
+        log_message("INFO", "ID Draft: ".$proceso_draft_id, FALSE);
+
+        $proceso_draft = Doctrine::getTable('Proceso')->find($proceso_draft_id);
+
+        log_message("INFO", "Root Draft: " . $proceso_draft->root, FALSE);
+
+        log_message("INFO", "UsuarioBackendSesion::usuario()->cuenta_id: " . UsuarioBackendSesion::usuario()->cuenta_id);
+        
+
+        $activo = $proceso_draft->findIdProcesoActivo($proceso_draft->root, UsuarioBackendSesion::usuario()->cuenta_id);
+
+        log_message("INFO", "Recuperado activo: [" . $activo->id . "]", FALSE);
+
+        if (strlen($activo->id) > 0) { // Existe proceso activo
+            log_message("INFO", "Existe Proceso Activo", FALSE);
+
+            $activo->estado = 'arch';
+            $activo->save();
+            log_message("INFO", "Save() Estado arch Proceso Activo", FALSE);
+        } else {
+            $proceso_draft->root = $proceso_draft->id;
+        }
+
+        $proceso_draft->estado = 'public';
+        $proceso_draft->save();
+
+        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
+
+        if ($cuenta->ambiente == 'dev') {
+
+            log_message("INFO", "Cuenta DEV", FALSE);
+
+            $fecha = new DateTime();
+            log_message("INFO", "Posterior a DateTime", FALSE);
+
+            log_message("INFO", "Previo proceso_draft->findIdProcesoActivo(proceso_draft->root [" . $proceso_draft->root . "], cuenta->vinculo_produccion [" . $cuenta->vinculo_produccion . "])", FALSE);
+            $proc_produccion = $proceso_draft->findIdProcesoActivo($proceso_draft->root, $cuenta->vinculo_produccion);
+            log_message("INFO", "Posterior proceso_draft->findIdProcesoActivo", FALSE);
+
+            log_message("INFO", "proc_produccion->id [" . $proc_produccion->id . "]");
+            log_message("INFO", "strlen proc_produccion->id [" . strlen($proc_produccion->id) . "]");
+
+            if (strlen($proc_produccion->id) > 0) { // Existe proceso productivo
+
+                // Auditar
+                $registro_auditoria = new AuditoriaOperaciones();
+                $registro_auditoria->fecha = $fecha->format("Y-m-d H:i:s");
+                $registro_auditoria->operacion = 'Eliminación de Proceso en cuenta productiva';
+                $registro_auditoria->motivo = "Publicación de nueva versión";
+                $usuario = UsuarioBackendSesion::usuario();
+                $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
+                $registro_auditoria->proceso = $proc_produccion->nombre;
+                $registro_auditoria->cuenta_id = $cuenta->vinculo_produccion;
+                // Detalles
+                $proceso_array['proceso'] = $proc_produccion->toArray(false);
+                $registro_auditoria->detalles = json_encode($proceso_array);
+                $registro_auditoria->save();
+
+                $proc_produccion->delete();
+            }
+
+            // Auditar
+            log_message("INFO", "Inicio Auditoria", FALSE);
+            
+            $registro_auditoria = new AuditoriaOperaciones();
+            $registro_auditoria->fecha = $fecha->format ("Y-m-d H:i:s");
+            $registro_auditoria->operacion = 'Publicación de Proceso a cuenta productiva';
+            $registro_auditoria->motivo = "Publicación de nueva versión";
+            $usuario = UsuarioBackendSesion::usuario();
+            $registro_auditoria->usuario = $usuario->nombre . ' ' . $usuario->apellidos . ' <' . $usuario->email . '>';
+            $registro_auditoria->proceso = $proceso_draft->nombre;
+            $registro_auditoria->cuenta_id = $cuenta->id;
+            // Detalles
+
+            $proceso_array['proceso'] = $proceso_draft->toArray(false);
+            $registro_auditoria->detalles = json_encode($proceso_array);
+            $registro_auditoria->save();
+            log_message("INFO", "Fin Auditoria", FALSE);
+
+
+            log_message('debug', 'previo a Proceso::importComplete($proceso_draft->exportComplete());');
+            $proceso = Proceso::importComplete($proceso_draft->exportComplete());
+            log_message('debug', '$cuenta->vinculo_produccion [' . $cuenta->vinculo_produccion);            
+            $proceso->cuenta_id = $cuenta->vinculo_produccion;
+            $proceso->save();
+            log_message('debug', 'post a $proceso->save();');
+
+            $this->migrarGrupos($proceso, $cuenta);
+        }
+
+        log_message("INFO", "Proceso actualizado", FALSE);
+
+        $respuesta = new stdClass ();
+        $respuesta->validacion = TRUE;
+        $respuesta->redirect = site_url('backend/procesos/index/');
+        echo json_encode($respuesta);
+    }
+
+    private function migrarGrupos($proceso, $cuenta) {
+        //asignar grupos de usuario de producción por cada tarea
+        log_message("INFO", "Revisando grupos para proceso id ".$proceso->id, FALSE);
+        $tareas = $proceso->getTareasProceso($proceso->id);
+        foreach ($tareas as $tarea){
+            $idUsuarios = $tarea->grupos_usuarios;
+            if(strlen($idUsuarios) > 0){
+                $ids = explode(",", $idUsuarios);
+                if(count($ids) > 0){
+                    $ids_prod = "";
+                    foreach ($ids as $id){
+                        $grupo = Doctrine::getTable("GrupoUsuarios")->find($id);
+                        log_message("INFO", "Revisando grupo: ".$grupo->nombre, FALSE);
+                        $grupo_prod = $grupo->existeGrupo($cuenta->vinculo_produccion);
+                        if(isset($grupo_prod)){
+                            log_message("INFO", "Existe en produccion", FALSE);
+                            log_message("INFO", "Nombre: ".$grupo_prod->nombre, FALSE);
+                            if(strlen($ids_prod) > 0){
+                                $ids_prod.= ",".$grupo_prod->id;
+                            }else{
+                                $ids_prod = $grupo_prod->id;
+                            }
+                        }else{
+                            log_message("INFO", "No existe en produccion", FALSE);
+                            $grupo_usuarios = new GrupoUsuarios();
+                            $grupo_usuarios->nombre = $grupo->nombre;
+                            $grupo_usuarios->cuenta_id = $cuenta->vinculo_produccion;
+                            $grupo_usuarios->save();
+                            log_message("INFO", "Se crea grupo en produccion", FALSE);
+                            log_message("INFO", "Grupo creado: ".$grupo_usuarios->id, FALSE);
+                            if(strlen($ids_prod) > 0){
+                                $ids_prod.= ",".$grupo_usuarios->id;
+                            }else{
+                                $ids_prod = $grupo_usuarios->id;
+                            }
+                        }
+                    }
+                    log_message("INFO", "id grupos prod: ".$ids_prod, FALSE);
+                    if(strlen($ids_prod) > 0) {
+                        $tarea->grupos_usuarios = $ids_prod;
+                        $tarea->save();
+                    }
+                }
+            }
+        }
+    }
+
+    private function crearDraft($proceso){
+
+        $proceso_id = $proceso->id;
+
+        log_message("INFO", "Buscando si proceso ya tiene draft creado", FALSE);
+
+        $root = $proceso_id;
+        if(isset($proceso->root) && strlen($proceso->root) > 0) {
+            $root = $proceso->root;
+        }
+
+        log_message("INFO", "Buscando draft con root: ".$root, FALSE);
+
+        $draft = $proceso->findDraftProceso($root, UsuarioBackendSesion::usuario()->cuenta_id);
+
+        log_message("INFO", "Draft: *".$draft->id."*", FALSE);
+        //log_message("INFO", "Draft2: ".$draft[0]->id, FALSE);
+
+        if(strlen($draft->id) == 0){ //No existe draft
+            log_message("INFO", "Draft no existe", FALSE);
+            $proceso=Proceso::importComplete($proceso->exportComplete());
+
+            log_message("INFO", "Buscando última version", FALSE);
+            $max_version = $proceso->findMaxVersion($root, UsuarioBackendSesion::usuario()->cuenta_id);
+            log_message("INFO", "Ultima version recuperada. ".$max_version, FALSE);
+
+            $proceso->version = $max_version+1;
+            $proceso->estado = 'draft';
+
+            if(!isset($proceso->root) || strlen($proceso->root) == 0){
+                $proceso->root = $proceso_id;
+            }
+
+            $proceso->save();
+
+        }else{
+            log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);
+            $proceso = $draft;//Doctrine::getTable('Proceso')->find($draft[0]["id"]);
+        }
+
+        return $proceso;
+
+    }
     public function ajax_auditar_eliminar_proceso($proceso_id) {
     	if (! in_array ( 'super', explode ( ",", UsuarioBackendSesion::usuario ()->rol ) ))
     		show_error ( 'No tiene permisos', 401 );
@@ -511,7 +753,7 @@ class Procesos extends MY_BackendController {
             $element->left=$t->posx;
             $element->top=$t->posy;
             $element->start=$t->inicial;
-            //$element->stop=$t->final;
+            $element->stop=$t->final;
             $modelo->elements[]=clone $element;
         }
         //$conexiones1=  Doctrine_Query::create()->from('Conexion c, c.TareaOrigen.Proceso p')->where('p.id = ?',$proceso_id);
@@ -577,4 +819,23 @@ class Procesos extends MY_BackendController {
     {        
         return @is_array(getimagesize($image));
     }
+
+    public function ajax_publicar_proceso($proceso_id) {
+        if (! in_array ( 'super', explode ( ",", UsuarioBackendSesion::usuario ()->rol ) ))
+            show_error ( 'No tiene permisos', 401 );
+
+        $proceso = Doctrine::getTable("Proceso")->find($proceso_id);
+        $data['proceso'] = $proceso;
+        $this->load->view ( 'backend/procesos/ajax_publicar_proceso', $data );
+    }
+
+    function varDump($data){
+        ob_start();
+        var_dump($data);
+        //print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
+
 }

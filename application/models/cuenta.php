@@ -107,4 +107,15 @@ class Cuenta extends Doctrine_Record {
         return true;
     }
 
+    public function getAmbienteDev($cuenta_prod_id){
+
+        $cuenta_dev = Doctrine_Query::create()
+            ->from('Cuenta c')
+            ->where('c.vinculo_produccion = ?', $cuenta_prod_id)
+            ->execute();
+
+        return $cuenta_dev;
+    }
+
+
 }

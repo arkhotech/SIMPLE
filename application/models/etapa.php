@@ -632,4 +632,12 @@ class Etapa extends Doctrine_Record {
         }
     }
     
+    public function getEtapaPorTareaId($id_tarea, $id_proceso) {
+        $etapa = Doctrine_Query::create()
+                ->from('Etapa e')
+                ->where('e.tarea_id = ?',$id_tarea)
+                ->andWhere('e.tramite_id = ?', $id_proceso)
+            ->execute();
+        return $etapa[0];
+    }
 }

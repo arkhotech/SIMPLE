@@ -15,14 +15,25 @@ class Seguimiento extends MY_BackendController {
 	}
 	public function index() {
 		// $data['procesos'] = Doctrine::getTable('Proceso')->findByCuentaId(UsuarioBackendSesion::usuario()->cuenta_id);
-		$data ['procesos'] = Doctrine_Query::create ()->from ( 'Proceso p, p.Cuenta c' )->where ('p.activo=1 AND c.id = ?', UsuarioBackendSesion::usuario ()->cuenta_id )->orderBy ( 'p.nombre asc' )->execute ();
+		$data ['procesos'] = Doctrine_Query::create ()->from ( 'Proceso p, p.Cuenta c' )->where ('p.activo=1 AND p.estado = "public" AND c.id = ?', UsuarioBackendSesion::usuario ()->cuenta_id )->orderBy ( 'p.nombre asc' )->execute ();
 		
 		$data ['title'] = 'Listado de Procesos';
 		$data ['content'] = 'backend/seguimiento/index';
 		$this->load->view ( 'backend/template', $data );
 	}
 	public function index_proceso($proceso_id) {
+
+        log_message("INFO", "Detalle de seguimiento para proceso id: ".$proceso_id, FALSE);
+
 		$proceso = Doctrine::getTable ( 'Proceso' )->find ( $proceso_id );
+
+        $procesos_archivados = $proceso->findProcesosArchivados($proceso->root);
+        $id_archivados = array();
+        log_message("INFO", "Buscando procesos relacionados archivados", FALSE);
+        foreach($procesos_archivados as $proc_arch){
+            $id_archivados[] = $proc_arch['id'];
+        }
+        log_message("INFO", "Procesos relacionados archivados: ".$this->varDump($id_archivados), FALSE);
 		
 		if (UsuarioBackendSesion::usuario ()->cuenta_id != $proceso->cuenta_id) {
 			echo 'Usuario no tiene permisos';
@@ -45,8 +56,12 @@ class Seguimiento extends MY_BackendController {
 		$pendiente = $this->input->get ( 'pendiente' ) !== false ? $this->input->get ( 'pendiente' ) : - 1;
 		$per_page = 50;
 		$busqueda_avanzada = $this->input->get ( 'busqueda_avanzada' );
-		
-		$doctrine_query = Doctrine_Query::create ()->from ( 'Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d' )->where ('p.activo=1 AND p.id = ?', $proceso_id )->having ( 'COUNT(d.id) > 0 OR COUNT(e.id) > 1' )-> // Mostramos solo los que se han avanzado o tienen datos
+
+        log_message("INFO", "Creando query", FALSE);
+		$doctrine_query = Doctrine_Query::create ()->from ( 'Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d' )
+            ->where ('p.activo=1')
+            ->andWhereIn('p.root', $id_archivados)
+            ->having ( 'COUNT(d.id) > 0 OR COUNT(e.id) > 1' )-> // Mostramos solo los que se han avanzado o tienen datos
 groupBy ( 't.id' )->orderBy ( $order . ' ' . $direction )->limit ( $per_page )->offset ( $offset );
 		
 		if ($created_at_desde)
@@ -582,7 +597,15 @@ groupBy ( 't.id' )->orderBy ( $order . ' ' . $direction )->limit ( $per_page )->
 		$data['proceso'] = $proceso;
 		$this->load->view ( 'backend/seguimiento/ajax_auditar_limpiar_proceso', $data );
 			
-			
 	}
+
+    function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
 
 }

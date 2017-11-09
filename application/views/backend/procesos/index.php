@@ -20,6 +20,12 @@
         var $link = $("#link_eliminados");
         $(this).is(":visible") ? $link.text("Ocultar Eliminados «") : $link.text("Mostrar Eliminados »");
     }
+
+    function publicarProceso(procesoId) {
+        $("#modal").load(site_url + "backend/procesos/ajax_publicar_proceso/" + procesoId);
+        $("#modal").modal();
+        return false;
+    }
 </script>
 
 <ul class="breadcrumb">
@@ -35,6 +41,8 @@
     <thead>
         <tr>
             <th>Proceso</th>
+            <th>Estado</th>
+            <th>Version</th>
             <th>Acciones
                 <a href="/assets/ayuda/simple/backend/export-import.html" target="_blank">
                     <span class="glyphicon glyphicon-info-sign"></span>
@@ -46,10 +54,17 @@
         <?php foreach($procesos as $p): ?>
         <tr>
             <td><?=$p->nombre?></td>
+            <td><?=$p->estado == 'public'?'Publicado':'Draft'?></td>
+            <td><?=$p->version?></td>
             <td>
-                <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
+                <?php if($editar_proceso){ ?>
+                    <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
+                <?php } ?>
                 <a class="btn btn-default" href="<?=site_url('backend/procesos/exportar/'.$p->id)?>"><i class="icon icon-share"></i> Exportar</a>
                 <a class="btn btn-danger" href="#" onclick="return eliminarProceso(<?=$p->id?>);"><i class="icon-white icon-remove"></i> Eliminar</a>
+                <?php if($p->estado == 'draft'){?>
+                    <a class="btn btn-primary" href="#" onclick="return publicarProceso(<?=$p->id?>);"><i class="icon-white icon-edit"></i> Publicar</a>
+                <?php }?>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -62,6 +77,7 @@
         <thead>
             <tr>
                 <th>Procesos Eliminados</th>
+                <th>Version</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -69,6 +85,7 @@
             <?php foreach($procesos_eliminados as $pe): ?>
             <tr>
                 <td><?=$pe->nombre?></td>
+                <td><?=$pe->version?></td>
                 <td>
                     <a class="btn btn-primary" href="#" onclick="return activarProceso(<?=$pe->id?>);"><i class="icon-white icon-share"></i> Activar</a>
                 </td>

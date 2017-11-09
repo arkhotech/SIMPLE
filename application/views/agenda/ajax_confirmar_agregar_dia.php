@@ -1,5 +1,7 @@
 <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal">×</button>
+  <button type="button" class="close" data-dismiss="modal">
+    <i class="icon-close icon--top"></i>
+  </button>
   <h3 id="myModalLabel">Confirmar</h3>
 </div>
 <div class="modal-body">
@@ -20,8 +22,8 @@
   ?>
 </div>
 <div class="modal-footer">
-  <button class="btn js_cerrar_vcancelar">Cancelar</button>
-  <button id="btnconfadd" class="btn btn-primary">Confirmar</button>
+  <button class="button button--lightgray js_cerrar_vcancelar">Cancelar</button>
+  <button id="btnconfadd" class="button">Confirmar</button>
 </div>
 <script>
   window.fecha = '<?php echo $ano . '-' . $mes . '-' . $dia . ' ' . $hora; ?>';

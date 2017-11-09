@@ -92,6 +92,12 @@ class Cuentas extends CI_Controller
                 $cuenta_id = (int)$cuenta->id;
 
                 if ($cuenta_id > 0) {
+                    if ($cuenta->ambiente == 'dev') {
+                        $stmn = Doctrine_Manager::getInstance()->connection();
+                        $sql_desvinculo_produccion = "UPDATE cuenta SET vinculo_produccion = NULL, ambiente='prod' WHERE vinculo_produccion = " . $cuenta_id;
+                        $result = $stmn->prepare($sql_desvinculo_produccion);
+                        $result->execute();
+                    }
 
                     // Calendar
                     $service = new Connect_services();

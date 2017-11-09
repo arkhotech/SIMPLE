@@ -1061,24 +1061,24 @@ form.ajaxForm {
   width: 99%;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 }
-.float-left{
+.float-left {
   float:left;
 }
-.float-right{
+.float-right {
   float:right;
 }
 .glyphicon-calendar:before {
     content: "\e109";
 }
- @font-face{
-  font-family:'Glyphicons Halflings';
-  src:url(../fonts/glyphicons-halflings-regular.eot);
-  src:url(../fonts/glyphicons-halflings-regular.eot?#iefix)
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url(../fonts/glyphicons-halflings-regular.eot);
+  src: url(../fonts/glyphicons-halflings-regular.eot?#iefix)
   format('embedded-opentype'),url(../fonts/glyphicons-halflings-regular.woff)
-  format('woff'),url(../fonts/glyphicons-halflings-regular.ttf)
-  format('truetype'),url(../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular)
+  format('woff'), url(../fonts/glyphicons-halflings-regular.ttf)
+  format('truetype'), url(../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular)
   format('svg')
- }
+}
 .selectgrupo{
   width: 315px;
 }
@@ -1122,7 +1122,7 @@ form.ajaxForm {
 .input-group.date .input-group-addon {
   margin-left: -7px;
 }
-.input-group .form-control{
+.input-group .form-control {
   vertical-align: -webkit-baseline-middle;
   margin-bottom: 11px;
   height: 20px;
@@ -1175,7 +1175,6 @@ form.ajaxForm {
 .cal_day_custom{
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 300px;
   padding-bottom: 14px;
 }
 .cont_hora_cal{
@@ -1620,4 +1619,17 @@ form.ajaxForm {
 .cal-year-box span[data-cal-date] {
   margin-right: -75px !important;
   font-size: 1.0em !important;
+}
+
+@media (max-width: 47.99em) {
+  #btnbloqueargeneral {
+    float: left !important;
+    display: block;
+  }
+
+  #cont_cal {
+    display: block;
+    float: left;
+    margin-top: 10px;
+  }
 }
