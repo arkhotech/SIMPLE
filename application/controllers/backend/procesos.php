@@ -720,6 +720,7 @@ class Procesos extends MY_BackendController {
         return $proceso;
 
     }
+
     public function ajax_auditar_eliminar_proceso($proceso_id) {
     	if (! in_array ( 'super', explode ( ",", UsuarioBackendSesion::usuario ()->rol ) ))
     		show_error ( 'No tiene permisos', 401 );
