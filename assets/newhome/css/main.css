@@ -1552,7 +1552,9 @@ form.ajaxForm {
     width: 384px;
   }
 }
+
 @media (max-width: 349px) {
+
   .modcalejec{
     width: 325px;
   }
@@ -1632,4 +1634,8 @@ form.ajaxForm {
     float: left;
     margin-top: 10px;
   }
+}
+
+.map input[type=text] {
+  width: 80%;
 }
