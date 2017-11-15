@@ -22,8 +22,7 @@ class Validador extends MY_Controller {
         
         if($this->form_validation->run()==TRUE){
             $file=Doctrine::getTable('File')->find($this->input->post('id'));
-            $filename_copia=  str_replace('.pdf', '.copia.pdf', $file->filename);
-            $path='uploads/documentos/'.$filename_copia;
+            $path='uploads/documentos/'.$file->filename;
             header('Content-Type: '. get_mime_by_extension($path));
             header('Content-Length: ' . filesize($path));
             readfile($path);
