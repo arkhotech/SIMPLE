@@ -90,12 +90,12 @@ class AccionContinuarTramite extends Accion {
             log_message("INFO", "Continuar tramite_id: ".$tramite_id->valor, FALSE);
             log_message("INFO", "Continuar tarea_id: ".$tarea_id->valor, FALSE);
 
-            $etapa = new Etapa();
-            $etapa = $etapa->getEtapaPorTareaId($tarea_id->valor, $tramite_id->valor);
+            $etapa_continuar = new Etapa();
+            $etapa_continuar = $etapa_continuar->getEtapaPorTareaId($tarea_id->valor, $tramite_id->valor);
             log_message("INFO", "id_etapa a continuar: ".$etapa->id);
-            if(strlen($etapa->id) != 0){ //Existe etapa para continuar el proceso
+            if(strlen($etapa_continuar->id) != 0){ //Existe etapa para continuar el proceso
                 $integracion = new IntegracionMediator();
-                $info_continuar = $integracion->continuarProceso($tramite_id->valor, $etapa->id, "0", $request);
+                $info_continuar = $integracion->continuarProceso($tramite_id->valor, $etapa_continuar->id, "0", $request);
 
                 $response_continuar = "{\"respuesta_continuar\": ".$info_continuar."}";
 
@@ -110,6 +110,7 @@ class AccionContinuarTramite extends Accion {
                 $cola->tarea_id = $tarea_id->valor;
                 $cola->request = $request;
                 $cola->procesado = 0;
+                log_message("INFO", "Se encola, ya que aun no existe etapa cola: ".$cola, FALSE);
                 $cola->save();
                 $response["respuesta_continuar"]="Se encola continuación trámite id:".$tramite_id->valor." en tarea id: ".$tarea_id->valor;
             }
