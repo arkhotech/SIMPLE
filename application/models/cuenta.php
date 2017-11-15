@@ -90,6 +90,25 @@ class Cuenta extends Doctrine_Record {
         return $cuentaSegunDominio;
     }
 
+    public static function cuentaSegunHost() {
+        static $firstTime = true;
+        static $cuentaSegunDominio = null;
+        if ($firstTime) {
+            $firstTime = false;
+            $CI = &get_instance();
+            $host = $CI->input->server('HTTP_HOST');
+            $host = explode(".", $host);
+            log_message('debug', '$host: ' . $host[0]);
+            if ($host) {
+                $cuentaSegunDominio = Doctrine::getTable('Cuenta')->findOneByNombre($host[0]);
+            } else {
+                $cuentaSegunDominio = Doctrine_Query::create()->from('Cuenta c')->limit(1)->fetchOne();
+            }
+        }
+
+        return $cuentaSegunDominio;
+    }
+
     public function getLogoADesplegar() {
         if ($this->logo)
             return base_url('uploads/logos/' . $this->logo);

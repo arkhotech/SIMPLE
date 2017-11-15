@@ -5,14 +5,17 @@ class ProcesoTable extends Doctrine_Table {
     public function findProcesosDisponiblesParaIniciar($usuario_id,$cuenta='localhost',$orderby='id',$direction='desc'){
         $usuario=Doctrine::getTable('Usuario')->find($usuario_id);
 
-        $cuenta = Doctrine::getTable('Cuenta')->find(UsuarioBackendSesion::usuario()->cuenta_id);
-        $estados = "public";
+        log_message("debug", "Usuario id: ".$usuario_id, FALSE);
+
+        $cuenta = Cuenta::cuentaSegunHost();
+        log_message("debug", "Cuenta id: ".$cuenta->id, FALSE);
+        $estados = "'public'";
         if($cuenta->ambiente == 'dev'){
-            $estados += ", draft";
+            $estados += ", 'draft'";
         }else{
             $cuenta_dev = $cuenta->getAmbienteDev($cuenta->id);
             if(count($cuenta_dev) == 0){
-                $estados += ", draft";
+                $estados += ", 'draft'";
             }
         }
 
