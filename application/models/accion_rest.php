@@ -166,6 +166,7 @@ class AccionRest extends Accion {
             if(isset($this->extra->timeout_reintentos)){
                 $reintentos = $this->extra->timeout_reintentos;
             }
+            $timeout = false;
 
             log_message("debug", "Numero de reintentos: ".$reintentos, FALSE);
 
@@ -191,6 +192,7 @@ class AccionRest extends Accion {
                         $result2['code']= '504';
                         $result2['desc']= $e->getMessage();
                         $intentos++;
+                        $timeout = true;
                     }else{
                         throw new ApiException($e->getMessage(),$e->getCode());
                     }
@@ -199,7 +201,7 @@ class AccionRest extends Accion {
                 log_message("debug", "Intentos: ".$intentos, FALSE);
                 log_message("debug", "Reintentos: ".$reintentos, FALSE);
 
-            }while($intentos < $reintentos);
+            }while($timeout && ($intentos < $reintentos));
 
             if($intentos != $reintentos){
                 $debug = $CI->rest->debug();
