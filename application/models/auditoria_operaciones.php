@@ -44,7 +44,7 @@ class AuditoriaOperaciones extends Doctrine_Record {
          $registro_auditoria->motivo = $motivo;
 
          //unset($accion_array['accion']['proceso_id']);
-         log_message('debug',$str_detalles);
+         //log_message('debug',$str_detalles);
          
          $registro_auditoria->detalles=  json_encode($data);
          $registro_auditoria->save();

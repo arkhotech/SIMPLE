@@ -344,10 +344,10 @@
 					<p> En donde:</p>
 					<ul>
 						<li>Campo <em>Nombre de la acción</em>: Corresponde al nombre de la acción a generar.</li>
-						<li>Campo<em>Cuentas</em>: Se listan las cuentas disponibles que han otorgado permisos a mi cuenta para poder iniciar procesos.</li>
-						<li>Campo<em>Trámites disponibles</em>: Se listan los trámites disponibles para iniciar pertenecientes a la cuenta seleccionada previamente.</li>
-						<li>Campo<em>Tarea desde la cual desea continuar el proceso</em>: Se listan las tareas existente en mi proceso, en donde se debe seleccionar en cual tarea se desea que retorne la respuesta del proceso iniciado una vez que termine su ejecución.</li>
-						<li>Campo<em>Request</em>: Mensaje en formato json necesario para iniciar el trámite seleccionado.</li>
+						<li>Campo <em>Cuentas</em>: Se listan las cuentas disponibles que han otorgado permisos a mi cuenta para poder iniciar procesos.</li>
+						<li>Campo <em>Trámites disponibles</em>: Se listan los trámites disponibles para iniciar pertenecientes a la cuenta seleccionada previamente.</li>
+						<li>Campo <em>Tarea desde la cual desea continuar el proceso</em>: Se listan las tareas existentes en mi proceso, en donde se debe seleccionar en cual tarea se desea que retorne la respuesta del proceso iniciado una vez que termine su ejecución.</li>
+						<li>Campo <em>Request</em>: Mensaje en formato json necesario para iniciar el trámite seleccionado.</li>
 					</ul>
 					<p> </p>
 					<p>Se debe tener en cuenta que esta acción esta muy relacionada con la acción Continuar trámite, si se desea recibir respuesta del subproceso iniciado, en el subproceso será necesario configurar una acción de Continuar trámite.
@@ -357,7 +357,108 @@
 					<p> </p>
 					<p>Para finalizar simplemente presione Guardar.</p>
 					<p> </p>
+					<p>Por ejemplo, supongamos que tenémos un proceso de solicitud de certificado, que necesita la ejecución de otro proceso para obtener los datos laborales de una persona.</p>
+					<p>El proceso de solicitud es el siguiente:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/SolicitudCertificado.png" alt="" width="454" height="402" /></p>
+					<p>Figura 40: "Proceso de solicitud de certificado"</p>
+					<p> </p>
+					<p>Y el proceso que retorna los datos laborales de una persona es el siguiente:</p>
+					<p> </p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EntregaDatosLaborales.png" alt="" width="454" height="402" /></p>
+					<p>Figura 41: "Proceso Entrega Datos Laborales"</p>
+					<p> </p>
+					<p>Para integrar procesos dentro de simple, se realizan las sigientes acciones:</p>
+					<ul>
+						<li>1. Primero se revisa lo que solicita de entrada el proceso que deseo iniciar desde otro trámite SIMPLE, esto se ve inspeccionando el primer formulario. Para este caso, el proceso de Entrega de datos laborales, pide los siguientes campos en su formulario de inicio:
+							<ul>
+								<li>nombre</li>
+								<li>apellido</li>
+							</ul>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/1_subproceso.png" alt="" width="454" height="402" /></p>
+							<p>Figura 42: "Revisión subproceso a iniciar"</p>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/1_pasos_subproceso.png" alt="" width="454" height="402" /></p>
+							<p>Figura 43: "Pasos subproceso a iniciar"</p>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/1_formulario_inicio_subproceso.png" alt="" width="454" height="402" /></p>
+							<p>Figura 44: "Campos formulario inicio subproceso"</p>
+							<p> </p>
+						</li>
+						<li>2. Conociendo la entrada, se configura la acción Iniciar Trámite, en donde se entrega en formato Json lo solicitado por el proceso Entrega de datos laborales.
+						</li>
+						<li>3. Se indica en cual de mis tareas quiero que retorne la información que necesita mi proceso, en este caso es la tarea Datos Laborales.
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/AccionIniciarTramite.png" alt="" width="454" height="402" /></p>
+							<p>Figura 45: "Ejemplo configuracion acción Iniciar Trámite"</p>
+							<p> </p>
+						</li>
+						<li>4. Luego se indica cuando quiero que se ejecute la acción.
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EventoIniciarTramite.png" alt="" width="454" height="402" /></p>
+							<p>Figura 46: "Ejemplo configuracion evento Iniciar Trámite"</p>
+							<p> </p>
+						</li>
+						<li>5. En el proceso Entrega de datos laborales, se configura la accion para continuar trámite, el cual continuará el proceso de Solicitud, según la configuracion de la acción Iniciar Trámite. Para este caso, como se indicó, se revisa la información que solicita la taréa Datos Laborales en su primer formulario, la cual es:
+							<ul>
+								<li>profesion</li>
+								<li>empresa</li>
+							</ul>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/5_tarea_continuar.png" alt="" width="454" height="402" /></p>
+							<p>Figura 47: "Revisión tarea donde se continuará el proceso"</p>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/5_formularioContinuar.png" alt="" width="454" height="402" /></p>
+							<p>Figura 48: "Formulario inicio de tarea para continuar el proceso"</p>
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/5_CamposFormContinuar.png" alt="" width="454" height="402" /></p>
+							<p>Figura 49: "Campos requeridos para continuar el proceso"</p>
+							<p> </p>
+						</li>
+						<li>6. Se configura la acción continuar trámite con la información necesaria.
+							<p> </p>
+							<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/ContinuarTramite.png" alt="" width="454" height="402" /></p>
+							<p>Figura 50: "Ejemplo configuración acción Continuar Trámite"</p>
+							<p> </p>
+						</li>
+						<li>6. Al continuar se visualiza el traspaso de información y como los procesos son ejecutados a través de los eventos configurados.</li>
+					</ul>
 
+					<p>Al ejecutar el proceso se refleja el siguinete comportamiento, primero iniciamos el proceso Solicitud de Certificado</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_InicioSolicitud.png" alt="" width="454" height="402" /></p>
+					<p>Figura 51: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Se ingresa la información solicitada al iniciar el proceso de Sollicitud de Certificado</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_2_IngresoData.png" alt="" width="454" height="402" /></p>
+					<p>Figura 52: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Al finalizar el paso anterior, se ejecuta la acción de iniciar trámite, esto se visualiza en el menú izquierdo, en donde se refleja que hay 2 procesos en la bandeja de entrada</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_3_FinalizoPaso.png" alt="" width="454" height="402" /></p>
+					<p>Figura 53: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Luego, en la bandeja de entrada se puede visualizar el proceso principal, el cual queda esperando en la etapa Datos Laborales, y el subproceso iniciado recientemente, el cual se encuentra en la etapa Obtener profesión y empresa</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_4_InicioSubProceso.png" alt="" width="454" height="402" /></p>
+					<p>Figura 54: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Al ingresar al subproceso nos muestra la información que fue entregada por el proceso principal, al iniciar el subproceso.</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_5_VerInfoInicioSubProc.png" alt="" width="454" height="402" /></p>
+					<p>Figura 55: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Se avanza en el subproceso, y se completa la información solicitada, la cual posteriormente será enviada al proceso principal.</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_6_CompletaInfoSubProc.png" alt="" width="454" height="402" /></p>
+					<p>Figura 56: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>Se finaliza el subproceso.</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_7_FinalizaSubProc.png" alt="" width="454" height="402" /></p>
+					<p>Figura 57: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+					<p>El proceso principal es avanzado por el subproceso a la siguiente etapa, y se visualiza los datos entregados por el subproceso.</p>
+					<p><img src="../../../assets/img/BackEnd/Acciones/IniciarProcesoSimple/EJ_8_VerInfoEnProcesoPadre.png" alt="" width="454" height="402" /></p>
+					<p>Figura 58: "Ejemplo Iniciar y Continuar Trámite Simple"</p>
+					<p> </p>
+
+					<p> </p>
 
 					<h4 id="continuar-tramite">Acción Continuar Trámite</h4>
 					<p>Esta acción, se debe configurar cuando sabemos que nuestro proceso esta habilitado para ser iniciado por otro trámite de SIMPLE, ya que depende de la acción Iniciar Trámite para poder ejecutarse de forma correcta.

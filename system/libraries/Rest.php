@@ -107,7 +107,7 @@ class REST
         {
             $this->rest_server .= '/';
         }
-        isset($config['timeout']) && $this->timeout = $config['timeout'];
+        /*isset($config['timeout']) && $this->timeout = $config['timeout'];
         isset($config['send_cookies']) && $this->send_cookies = $config['send_cookies'];
 
         isset($config['api_name']) && $this->api_name = $config['api_name'];
@@ -118,7 +118,20 @@ class REST
         isset($config['http_pass']) && $this->http_pass = $config['http_pass'];
 
         isset($config['ssl_verify_peer']) && $this->ssl_verify_peer = $config['ssl_verify_peer'];
-        isset($config['ssl_cainfo']) && $this->ssl_cainfo = $config['ssl_cainfo'];
+        isset($config['ssl_cainfo']) && $this->ssl_cainfo = $config['ssl_cainfo'];*/
+
+        $this->timeout = $config['timeout'];
+        $this->send_cookies = $config['send_cookies'];
+
+        $this->api_name = $config['api_name'];
+        $this->api_key = $config['api_key'];
+
+        $this->http_auth = $config['http_auth'];
+        $this->http_user = $config['http_user'];
+        $this->http_pass = $config['http_pass'];
+
+        $this->ssl_verify_peer = $config['ssl_verify_peer'];
+        $this->ssl_cainfo = $config['ssl_cainfo'];
     }
     ////////////////////////////////////////////////
     ////////////////////////////////////////////////
@@ -272,6 +285,10 @@ class REST
     //funcion modificada para el timeout
     protected function _call($method, $uri, $params = array(), $format = NULL)
     {
+        log_message("debug", "Metodo: ".$method, FALSE);
+        log_message("debug", "Uri: ".$uri, FALSE);
+        log_message("debug", "params: ".$this->varDump($params), FALSE);
+        log_message("debug", "format: ".$format, FALSE);
         if ($format !== NULL)
         {
             $this->format($format);
@@ -280,11 +297,13 @@ class REST
         $this->http_header('Accept', $this->mime_type);
 
         // Initialize cURL session
+        log_message("debug", "URL Servicio: ".$this->rest_server.$uri, FALSE);
         $this->_ci->curl->create($this->rest_server.$uri);
 
 
         // If using ssl set the ssl verification value and cainfo
         // contributed by: https://github.com/paulyasi
+        log_message("debug", "SSL: ".$this->ssl_verify_peer, FALSE);
         if ($this->ssl_verify_peer === FALSE)
         {
             $this->_ci->curl->ssl(FALSE);
@@ -299,16 +318,22 @@ class REST
         // If authentication is enabled use it
         if ($this->http_auth != '' && $this->http_user != '')
         {
+            //$hash = base64_encode($this->http_user . ":" . $this->http_pass);
+            log_message('info', "2 Seteando seguridad basic $this->http_user, $this->http_pass, $this->http_auth", FALSE);
+
             $this->_ci->curl->http_login($this->http_user, $this->http_pass, $this->http_auth);
+
         }
         
         // If we have an API Key, then use it
+        log_message("debug", "ApiKey: ".$this->api_key, FALSE);
         if ($this->api_key != '')
         {
             $this->_ci->curl->http_header($this->api_name, $this->api_key);
         }
 
         // Send cookies with curl
+        log_message("debug", "send_cookies: ".$this->send_cookies, FALSE);
         if ($this->send_cookies != '')
         {
                 

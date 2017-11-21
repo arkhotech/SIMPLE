@@ -130,7 +130,6 @@ class AccionSoap extends Accion {
                 //se verifica si existe numero de reintentos
                 if(isset($error) && strpos($error, 'timed out') !== false){
                     log_message("INFO", "Intento Nro: ".$intentos, FALSE);
-                    log_message("INFO", "Error SOAP ".$error, FALSE);
                     $intentos++;
                 }
             }while($intentos < $reintentos && strpos($error, 'timed out') !== false);

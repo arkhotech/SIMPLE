@@ -32,7 +32,7 @@ class SeguridadIntegracion{
                     'server'          => $server,
                     'http_user'       => $user,
                     'http_pass'       => $pass,
-                    'http_auth'       => 'basic'
+                    'http_auth'       => 'Basic'
                 );
                 break;
             case "API_KEY":

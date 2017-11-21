@@ -207,6 +207,7 @@ class Curl {
 	public function http_login($username = '', $password = '', $type = 'any')
 	{
 		$this->option(CURLOPT_HTTPAUTH, constant('CURLAUTH_' . strtoupper($type)));
+        log_message("debug", "sin base64: ".$username . ':' . $password, FALSE);
 		$this->option(CURLOPT_USERPWD, $username . ':' . $password);
 		return $this;
 	}

@@ -220,8 +220,6 @@ class AccionRest extends Accion {
                 }
 
                 log_message("debug", "Respuesta REST: ".$this->varDump($result2), FALSE);
-            }else{
-
             }
 
         }catch (Exception $e){
@@ -231,6 +229,7 @@ class AccionRest extends Accion {
         }
 
         $response[$this->extra->var_response]=$result2;
+        log_message("debug", "Respuesta REST Response: ".$this->varDump($response), FALSE);
 
         foreach($response as $key=>$value){
             $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);

@@ -90,7 +90,7 @@ class AccionNotificaciones extends Accion {
 
 
                         $seguridad = new SeguridadIntegracion();
-                        $config = $seguridad->getConfigRest($idSeguridad, $server);
+                        $config = $seguridad->getConfigRest($idSeguridad, $server, 30);
 
                         log_message("INFO", "Llamando a suscriptor URL: " . $uri, FALSE);
 
@@ -114,8 +114,12 @@ class AccionNotificaciones extends Accion {
                                 "Error Notificando a suscriptor " . $suscriptor->institucion, $response, array());
 
                         } else {
-                            // Caso OK, sin errores
-                            $result2 = get_object_vars($result);
+                            // Caso con errores
+                            if(isset($result)){
+                                $result2 = get_object_vars($result);
+                            }else{
+                                $result2 = "SUCCESS";
+                            }
                             $response = $result2;
                             AuditoriaOperaciones::registrarAuditoria($proceso->nombre,
                                 "Suscriptor " . $suscriptor->institucion . " notificado exitosamente", $response, array());
