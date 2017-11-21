@@ -117,6 +117,13 @@ $(document).ready(function(){
         $('#modal').load(site_url+"backend/procesos/ajax_editar_conexiones/"+procesoId+"/"+id);
         $('#modal').modal('show')
     });
+
+    $(document).on("dblclick doubletap","#draw .union",function(event){
+        event.stopPropagation();
+        var id=$(this).closest(".box").attr("id");
+        $('#modal').load(site_url+"backend/procesos/ajax_editar_conexiones/"+procesoId+"/"+id+"/union");
+        $('#modal').modal('show')
+    });
     
     //Asigno el evento para editar el proceso al hacerle click al titulo
     $(document).on("click","#areaDibujo h1 a",function(event){

@@ -76,7 +76,7 @@ Class MY_Form_validation extends CI_Form_validation {
      */
     public function alpha_space($str)
     {
-        return ( ! preg_match('/^([-a-z0-9\s])+$/i', $str)) ? FALSE : TRUE;
+        return ( ! preg_match('/^[\pL\pN\s]{0,75}$/u', $str)) ? FALSE : TRUE;
     }
 
 
