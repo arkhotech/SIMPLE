@@ -608,7 +608,7 @@ class IntegracionMediator{
             $paso = $etapa->getPasoEjecutable($secuencia);
             $etapa->iniciarPaso($paso);
             $forms[] = $this->obtenerFormulario($paso->formulario_id,$etapa->id);
-            $estado = $this->obtenerEstadoProceso($forms, $etapa, $id_proceso);
+            $estado = $this->obtenerEstadoProceso($forms, $etapa, $id_proceso, $secuencia);
         }
         
         $campos = new Campo();
@@ -623,7 +623,7 @@ class IntegracionMediator{
         return $result;
     }
 
-    private function obtenerEstadoProceso($forms, $etapa, $id_proceso){
+    private function obtenerEstadoProceso($forms, $etapa, $id_proceso, $secuencia = null){
         log_message("debug", "Verificando campos en proxima etapa", FALSE);
         $tieneCamposIN = false;
         foreach ($forms[0]['form']['campos'] as $record){
@@ -636,8 +636,14 @@ class IntegracionMediator{
         log_message("debug", "Hay campos IN: ".$tieneCamposIN, FALSE);
         $estado = 'activo';
         if(!$tieneCamposIN){
+
+            $next_step = null;
+            if(isset($secuencia)){
+                $next_step = $etapa->getPasoEjecutable($secuencia+1);
+            }
+
             $next_etapa = $this->obtenerProximaEtapa($etapa, $id_proceso);
-            if($next_etapa === NULL){
+            if(!isset($next_step) && $next_etapa === NULL){
                 $etapa->avanzar();
                 $estado = 'finalizado';
             }
