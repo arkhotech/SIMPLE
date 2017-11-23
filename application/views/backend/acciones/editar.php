@@ -21,9 +21,10 @@
         <?php if(!$edit):?>
             <legend> Crear Acción
         <?php endif; ?>
-        <?php if($edit):?>
+        <?php if($edit){
+        $tipo= $accion->tipo;?>
             <legend> Editar Acción
-        <?php endif; ?>
+        <?php }?>
         <?php if ($tipo == "enviar_correo") { ?>
             <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/acciones.html#enviar_correo" target="_blank">
                 <span class="glyphicon glyphicon-info-sign"></span>

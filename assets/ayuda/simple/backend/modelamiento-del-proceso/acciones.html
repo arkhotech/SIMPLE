@@ -230,17 +230,34 @@
 						<li>Campo<em> Endpoint</em>: Corresponde a la dirección del host que provee el servicio.</li>
 						<li>Campo<em> Resource</em>: Corresponde a la direccion del servicio propiemente tal. Considere que mediante esta url, se le podrá valores. Por ejemplo, si usted desea pasar la variable Rut como parámetro, en caso de elegir el método GET, debe escribir la URL de la siguiente forma: http://server/resource/11111111-1</li>
 						<li>Campo<em> Método</em>: Metodos HTTP disponibles para elconsumo de servicios Rest (GET, POST, PUT, DELETE)</li>
-						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout</li>
+						<li>Campo<em> Timeout</em>: Corresponde al tiempo en segundos que SIMPLE esperará respuesta del webservices, sino dará un error de timeout. En caso de no ser seteado, por defecto su valor sera 30 seg.</li>
 						<li>Campo<em> Número reintentos</em>: En caso de existir un timeout, la accion tratará de consumir el servicio las veces que se indique en este campo, por defecto su valor es 3</li>
 						<li>Campo<em> Header</em>: Corresponde a la definición de parámetros a pasar en la cabecera de la petición</li>
 						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
 					</ul>
 					<p>Por ejemplo, para la siguinete URL: http://servidorweb/webservice/webservice.php?rut=@@rut</p>
  					<p>La parte <em>http://servidorweb</em> corresponde al Endpoint. Y la parte <em>/webservice/webservice.php</em> corresponde al Resource.</p>
-					<p> </p>
 					<p>Tenga presente, que el WebService DEBE OBLIGATORIAMENTE responder con formato JSON y aceptar consultas vía REST.</p>
 					<p> </p>
-					<p>Las variables de respuesta, podrán ser utilizadas anteponiendo @@, por ejemplo, al utilizar la variable <em>@@variable2</em> informará lo que se devuelva como <em>valor2</em>.</p>
+					<p><h5>Trabajando con el resultado</h5></p>
+					<p>La variable de respuesta, podrá ser utilizada anteponiendo @@, por ejemplo:</p>
+					<p>Para el siguinete json de respuesta</p>
+					<p>{</p>
+					<p> "nombre":"Un nombre",</p>
+					<p> "persona":{</p>
+					<p> &nbsp;&nbsp;"edad":45</p>
+					<p>  &nbsp;}</p>
+					<p>}</p>
+					<p>Se se definió por ejemplo <em>respuesta_servicio</em> como variable de respuesta, la forma de acceder al nombre será <em>@@respuesta_servicio->nombre</em>.</p>
+					<p>Y si se requiere llegar al dato de edad, la forma de acceder será <em>@@respuesta_servicio->persona->edad</em>.</p>
+					<p> </p>
+					<p><h5>Controlando los errores</h5></p>
+					<p>Esta acción, es una función genérica de consulta a servicios rest, por lo cual la lógica de errores del servicio que se esté consumiendo, debe ser manejada con reglas de negocio según corresponda.</p>
+					<p>Para el caso de errores no controlados por el servicio, errores de conexión o timeout, estos serámn notificados en la variable de respuesta configurada con la sigueinte estructura:</p>
+					<p>{</p>
+					<p> "code" : 504, (Por ejemplo para el caso de timeout)</p>
+					<p> "desc" : "Timeout"</p>
+					<p>}</p>
 					<p> </p>
 					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
 					<p> </p>
@@ -265,7 +282,27 @@
 						<li>Campo<em> Seguridad</em>: Si el servicio requiere autenticación, esta será administrada en la sección de suguridad que se explicará más adelante. Este campo corresponde a la selección de la seguridad configurada.</li>
 					</ul>
 					<p> </p>
-					<p>Tenga presente, que la respuesta del WebService quedará almacenada en una variable llamada "response_soap".</p>
+					<p>Tenga presente, que la respuesta del WebService quedará almacenada en la variable de respuesta configurada, la cual contendrá un objeto json.</p>
+					<p> </p>
+					<p><h5>Trabajando con el resultado</h5></p>
+					<p>La variable de respuesta, podrá ser utilizada anteponiendo @@, por ejemplo:</p>
+					<p>Para el siguinete json de respuesta</p>
+					<p>{</p>
+					<p> "nombre":"Un nombre",</p>
+					<p> "persona":{</p>
+					<p> &nbsp;&nbsp;"edad":45</p>
+					<p>  &nbsp;}</p>
+					<p>}</p>
+					<p>Se se definió por ejemplo <em>respuesta_servicio</em> como variable de respuesta, la forma de acceder al nombre será <em>@@respuesta_servicio->nombre</em>.</p>
+					<p>Y si se requiere llegar al dato de edad, la forma de acceder será <em>@@respuesta_servicio->persona->edad</em>.</p>
+					<p> </p>
+					<p><h5>Controlando los errores</h5></p>
+					<p>Esta acción, es una función genérica de consulta a servicios rest, por lo cual la lógica de errores del servicio que se esté consumiendo, debe ser manejada con reglas de negocio según corresponda.</p>
+					<p>Para el caso de errores no controlados por el servicio, errores de conexión o timeout, estos serámn notificados en la variable de respuesta configurada con la sigueinte estructura:</p>
+					<p>{</p>
+					<p> "code" : 504, (Por ejemplo para el caso de timeout)</p>
+					<p> "desc" : "Timeout"</p>
+					<p>}</p>
 					<p> </p>
 					<p>Para mayor información sobre el WebService que desea utilizar, acérquese al área de IT a consultar.</p>
 					<p> </p>
