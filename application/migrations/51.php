@@ -1,5 +1,5 @@
 <?php
-class Migration_45 extends Doctrine_Migration_Base {
+class Migration_51 extends Doctrine_Migration_Base {
 
     public function up() {
 

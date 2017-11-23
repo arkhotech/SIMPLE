@@ -1,5 +1,5 @@
 <?php
-class Migration_44 extends Doctrine_Migration_Base {
+class Migration_50 extends Doctrine_Migration_Base {
 
     public function up() {
 
@@ -9,23 +9,23 @@ class Migration_44 extends Doctrine_Migration_Base {
                 'notnull' => 1,
                 'primary' => 1
             ),
-            'id_cuenta_origen' => array(
-                'type' => 'int(10)'
+            'institucion' => array(
+                'type' => 'varchar(128)'
             ),
-            'id_cuenta_destino' => array(
-                'type' => 'int(10)'
+            'extra' => array(
+                'type' => 'text'
             ),
-            'id_proceso' => array(
-                'type' => 'int(10)'
+            'proceso_id' => array(
+                'type' => 'int'
             )
         );
 
-        $this->createTable('proceso_cuenta', $columns, array('primary' => array('id')));
+        $this->createTable('suscriptor', $columns, array('primary' => array('id')));
     }
 
     public function postUp() {
-        $this->createForeignKey( 'proceso_cuenta', 'fk_trigger_proceso2', array(
-                'local'        => 'id_proceso',
+        $this->createForeignKey( 'suscriptor', 'fk_trigger_proceso2', array(
+                'local'        => 'proceso_id',
                 'foreign'      => 'id',
                 'foreignTable' => 'proceso',
                 'onUpdate'     => 'CASCADE',
@@ -35,7 +35,7 @@ class Migration_44 extends Doctrine_Migration_Base {
     }
 
     public function down() {
-        $this->dropTable('proceso_cuenta');
+        $this->dropTable('suscriptor');
     }
 
 }

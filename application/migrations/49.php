@@ -1,5 +1,5 @@
 <?php
-class Migration_42 extends Doctrine_Migration_Base {
+class Migration_49 extends Doctrine_Migration_Base {
     public function up(){
         $this->addColumn( 'accion', 'exponer_variable', 'integer' , null, array( 'notnull' => 1,'default'=>0));
 

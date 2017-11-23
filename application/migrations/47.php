@@ -1,5 +1,5 @@
 <?php 
-	class Migration_40 extends Doctrine_Migration_Base {
+	class Migration_47 extends Doctrine_Migration_Base {
 
 	    public function up() {
 	        $this->addColumn('tarea', 'exponer_tramite', 'tinyint', null, array('notnull'=>1));
