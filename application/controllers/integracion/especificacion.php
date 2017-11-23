@@ -12,7 +12,8 @@ class Especificacion extends REST_Controller{//MY_BackendController {
             $tarea=Doctrine::getTable('Proceso')->findProcesosExpuestos(Cuenta::cuentaSegunDominio()->id);
             log_message('debug','Recuperando procesos expuestos: '.count($tarea));
             $result = array();
-            $nombre_host = gethostname();
+            $host = $this->input->server('HTTP_HOST');
+            //$nombre_host = gethostname();
             (isset($_SERVER['HTTPS']) ? $protocol = 'https://' : $protocol = 'http://');
             foreach($tarea as $res ){
                 array_push($result, array(
@@ -22,7 +23,7 @@ class Especificacion extends REST_Controller{//MY_BackendController {
                     "version" => "1.0",
                     "institucion" => $res['nombre_cuenta'],
                     "descripcion" => $res['previsualizacion'],
-                    "URL" => $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']
+                    "URL" => $protocol.$host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']
                 ));
             }
             $retval["catalogo"] = $result;

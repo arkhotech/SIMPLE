@@ -12,7 +12,8 @@
                 <th>Url</th>
             </tr>       
             <?
-                $nombre_host = gethostname();
+                //$nombre_host = gethostname();
+                $host = $this->input->server('HTTP_HOST');
                 ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
                 foreach ($json as $res){ 
             ?>
@@ -21,7 +22,7 @@
                     <td><? echo $res['tarea'] ?></td>
                     <td><? echo $res['previsualizacion'] ?></td>
                     <td>
-                        <a class="btn btn-default" target="_blank" href="<? echo $protocol.$nombre_host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']; ?> ">
+                        <a class="btn btn-default" target="_blank" href="<? echo $protocol.$host.'/integracion/especificacion/servicio/proceso/'.$res['id'].'/tarea/'.$res['id_tarea']; ?> ">
                             <i class="icon-upload icon"></i>Swagger
                         </a>
                     </td>
