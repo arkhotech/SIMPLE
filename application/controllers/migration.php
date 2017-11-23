@@ -17,5 +17,4 @@ class Migration extends CI_Controller{
         $migration = new Doctrine_Migration( 'application/migrations' );
         $migration->migrate($version);
     }
-    
 }

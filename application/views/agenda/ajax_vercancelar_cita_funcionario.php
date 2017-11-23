@@ -1,6 +1,8 @@
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
-    <h3 id="myModalLabel">Cita</h3>
+  <button type="button" class="close" data-dismiss="modal">
+    <i class="icon-close icon--top"></i>
+  </button>
+  <h3 id="myModalLabel">Cita</h3>
 </div>
 <div class="modal-body">
   <div class="validacion valcancelcita"></div>
@@ -32,8 +34,8 @@
   </table>
 </div>
 <div class="modal-footer">
-  <button class="btn js_cerrar_vcancelar" data-dismiss="modal">Cerrar</button>
-  <button class="btn btn-primary" onclick="confirmar_cancelar_cita(<?= $idcita ?>);" id="cancelar_cita_<?= $idcita ?>">Cancelar Cita</button>
+  <button class="button button--lightgray js_cerrar_vcancelar" data-dismiss="modal">Cerrar</button>
+  <button class="button" onclick="confirmar_cancelar_cita(<?= $idcita ?>);" id="cancelar_cita_<?= $idcita ?>">Cancelar Cita</button>
 </div>
 
 <?php

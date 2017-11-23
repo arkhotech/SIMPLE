@@ -48,6 +48,9 @@
         <script src="<?= base_url() ?>assets/js/jquery.doubletap/jquery.doubletap.js" type="text/javascript"></script> <?php //JS para soportar dobleclick en iPad     ?>
         <script src="<?= base_url() ?>assets/js/json-js/json2.js" type="text/javascript"></script> <?php //JS para convertir objetos a notacion JSON en multiples browsers     ?>
         <script src="<?= base_url() ?>assets/js/highcharts/highcharts.js" type="text/javascript"></script> <?php //JS para hacer graficos     ?>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=<?= mapskey() ?>&libraries=places&&language=ES"></script>
+
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
@@ -74,7 +77,11 @@
             <div class="container-fluid">
                 <div class="row-fluid">
                     <div class="span2">
-                        <h1 id="logo"><a href="<?= site_url('backend/portada') ?>"><img src="<?= base_url() ?>assets/img/logo.png" alt="Tramitador" /></a></h1>
+                        <h1 id="logo">
+                            <a href="<?= site_url('backend/portada') ?>">
+                                <img src="<?= base_url() ?>assets/img/logo.png" alt="Tramitador" />
+                            </a>
+                        </h1>
                     </div>
                     <div class="span10">
                         <div class="row-fluid">

@@ -1,0 +1,174 @@
+/* =Settings
+----------------------------------------------- */
+/* =Libraries
+----------------------------------------------- */
+/* Slider */
+.slick-slider {
+  position: relative;
+  display: block;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent; }
+
+.slick-list {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  margin: 0;
+  padding: 0; }
+  .slick-list:focus {
+    outline: none; }
+  .slick-list.dragging {
+    cursor: pointer;
+    cursor: hand; }
+
+.slick-slider .slick-track,
+.slick-slider .slick-list {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0); }
+
+.slick-track {
+  position: relative;
+  left: 0;
+  top: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto; }
+  .slick-track:before, .slick-track:after {
+    content: "";
+    display: table; }
+  .slick-track:after {
+    clear: both; }
+  .slick-loading .slick-track {
+    visibility: hidden; }
+
+.slick-slide {
+  float: left;
+  height: 100%;
+  min-height: 1px;
+  display: none; }
+  [dir="rtl"] .slick-slide {
+    float: right; }
+  .slick-slide img {
+    display: block; }
+  .slick-slide.slick-loading img {
+    display: none; }
+  .slick-slide.dragging img {
+    pointer-events: none; }
+  .slick-initialized .slick-slide {
+    display: block; }
+  .slick-loading .slick-slide {
+    visibility: hidden; }
+  .slick-vertical .slick-slide {
+    display: block;
+    height: auto;
+    border: 1px solid transparent; }
+
+.slick-arrow.slick-hidden {
+  display: none; }
+
+/* =Colors
+----------------------------------------------- */
+.c-header {
+  -webkit-box-shadow: 1px 2px 1px 1px #E3E5EF;
+          box-shadow: 1px 2px 1px 1px #E3E5EF; }
+
+.c-buttons .button {
+  margin: 1.125em 0; }
+
+.c-title {
+  color: #54698D;
+  font-family: "Roboto", sans-serif; }
+
+.c-sub-title {
+  color: #16325C;
+  font-family: "Roboto", sans-serif;
+  font-size: 1em; }
+
+.c-color {
+  margin: 0 0 30px; }
+  .c-color_circle {
+    background-color: transparent;
+    border-radius: 50%;
+    display: block;
+    height: 60px;
+    width: 60px;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative; }
+    .c-color_circle:after {
+      content: "";
+      background: #FFFFFF;
+      -webkit-box-shadow: 0 8px 14px 0 rgba(168, 183, 199, 0.5);
+              box-shadow: 0 8px 14px 0 rgba(168, 183, 199, 0.5);
+      border-radius: 100px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1; }
+  .c-color_text {
+    display: inline-block;
+    margin-left: 15px;
+    vertical-align: middle; }
+
+.c-box {
+  border-bottom: 1px solid #111111; }
+  .c-box_title {
+    font-size: 2.0272865295em;
+    color: #111111; }
+  .c-box_text {
+    font-size: 1.265625em;
+    color: rgba(17, 17, 17, 0.8);
+    padding: 30px 0; }
+
+.c-collapsible {
+  padding: 50px 0; }
+  .c-collapsible .collapsible-block {
+    margin-right: 0;
+    margin-left: 0; }
+  .c-collapsible .collapsible_item {
+    border-bottom: 0; }
+
+.aux-box {
+  border-bottom: 1px solid rgba(10, 19, 45, 0.1);
+  padding: 30px 0 10px; }
+  .aux-box_side-text {
+    font-size: 0.7901234568em;
+    font-family: Roboto;
+    color: #111111; }
+  .aux-box_font-large {
+    font-size: 2.0272865295em;
+    color: #111111; }
+  .aux-box_font-medium {
+    font-size: 1.265625em;
+    color: #111111; }
+  .aux-box_roboto {
+    color: #111111;
+    font-family: Roboto; }
+    .aux-box_roboto_font--head-medium {
+      font-size: 21px;
+      color: rgba(17, 17, 17, 0.6); }
+    .aux-box_roboto_font-medium {
+      font-size: 1em; }
+    .aux-box_roboto_underline {
+      text-decoration: underline; }
+    .aux-box_roboto_font-head {
+      font-size: 0.7023319616em;
+      opacity: 0.92; }
+   code{
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #0021FF;
+    background-color: #E3E5EF;
+    border-radius: 4px;
+   }
+/*# sourceMappingURL=components.css.map */

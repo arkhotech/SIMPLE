@@ -60,6 +60,8 @@ class Documentos extends MY_BackendController {
         $data['documento'] = $documento;
         $data['edit'] = TRUE;
         $data['proceso']=$documento->Proceso;
+        $procesosArchivados = $data['proceso']->findProcesosArchivados($data['proceso']->root);
+        $data['procesos_arch'] = $procesosArchivados;
         $data['title'] = 'Edición de Documento';
         $data['content'] = 'backend/documentos/editar';
 

@@ -155,6 +155,14 @@
     <li><a href="<?= site_url('backend/Admseguridad/listar/' . $proceso->id) ?>">Seguridad</a></li>
     <li><a href="<?= site_url('backend/suscriptores/listar/' . $proceso->id) ?>">Suscriptores Externos</a></li>
 </ul>
+<form id="procArchivadoForm" method="POST" action="/backend/procesos/editar/">
+    Versiones anteriores
+    <select id="proc_arch_id" name="proc_arch_id" class="AlignText">
+        <?php foreach($procesos_arch as $proceso_arch):?>
+            <option value="<?=$proceso_arch['id']?>" <?=$proceso_arch['id']==$proceso->id?'selected':''?>><?=$proceso_arch['nombre'].'-'.$proceso_arch['version']?></option>
+        <?php endforeach ?>
+    </select>
+</form>
 
 
 <div id="areaDibujo">
@@ -182,3 +190,13 @@
 <div class="modal hide fade" id="modal">
 
 </div>
+<div class="modal hide fade" id="modalSelectIcon"></div>
+<script>
+    $(function() {
+        $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+        $(document).on('click', '#SelectIcon', function() {
+            $("#modalSelectIcon").load("<?= site_url('backend/procesos/seleccionar_icono') ?>");
+            $("#modalSelectIcon").modal();
+        });
+    });
+</script>

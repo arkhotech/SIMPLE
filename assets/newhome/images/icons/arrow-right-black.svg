@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="13px" height="7px" viewBox="0 0 13 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="buttons/basic/Boton-contingencia-F2C728" transform="translate(-347.000000, -27.000000)" fill="#111111">
+            <g id="Boton-contingencia-Copy-3">
+                <g id="arrow" transform="translate(347.000000, 27.000000)">
+                    <polygon id="→" points="12.53125 3.375 9.15625 0 9.15625 2.796875 0 2.796875 0 3.953125 9.15625 3.953125 9.15625 6.75"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

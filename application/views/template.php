@@ -6,10 +6,10 @@
     </head>
 
     <body>
-    <ul class="saltar">
-    <li><a href="#main" tabindex="1">Ir al contenido</a>
-    </li>
-</ul>
+        <ul class="saltar">
+            <li><a href="#main" tabindex="1">Ir al contenido</a>
+            </li>
+        </ul>
         <header>
             <div class="container">
                 <div class="row">
@@ -40,7 +40,7 @@
                                                     <input name="password" id="password" type="password" class="input-xlarge">
                                                     <div id="login_captcha"></div>
                                                     <p class="olvido">
-                                                        <a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a> - <a href="<?= site_url('autenticacion/registrar') ?>">Registrate aquí</a>
+                                                        <a href="<?= site_url('autenticacion/olvido') ?>">¿Olvidaste tu contraseña?</a>
                                                     </p>
                                                     <button class="btn btn-primary pull-right" type="submit">Ingresar</button>
                                                 </fieldset>

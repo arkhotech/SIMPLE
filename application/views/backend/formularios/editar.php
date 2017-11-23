@@ -49,6 +49,7 @@
         </div>
         <div class="btn-group">
             <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'javascript')">Javascript</button>
+            <button class="btn btn-inverse" onclick="return agregarCampo(<?= $formulario->id ?>,'maps')">Mapa</button>
         </div>
     </div>
 

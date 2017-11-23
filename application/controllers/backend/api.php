@@ -402,6 +402,85 @@ class API extends MY_BackendController {
         
     }
 
+    /*
+        Generación de trámites de forma externa
+    */
+    public function ejecutar($proceso_id){
+        if($proceso_id){
+            $proceso=Doctrine::getTable('Proceso')->find($proceso_id);
+            if(!$proceso)
+                show_404();
+            
+            //inicio de sesión con usuario no registrado
+            $usuario = new Usuario();
+            $usuario->usuario = random_string('unique');
+            $usuario->setPasswordWithSalt(random_string('alnum', 32));
+            $usuario->registrado = 0;
+            $usuario->save();
+            UsuarioSesion::login($usuario->usuario, $usuario->password);
+            $CI = & get_instance();
+            $CI->session->set_userdata('usuario_id', $usuario->id);
+            if(!$proceso->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)){
+                echo 'Usuario no puede iniciar este proceso';
+                exit;
+            }
+            
+            //inicio del trámite
+            $tramite=new Tramite();
+            $tramite->iniciar($proceso->id);
+            $etapa=Doctrine::getTable('Etapa')->find($tramite->getEtapasActuales()->get(0)->id);
+            
+            //almacenamiento de variables por POST
+            $vars = $this->input->post(NULL, TRUE);
+            foreach($vars as $key => $value){
+                $key = str_replace("-", "_", $key);
+                $key = str_replace(" ", "_", $key);
+                $dato=Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($key,$etapa->id);
+                if(!$dato)
+                    $dato=new DatoSeguimiento();
+                $dato->nombre=$key;
+                $dato->valor=$value;
+                if(!is_object($dato->valor) && !is_array($dato->valor)){                            
+                    if(preg_match('/^\d{4}[\/\-]\d{2}[\/\-]\d{2}$/', $dato->valor)){
+                        $dato->valor=preg_replace("/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})/i","$3-$2-$1",$dato->valor);
+                    }
+                }
+                $dato->etapa_id=$etapa->id;
+                $dato->save();
+            }
+
+            //pasos(formularios y campos)
+            $ejecutar = true;
+            $secuencia = 0;
+            while($ejecutar){
+                $paso = $etapa->getPasoEjecutable($secuencia);
+                if(!$paso) 
+                    break;
+
+                //ejecución de eventos antes de iniciar el paso
+                $etapa->iniciarPaso($paso);
+                //campos del paso(formulario)
+                foreach($paso->Formulario->Campos as $c){
+                    $c->displayConDatoSeguimiento($etapa->id,$paso->modo);
+                }
+                //ejecución de eventos después de finalizar el paso
+                $etapa->finalizarPaso($paso);
+                $secuencia++;
+            }
+            $etapa->avanzar();
+            
+            //resultado del trámite es entregar todas las variables generadas en json
+            $datos=Doctrine::getTable('DatoSeguimiento')->findByEtapaId($etapa->id);
+            foreach($datos as $dato){
+                $data[$dato->nombre] = $dato->valor;
+            }
+            header('Content-type: application/json');
+            echo json_indent(json_encode($data));
+        }else{
+            show_404();
+        }
+    }
+
     public function testjson($evento){
         $this->_auth();
         $evento = Doctrine_Query::create()

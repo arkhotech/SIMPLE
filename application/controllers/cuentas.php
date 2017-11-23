@@ -21,7 +21,7 @@ class Cuentas extends MY_Controller {
         
         $data['content'] = 'cuenta/editar';
         $data['title'] = 'Edita tu información';
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
     
     public function editar_form(){
@@ -62,7 +62,7 @@ class Cuentas extends MY_Controller {
         $data['redirect']=$this->input->server('HTTP_REFERER');
         $data['content'] = 'cuenta/editar_password';
         $data['title'] = 'Edita tu información';
-        $this->load->view('template', $data);
+        $this->load->view('template_newhome', $data);
     }
     
     public function editar_password_form(){

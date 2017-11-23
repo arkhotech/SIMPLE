@@ -15,7 +15,9 @@
     }
 </style>
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="close" data-dismiss="modal">
+        <i class="icon-close icon--top"></i>
+    </button>
     <h3 id="myModalLabel">Calendario</h3>
 </div>
     <div class="modal-body">
@@ -44,8 +46,8 @@
         
     </div>
 <div class="modal-footer">
-    <button class="btn js_cerrar_vcancelar" data-dismiss="modal">Cerrar</button>
-    <a href="#" onclick="" class="btn btn-primary">Escojer fecha</a>
+    <button class="button button--lightgray js_cerrar_vcancelar" data-dismiss="modal">Cerrar</button>
+    <a href="#" onclick="" class="button">Escojer fecha</a>
 </div>
 <div id="modalconfirmar" class="modal hide fade modalconfg modcalejec"></div>
 <input type="hidden" id="urlbase" value="<?= base_url() ?>" />

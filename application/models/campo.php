@@ -6,7 +6,7 @@ class Campo extends Doctrine_Record {
     public $etiqueta_tamano='large'; //Indica el tamaño default que tendra el campo de etiqueta. Puede ser large o xxlarge.
     public $requiere_nombre=true;    //Indica si requiere que se le ingrese un nombre (Es decir, no generarlo aleatoriamente)
     public $datos_agenda=false;     // Indica si se deben mostrar los satos adicionales para la agenda.
-
+    public $datos_mapa=false; // Indica si se deben mostrar que datos se deben mostrar asociados al mapa.
     
     public static function factory($tipo){
         if($tipo=='text')
@@ -47,6 +47,8 @@ class Campo extends Doctrine_Record {
             $campo=new CampoAgenda();
         else if($tipo=='recaptcha')
             $campo=new CampoRecaptcha();
+        else if($tipo=='maps')
+            $campo=new CampoMaps();
 
         $campo->assignInheritanceValues();
 
@@ -93,7 +95,8 @@ class Campo extends Doctrine_Record {
                 'CampoJavascript'  => array('tipo' => 'javascript'),
                 'CampoGrid'  => array('tipo' => 'grid'),
                 'CampoAgenda'  => array('tipo' => 'agenda'),
-                'CampoRecaptcha'  => array('tipo' => 'recaptcha')
+                'CampoRecaptcha'  => array('tipo' => 'recaptcha'),
+                'CampoMaps'  => array('tipo' => 'maps')
             ));
     }
 

@@ -10,6 +10,7 @@
         <link href="<?= base_url() ?>assets/css/bootstrap.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/responsive.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/js/file-uploader/fileuploader.css" rel="stylesheet">
+        <link href="<?= base_url() ?>assets/css/bootstrap2-toggle.min.css" rel="stylesheet">
         <link href="<?= base_url() ?>assets/css/common.css?v0.1" rel="stylesheet">
 
 
@@ -17,12 +18,25 @@
         <script src="<?= base_url() ?>assets/js/bootstrap.min.js" type="text/javascript"></script> <?php //JS base       ?>
         <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
         <script src="<?= base_url() ?>assets/js/bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js"></script>
+        <script src="<?= base_url() ?>assets/js/bootstrap2-toggle.min.js"></script>
         <script src="<?= base_url() ?>assets/js/jquery.chosen/chosen.jquery.min.js"></script> <?php //Soporte para selects con multiple choices     ?>
         <script src="<?= base_url() ?>assets/js/file-uploader/fileuploader.js"></script> <?php //Soporte para subir archivos con ajax     ?>
+
         <script src="<?= base_url() ?>assets/js/common.js"></script>
         <script type="text/javascript">
             var site_url = "<?= site_url() ?>";
             var base_url = "<?= base_url() ?>";
+
+            $(document).ready(function() {
+
+                $('#toggle_ambiente_dev').change(function() {
+                    if ($(this).prop('checked')) {
+                        $('#vinculo_prod').show(300);
+                    } else {
+                        $('#vinculo_prod').hide(300);
+                    }
+                });
+            });
         </script>
     </head>
     <body>
@@ -45,7 +59,6 @@
                             </ul>
                         </div>
                     </div>
-
                 </div>
             </header>
             <div id="main">
@@ -57,6 +70,7 @@
                             <li><a href="<?= site_url('manager/cuentas') ?>">Cuentas</a></li>
                             <li><a href="<?= site_url('manager/usuarios') ?>">Usuarios Backend</a></li>
                             <li><a href="<?= site_url('manager/diaferiado') ?>">D&iacute;as Feriados</a></li>
+                            <li><a href="<?= site_url('manager/categorias') ?>">Categorías</a></li>
                             <li class="nav-header">Consultas</li>
                             <li><a href="<?= site_url('manager/tramites_expuestos') ?>">Trámites expuestos como servicios</a></li>      
                             <li class="nav-header">Estadisticas</li>
@@ -69,9 +83,6 @@
                     </div>
                 </div>
             </div>
-
-
-
 
             <footer class="row-fluid">
                  <div class="area2">
@@ -88,21 +99,21 @@
                             </div>
                             <br>
                             <div class="">
-                                <p><a href="http://instituciones.chilesinpapeleo.cl/page/view/simple" target="_blank">Powered by SIMPLE</a></p>
+                                <p>
+                                    <a href="http://instituciones.chilesinpapeleo.cl/page/view/simple" target="_blank">Powered by SIMPLE</a>
+                                </p>
                             </div>
-
                         </div>
                         <div class="span6 align-center">
 
                         </div>
-                        <div class="span3">                            
+                        <div class="span3">
                             <a href="http://www.gob.cl" target="_blank"><img src="<?= base_url() ?>assets/img/gobierno_chile.png" alt="Gobierno de Chile" /></a>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
             </footer>
         </div>
-
     </body>
 </html>

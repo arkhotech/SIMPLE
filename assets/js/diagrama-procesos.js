@@ -39,6 +39,10 @@ function drawFromModel(model,width,height,tipoconector){
     $(model.elements).each(function(i,e){
         externa = e.externa==1?"externa":"";
         $("#draw").append("<div id='"+e.id+"' class='box "+externa+"' style='top: "+e.top+"px; left: "+e.left+"px;'>"+e.name+(e.start==1?'<div class="inicial"></div>':'')+"</div>");
+        if(e.stop == 1){
+            $("#draw #"+e.id).append('<div class="conector secuencial"></div>');
+            $("#draw #"+e.id).append('<div class="final-secuencial"></div>');
+        }
     });
     
     //Creamos las conexiones
@@ -71,6 +75,10 @@ function drawFromModelUpdate(model,width,height){
     //Creamos los elementos
     $(model.elements).each(function(i,e){
         $("#draw").append("<div id='"+e.id+"' class='box' style='top: "+e.top+"px; left: "+e.left+"px;'>"+e.name+(e.start==1?'<div class="inicial"></div>':'')+"</div>");
+        if(e.stop == 1){
+            $("#draw #"+e.id).append('<div class="conector secuencial"></div>');
+            $("#draw #"+e.id).append('<div class="final-secuencial"></div>');
+        }
     });
     
     //Creamos las conexiones

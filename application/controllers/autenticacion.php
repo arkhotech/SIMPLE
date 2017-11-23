@@ -15,20 +15,20 @@ class Autenticacion extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->authConfig = array(
-               'client_info' => array(
-                   'client_id' => Cuenta::cuentaSegunDominio()->client_id,
-                   'redirect_uri' => site_url('autenticacion/callback'),
-                   'authorization_endpoint' => 'https://www.claveunica.gob.cl/openid/authorize',
-                   'token_endpoint' => 'https://www.claveunica.gob.cl/openid/token',
-                   'user_info_endpoint' => 'https://www.claveunica.gob.cl/openid/userinfo',
-                   'authentication_info' => array(
-                       'method' => 'client_secret_post',
-                       'params' => array(
-                           'client_secret' => Cuenta::cuentaSegunDominio()->client_secret
-                       )
-                   )
-               )
-           );
+            'client_info' => array(
+                'client_id' => Cuenta::cuentaSegunDominio()->client_id,
+                'redirect_uri' => site_url('autenticacion/callback'),
+                'authorization_endpoint' => 'https://www.claveunica.gob.cl/openid/authorize',
+                'token_endpoint' => 'https://www.claveunica.gob.cl/openid/token',
+                'user_info_endpoint' => 'https://www.claveunica.gob.cl/openid/userinfo',
+                'authentication_info' => array(
+                    'method' => 'client_secret_post',
+                    'params' => array(
+                        'client_secret' => Cuenta::cuentaSegunDominio()->client_secret
+                    )
+                )
+            )
+        );
     }
     
     public function login_openid() {
@@ -42,12 +42,12 @@ class Autenticacion extends MY_Controller {
         */
 
         $redirectlogin = $this->input->get('redirect') ? $this->input->get('redirect') : site_url();
-        setcookie('redirectlogin', '', time()-3600);
-        setcookie("redirectlogin", $redirectlogin, time()+3600);
+        setcookie('redirectlogin', '', time() - 3600);
+        setcookie("redirectlogin", $redirectlogin, time() + 3600);
         $flow = new Basic($this->authConfig);
-        if (! isset($_GET['code'])) {
+        if (!isset($_GET['code'])) {
             try {
-                $uri = $flow->getAuthorizationRequestUri('openid nombre');
+                $uri = $flow->getAuthorizationRequestUri('openid run name');
                 redirect($uri);
             } catch (\Exception $e) {
                 printf("Exception during authorization URI creation: [%s] %s", get_class($e), $e->getMessage());
@@ -59,12 +59,23 @@ class Autenticacion extends MY_Controller {
         $flow = new Basic($this->authConfig);
         $token = $flow->getAccessToken($_GET['code']);
         $infoPersonal = $flow->getUserInfo($token);
-        $rut = $infoPersonal['RUT'];
-        $rut = str_replace(".", "", $rut);
+        log_message('debug', 'infoPersonal: ' . json_encode($infoPersonal));
+        $infoPer = json_encode($flow->getUserInfo($token));
+        $rut = $infoPersonal['RolUnico']['numero'] . '-' . $infoPersonal['RolUnico']['DV'];
+        log_message('debug','rut: ' . $rut);
+        $nombres = implode(" ", $infoPersonal['name']['nombres']);
+        $apellidoPaterno = $infoPersonal['name']['apellidos'][0];
+        $apellidoMaterno = $infoPersonal['name']['apellidos'][1];
+
         $CI = & get_instance();
-        $CI->session->set_flashdata('openidcallback',1);
-        $CI->session->set_flashdata('rut',$rut);
+        $CI->session->set_flashdata('openidcallback', 1);
+        $CI->session->set_flashdata('rut', $rut);
+        $CI->session->set_flashdata('nombres', $nombres);
+        $CI->session->set_flashdata('apellidoPaterno', $apellidoPaterno);
+        $CI->session->set_flashdata('apellidoMaterno', $apellidoMaterno);
         $redirectlogin = $_COOKIE['redirectlogin'];
+
+        log_message('debug', 'flow: ' . json_encode($flow));
         redirect($redirectlogin);
     }
 
@@ -201,11 +212,19 @@ class Autenticacion extends MY_Controller {
         $this->load->view('autenticacion/login', $data);
     }
 
+    /*
+     * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
+     * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar() {
+
         $data['title'] = 'Registro';
         $this->load->view('autenticacion/registrar', $data);
     }
+    */
 
+    /*
+     * Deprecated: Req. "Eliminar la capacidad de crear nuevos usuarios en la interfaz que utilizan los ciudadanos"
+     * Proyecto: 617-143-CT17 SIMPLE Mejoras Usabilidad.
     public function registrar_form() {
         $this->form_validation->set_rules('usuario', 'Nombre de Usuario', 'required|alpha_dash|callback_check_usuario');
         $this->form_validation->set_rules('nombres', 'Nombres', 'required');
@@ -247,6 +266,7 @@ class Autenticacion extends MY_Controller {
 
         echo json_encode($respuesta);
     }
+    */
 
     public function olvido() {        
         $data['title']='Olvide mi contraseña';
@@ -289,7 +309,7 @@ class Autenticacion extends MY_Controller {
         echo json_encode($respuesta);
     }
     
-    public function reestablecer(){
+    public function reestablecer() {
         $id=$this->input->get('id');
         $reset_token=$this->input->get('reset_token');
         
@@ -317,7 +337,7 @@ class Autenticacion extends MY_Controller {
         $this->load->view('autenticacion/reestablecer',$data);  
     }
     
-    public function reestablecer_form(){
+    public function reestablecer_form() {
         $id=$this->input->get('id');
         $reset_token=$this->input->get('reset_token');
         

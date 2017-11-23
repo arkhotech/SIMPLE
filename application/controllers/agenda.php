@@ -15,7 +15,8 @@ class Agenda extends MY_Controller {
         include APPPATH . 'third_party/httpful/bootstrap.php';
         $this->base_services=$this->config->item('base_service');
         $this->context=$this->config->item('context_service');
-        $this->records=empty($this->config->item('records'))?10:$this->config->item('records');
+        $recordsc = $this->config->item('records');
+        $this->records=empty($recordsc)?10:$recordsc;
         $cuenta = Cuenta::cuentaSegunDominio()->id;
         try{
             $service=new Connect_services();
@@ -451,70 +452,145 @@ class Agenda extends MY_Controller {
         }
     }
  
-    public function miagenda($pagina=1) {
+    public function miagenda($pagina = 1) {
+
         log_message('debug', 'miagenda');
+
         if (!UsuarioSesion::usuario()->registrado) {
             $this->session->set_flashdata('redirect', current_url());
             redirect('autenticacion/login');
         }
-        $tipousuario=$this->validarTipoUsuario();
-        $agendas=array();
-        $agenda=(isset($_POST['cmbagenda']) && is_numeric($_POST['cmbagenda']) && $_POST['cmbagenda']>0)?$_POST['cmbagenda']:0;
-        if($tipousuario){
-            try{
-                $id=(isset(UsuarioSesion::usuario()->id))?UsuarioSesion::usuario()->id:0;
-                $agendas=$this->obtenerAgendas($id);//
-                $data['agendas']=$agendas;
-                if($agenda==0){
+
+        $tipousuario = $this->validarTipoUsuario();
+        $agendas = array();
+        $agenda = (isset($_POST['cmbagenda']) && is_numeric($_POST['cmbagenda']) && $_POST['cmbagenda']>0)?$_POST['cmbagenda']:0;
+        if ($tipousuario) {
+            try {
+                $id = (isset(UsuarioSesion::usuario()->id)) ? UsuarioSesion::usuario()->id : 0;
+                $agendas = $this->obtenerAgendas($id);//
+                $data['agendas'] = $agendas;
+                if ($agenda == 0) {
                     $agenda=$agendas[0]->id;
                 }
-            }catch(Exception $err){
+            } catch (Exception $err) {
                 log_message('error', 'miagenda '.$err);
-                //echo $err->getMessage();
+                // echo $err->getMessage();
             }
-        }        
-        $data['pagina']=$pagina;
-        $total_registros=0;
-        $registros=$this->records; // numero de registro a mostrar por pagina
-        $num_paginas=5; // numeros maximo de paginas a mostrar en la lista del paginador
-        $inicio = ($pagina-1) * $registros; // se calcula desde que registro se empieza a mostrar
-        $finreg=$inicio+$registros; // se calcula hasta que registro se muestra
-        $pagina_intervalo=ceil($num_paginas/2)-1;
-        $pagina_desde=$pagina-$pagina_intervalo; 
-        $pagina_hasta=$pagina+$pagina_intervalo;
-        $data['pagina_intervalo']=$pagina_intervalo;
-        $data['pagina_desde']=$pagina_desde;
-        $data['pagina_hasta']=$pagina_hasta;
-        if($agenda>0){
-            $arraydata=$this->ajax_listar_citas_agenda($pagina,$agenda);
-        }else{
-            $arraydata=$this->ajax_listar_citas($pagina,$tipousuario);    
         }
-        $datos=array();
-        if($arraydata['code']==200){
-            $datos=$arraydata['data'];
-            $total_registros=empty($arraydata['count'])?0:$arraydata['count'];
+        $data['pagina'] = $pagina;
+        $total_registros = 0;
+        $registros = $this->records; // numero de registro a mostrar por pagina
+        $num_paginas = 5; // numeros maximo de paginas a mostrar en la lista del paginador
+        $inicio = ($pagina - 1) * $registros; // se calcula desde que registro se empieza a mostrar
+        $finreg = $inicio + $registros; // se calcula hasta que registro se muestra
+        $pagina_intervalo = ceil($num_paginas / 2) - 1;
+        $pagina_desde = $pagina - $pagina_intervalo; 
+        $pagina_hasta = $pagina + $pagina_intervalo;
+        $data['pagina_intervalo'] = $pagina_intervalo;
+        $data['pagina_desde'] = $pagina_desde;
+        $data['pagina_hasta'] = $pagina_hasta;
+        if ($agenda > 0) {
+            $arraydata = $this->ajax_listar_citas_agenda($pagina, $agenda);
+        } else {
+            $arraydata = $this->ajax_listar_citas($pagina, $tipousuario);
         }
-        $data['agenda']=$agenda;
+        $datos = array();
+        if ($arraydata['code']== 200) {
+            $datos = $arraydata['data'];
+            $total_registros = empty($arraydata['count'])?0:$arraydata['count'];
+        }
+        $data['agenda'] = $agenda;
         $total_paginas = ceil($total_registros / $registros); // calculo de total de paginas.
-        $total_paginas=($total_paginas!=0)?$total_paginas:1;
-        $data['data']=$datos;
-        $data['total_paginas']=$total_paginas;
-        if($tipousuario){//true si es funcionario false si es un ciudadano
-            //$idagenda=(isset($_GET['idagenda']) && is_numeric($_GET['idagenda']))?$_GET['idagenda']:0;
+        $total_paginas = ($total_paginas!=0)?$total_paginas:1;
+        $data['data'] = $datos;
+        $data['total_paginas'] = $total_paginas;
+
+        // true si es funcionario o false si es un ciudadano
+        if ($tipousuario) {
+            // $idagenda = (isset($_GET['idagenda']) && is_numeric($_GET['idagenda']))?$_GET['idagenda']:0;
+            $data['idagenda'] = $agenda;
+            $data['title'] = 'Mi Agenda';
+            $data['sidebar']='miagenda';
+            $data['content'] = 'agenda/miagenda_funcionario';
+            $this->load->view('template_newhome', $data);
+
+        } else {
+            $data['title'] = 'Mi Agenda';
+            $data['sidebar']='miagenda';
+            $data['content'] = 'agenda/miagenda';
+            $this->load->view('template_newhome', $data);
+        }
+    }
+
+    public function miagenda2($pagina = 1) {
+
+        log_message('debug', 'miagenda');
+
+        if (!UsuarioSesion::usuario()->registrado) {
+            $this->session->set_flashdata('redirect', current_url());
+            redirect('autenticacion/login');
+        }
+
+        $tipousuario = $this->validarTipoUsuario();
+        $agendas = array();
+        $agenda = (isset($_POST['cmbagenda']) && is_numeric($_POST['cmbagenda']) && $_POST['cmbagenda']>0)?$_POST['cmbagenda']:0;
+        if ($tipousuario) {
+            try {
+                $id = (isset(UsuarioSesion::usuario()->id)) ? UsuarioSesion::usuario()->id : 0;
+                $agendas = $this->obtenerAgendas($id);//
+                $data['agendas'] = $agendas;
+                if ($agenda == 0) {
+                    $agenda=$agendas[0]->id;
+                }
+            } catch (Exception $err) {
+                log_message('error', 'miagenda '.$err);
+                // echo $err->getMessage();
+            }
+        }
+        $data['pagina'] = $pagina;
+        $total_registros = 0;
+        $registros = $this->records; // numero de registro a mostrar por pagina
+        $num_paginas = 5; // numeros maximo de paginas a mostrar en la lista del paginador
+        $inicio = ($pagina - 1) * $registros; // se calcula desde que registro se empieza a mostrar
+        $finreg = $inicio + $registros; // se calcula hasta que registro se muestra
+        $pagina_intervalo = ceil($num_paginas / 2) - 1;
+        $pagina_desde = $pagina - $pagina_intervalo; 
+        $pagina_hasta = $pagina + $pagina_intervalo;
+        $data['pagina_intervalo'] = $pagina_intervalo;
+        $data['pagina_desde'] = $pagina_desde;
+        $data['pagina_hasta'] = $pagina_hasta;
+        if ($agenda > 0) {
+            $arraydata = $this->ajax_listar_citas_agenda($pagina, $agenda);
+        } else {
+            $arraydata = $this->ajax_listar_citas($pagina, $tipousuario);
+        }
+        $datos = array();
+        if ($arraydata['code']== 200) {
+            $datos = $arraydata['data'];
+            $total_registros = empty($arraydata['count'])?0:$arraydata['count'];
+        }
+        $data['agenda'] = $agenda;
+        $total_paginas = ceil($total_registros / $registros); // calculo de total de paginas.
+        $total_paginas = ($total_paginas!=0)?$total_paginas:1;
+        $data['data'] = $datos;
+        $data['total_paginas'] = $total_paginas;
+
+        // true si es funcionario o false si es un ciudadano
+        if ($tipousuario) {
+            // $idagenda = (isset($_GET['idagenda']) && is_numeric($_GET['idagenda']))?$_GET['idagenda']:0;
             $data['idagenda'] = $agenda;
             $data['title'] = 'Mi Agenda';
             $data['sidebar']='miagenda';
             $data['content'] = 'agenda/miagenda_funcionario';
             $this->load->view('template', $data);
 
-        }else{
+        } else {
             $data['title'] = 'Mi Agenda';
             $data['sidebar']='miagenda';
             $data['content'] = 'agenda/miagenda';
             $this->load->view('template', $data);
         }
-    }  
+    }
 
     public function diasFeriados() {
         log_message('info', '[INI][diasFeriados]');

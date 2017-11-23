@@ -9,35 +9,35 @@
             </div>
         <?php endforeach ?>
         <div class="form-actions">
-            <?php if ($secuencia > 0): ?><a class="btn" href="<?= site_url('etapas/ver/' . $etapa->id . '/' . ($secuencia - 1)) ?>"><i class="icon-chevron-left"></i> Volver</a><?php endif; ?>
-            <?php if ($secuencia + 1 < count($etapa->getPasosEjecutables())): ?><a class="btn btn-primary" href="<?= site_url('etapas/ver/' . $etapa->id . '/' . ($secuencia + 1)) ?>">Siguiente</a><?php endif; ?>
+            <?php if ($secuencia > 0): ?><a class="button button--gray" href="<?= site_url('etapas/ver/' . $etapa->id . '/' . ($secuencia - 1)) ?>"><i class="icon-chevron-left"></i> Volver</a><?php endif; ?>
+            <?php if ($secuencia + 1 < count($etapa->getPasosEjecutables())): ?><a class="button" href="<?= site_url('etapas/ver/' . $etapa->id . '/' . ($secuencia + 1)) ?>">Siguiente</a><?php endif; ?>
         </div>
     </fieldset>
 </form>
 <script>
-    $(function(){
+    $(function() {
         moment.lang('es');
-        $.each($('.js-data-cita'),function(){
-            if($(this).is('[readonly]')){
-                var id=$(this).attr('id');
-                var arrdat=$(this).val().split('_');
-                var d=new Date(arrdat[1]);
-                var h='';
-                if(d.getHours()<=9){
-                    h='0'+d.getHours();
-                }else{
-                    h=d.getHours();
+        $.each($('.js-data-cita'),function() {
+            if ($(this).is('[readonly]')) {
+                var id = $(this).attr('id');
+                var arrdat = $(this).val().split('_');
+                var d = new Date(arrdat[1]);
+                var h = '';
+                if (d.getHours() <= 9) {
+                    h = '0' + d.getHours();
+                } else {
+                    h = d.getHours();
                 }
-                var m='';
-                if(d.getMinutes()<=9){
-                    m='0'+d.getMinutes();
-                }else{
-                    m=d.getMinutes();
+                var m = '';
+                if (d.getMinutes() <= 9) {
+                    m = '0' + d.getMinutes();
+                } else {
+                    m = d.getMinutes();
                 }
-                var fecha=d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+' '+h+':'+m;
+                var fecha = d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + h + ':' + m;
                 
-                var lab=moment(d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate()).format("LL");
-                $('#txtresult'+id).html(lab+' a las '+h+':'+m+" horas");
+                var lab = moment(d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate()).format("LL");
+                $('#txtresult' + id).html(lab + ' a las ' + h + ':' + m + " horas");
             }
         });
     });

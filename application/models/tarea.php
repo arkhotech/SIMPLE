@@ -6,7 +6,7 @@ class Tarea extends Doctrine_Record {
         $this->hasColumn('id');
         $this->hasColumn('identificador');
         $this->hasColumn('inicial');
-        //$this->hasColumn('final');
+        $this->hasColumn('es_final');
         $this->hasColumn('proceso_id');
         $this->hasColumn('nombre');
         $this->hasColumn('posx');
@@ -263,17 +263,19 @@ class Tarea extends Doctrine_Record {
             $conexion->tarea_id_destino = null;
             $conexion->regla = null;
             $this->ConexionesOrigen[] = $conexion;
+            $this->es_final = true;
         }else if(!$final && $this->final){
             //Limpiamos las conexiones antiguas
             foreach ($this->ConexionesOrigen as $key => $c)
                 unset($this->ConexionesOrigen[$key]);
+            $this->es_final = false;
         }
     }
 
 
     //Retorna true si es una tarea final.
     public function getFinal() {
-        if ($this->ConexionesOrigen->count() == 1 && $this->ConexionesOrigen[0]->tipo == 'secuencial' && !$this->ConexionesOrigen[0]->tarea_id_destino)
+        if ($this->es_final || ($this->ConexionesOrigen->count() == 1 && $this->ConexionesOrigen[0]->tipo == 'secuencial' && !$this->ConexionesOrigen[0]->tarea_id_destino))
             return true;
 
         return false;

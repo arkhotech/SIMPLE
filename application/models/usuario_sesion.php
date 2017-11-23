@@ -166,18 +166,27 @@ class UsuarioSesion {
         }
         */
         $rut = $CI->session->flashdata('rut') ? $CI->session->flashdata('rut') : $CI->session->userdata('usuario_rut');
+        $nombres = $CI->session->flashdata('nombres') ? $CI->session->flashdata('nombres') : "";
+        $apellidoPaterno = $CI->session->flashdata('apellidoPaterno') ? $CI->session->flashdata('apellidoPaterno') : "";
+        $apellidoMaterno = $CI->session->flashdata('apellidoMaterno') ? $CI->session->flashdata('apellidoMaterno') : "";
+
         $usuario = Doctrine::getTable('Usuario')->findOneByRutAndOpenId($rut, 1);
+
         if (!$usuario) {
             $usuario = new Usuario();
             $usuario->usuario = $rut;
+            $usuario->nombres = $nombres;
+            $usuario->apellido_paterno = $apellidoPaterno;
+            $usuario->apellido_materno = $apellidoMaterno;
             $usuario->registrado = 1;
             $usuario->open_id = 1;
         }
         $usuario->rut = $rut;
+
         $usuario->save();
         $CI->session->set_userdata('usuario_id', $usuario->id);
         $CI->session->set_userdata('usuario_rut', $usuario->rut);
-        $CI->session->set_userdata('usuario_login',1);
+        $CI->session->set_userdata('usuario_login', 1);
         self::$user = $usuario;
     }
 
