@@ -30,7 +30,8 @@
                     <th>Url</th>
                 </tr>       
                 <?
-                    $nombre_host = gethostname();
+                    //$nombre_host = gethostname();
+                    $nombre_host = $this->input->server('HTTP_HOST');
                     ($_SERVER['HTTPS'] ? $protocol = 'https://' : $protocol = 'http://');
                     foreach ($json as $res){ 
                 ?>
