@@ -2014,11 +2014,12 @@ ul li {
   width: 10px;
   height: 10px; }
 
-.icon-download {
-  background-image: url("../images/icons/download.svg");
-  width: 10px;
-  height: 16px; }
-
+/*
+*.icon-download {
+*  background-image: url("../images/icons/download.svg");
+*  width: 10px;
+*  height: 16px; }
+*/
 .icon-messenger {
   background-image: url("../images/icons/messenger.svg");
   width: 32px;
