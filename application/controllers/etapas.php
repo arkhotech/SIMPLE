@@ -419,7 +419,7 @@ class Etapas extends MY_Controller {
                 log_message("debug", "pendiente");
                 foreach ($proximas->tareas as $tarea) {
                     log_message('debug', 'Ejecutando continuar de etapa ' . $tarea->id . " en trámite " . $etapa->tramite_id);
-                    $etapa = $etapa->ejecutarColaContinuarTarea($tarea->id, $tareas_encoladas);
+                    $etapa->ejecutarColaContinuarTarea($tarea->id, $tareas_encoladas);
                 }
             }
         }catch(Exception $err){
