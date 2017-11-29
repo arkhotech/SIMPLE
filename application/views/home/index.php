@@ -206,6 +206,12 @@
                   <?php foreach ($procesos as $p): ?>
                     <?php if ($p->destacado == 0 || $p->categoria_id == 0): ?>
                       <div class="col-md-4 item">
+
+                        <?php if ($p->estado == 'draft') : ?>
+                        <div class="wrap">
+                          <span class="ribbon6">Draft</span>
+                        </div>
+                        <?php endif ?>
                         <?php if ($p->canUsuarioIniciarlo(UsuarioSesion::usuario()->id)): ?>
                           <a href="<?=site_url('tramites/iniciar/'.$p->id)?>">
                         <?php else: ?>
