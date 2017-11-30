@@ -213,10 +213,11 @@
                                 $(document).ready(function(){
                                     MostrarExponer();
                                     $("input[name=activacion]").change(function(){
-                                        if($("input[name=activacion]:checked").val()=='entre_fechas')
+                                        if($("input[name=activacion]:checked").val()=='entre_fechas'){
                                             $("#activacionEntreFechas").show();
                                         } else {
                                             $("#activacionEntreFechas").hide();
+                                        }
                                     }).change();
                                     $("#inicial").click(function() {
                                       MostrarExponer();

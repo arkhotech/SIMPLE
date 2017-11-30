@@ -151,6 +151,8 @@ class Proceso extends Doctrine_Record {
 
         $proceso->Acciones;
         $proceso->Documentos;
+        $proceso->Admseguridad;
+        $proceso->Suscriptores;
 
         $object=$proceso->toArray();        
         $object['Conexiones']=$proceso->getConexiones()->toArray();
