@@ -127,3 +127,150 @@ function getJson(){
 
     
 }
+
+function tabla_declaracion($json){
+    $json_encodedd = json_encode($json);
+    $resultado = json_decode($json_encodedd);
+    $tablas_anidadas = "";
+
+    if(count($resultado->registroPorAnnio)>1){
+        foreach($resultado->registroPorAnnio as $registro){
+            $columnas = "";
+            $filas = "";
+            $mes = 0;
+            $panio = '<p>'.$registro->annio.'</p>';
+            $tabla = '<table border="1" cellpadding="1" cellspacing="1"><thead>';
+            foreach($registro->registrosPorMeses->mes as $registro2){
+                if($mes==0)
+                    $columnas .= "<tr>";
+                $filas .= "<tr>";
+                foreach($registro2 as $registro3=>$valor3){
+                    if($mes==0){
+                        $spaced = preg_replace('/([A-Z])/', ' $1', $registro3);
+                        $columnas .= '<td><strong>'.$spaced.'</strong></td>';
+                    }
+                    $spaced = preg_replace('/([A-Z])/', ' $1', $valor3);
+                    $filas .= '<td>'.$valor3.'</td>';
+                }
+                if($mes==0)
+                    $columnas .= "</tr>";
+                $filas .= "</tr>";
+                $mes++;
+            }
+            $tabla .= $columnas.'</thead><tbody>'.$filas.'</tbody></table>';
+            $tablas_anidadas .= $panio.$tabla;
+        }
+    }elseif(count($resultado->registroPorAnnio)==1){
+        $mes = 0;
+        if($resultado->registroPorAnnio->annio != 0){
+            foreach($resultado->registroPorAnnio->registrosPorMeses->mes as $registro2){
+                $panio = '<p>'.$resultado->registroPorAnnio->annio.'</p>';
+                $tabla = '<table border="1" cellpadding="1" cellspacing="1"><thead>';
+                if($mes==0)
+                    $columnas .= "<tr>";
+                $filas .= "<tr>";
+                foreach($registro2 as $registro3=>$valor3){
+                    if($mes==0){
+                        $spaced = preg_replace('/([A-Z])/', ' $1', $registro3);
+                        $columnas .= '<td><strong>'.$spaced.'</strong></td>';
+                    }
+                    $filas .= '<td>'.$valor3.'</td>';
+                }
+                if($mes==0)
+                    $columnas .= "</tr>";
+                $filas .= "</tr>";
+                $mes++;
+            }
+            $tabla .= $columnas.'</thead><tbody>'.$filas.'</tbody></table>';
+            $tablas_anidadas .= $panio.$tabla;
+        }
+    }
+    return $tablas_anidadas;
+}
+
+function tabla_pension($json){
+
+    $json_encodedd = json_encode($json);
+    $resultado = json_decode($json_encodedd);
+    $tablas_anidadas = "";
+    
+    //Haberes
+    if(count($resultado->emision->haberes->registrosContables)>1){
+        $mes = 0;
+        $columnas = "";
+        $filas = "";
+        $tabla_haberes = '<tr><td style="float: left;"><table border="1" cellpadding="1" cellspacing="1"><thead><tr><td colspan="2"><center><strong>Haberes</strong></center></td></tr>';
+        foreach($resultado->emision->haberes->registrosContables as $registro2){
+            if($mes==0)
+                $columnas .= "<tr>";
+            $filas .= "<tr>";
+            foreach($registro2 as $registro3=>$valor3){
+                if($mes==0)
+                    $columnas .= '<td><strong>'.$registro3.'</strong></td>';
+                $filas .= '<td>'.$valor3.'</td>';
+            }
+            if($mes==0)
+                $columnas .= "</tr>";
+            $filas .= "</tr>";
+            $mes++;
+        }
+        $tabla_haberes .= $columnas.'</thead><tbody>'.$filas.'</tbody></table></td>';
+    }elseif(count($resultado->emision->haberes->registrosContables)==1){
+        $mes = 0;
+        $columnas = "";
+        $filas = "";
+        $tabla_haberes = '<tr><td style="float: left;"><table border="1" cellpadding="1" cellspacing="1"><thead><tr><td colspan="2"><center><strong>Haberes</strong></center></td></tr>';
+        $columnas .= "<tr>";
+        $filas .= "<tr>";
+        foreach($resultado->emision->haberes->registrosContables as $registro3=>$valor3){
+            $columnas .= '<td><strong>'.$registro3.'</strong></td>';
+            $filas .= '<td>'.$valor3.'</td>';
+            $mes++;
+        }
+        $columnas .= "</tr>";
+        $filas .= "</tr>";
+        $tabla_haberes .= $columnas.'</thead><tbody>'.$filas.'</tbody></table></td></tr>';
+    }
+    //Fin Haberes
+
+    //Descuentos
+    if(count($resultado->emision->descuentos->registrosContables)>1){
+        $mes = 0;
+        $columnas = "";
+        $filas = "";
+        $tabla_descuentos = '<td style="float: right;"><table border="1"cellpadding="1" cellspacing="1"><thead><tr><td colspan="2"><center><strong>Descuentos</strong></center></td></tr>';
+        foreach($resultado->emision->descuentos->registrosContables as $registro2){
+            if($mes==0)
+                $columnas .= "<tr>";
+            $filas .= "<tr>";
+            foreach($registro2 as $registro3=>$valor3){
+                if($mes==0)
+                    $columnas .= '<td><strong>'.$registro3.'</strong></td>';
+                $filas .= '<td>'.$valor3.'</td>';
+            }
+            if($mes==0)
+                $columnas .= "</tr>";
+            $filas .= "</tr>";
+            $mes++;
+        }
+        $tabla_descuentos .= $columnas."</thead><tbody>".$filas."</tbody></table></td></tr>";
+    }elseif(count($resultado->emision->descuentos->registrosContables)==1){
+        $columnas = "";
+        $filas = "";
+        $tabla_descuentos = '<div style="float:left"><table border="1" cellpadding="1" cellspacing="1"><thead><tr><td colspan="2"><center><strong>Descuentos</strong></center></td></tr><tr>';
+        foreach($resultado->emision->descuentos->registrosContables as $registro3=>$valor3){
+            $columnas .= '<td><strong>'.$registro3.'</strong></td>';
+            $filas .= '<td>'.$valor3.'</td>';
+        }
+        $columnas .= "</tr>";
+        $filas .= "</tr>";
+        $tabla_descuentos .= $columnas.'</thead><tbody>'.$filas.'</tbody></table></div>';
+    }
+    if(!empty($tabla_haberes) || !empty($tabla_descuentos))
+        $tablas_anidadas .= '<table style="width: 100%;">'.$tabla_haberes.$tabla_descuentos.'</table>';
+
+    return $tablas_anidadas;
+}
+
+
+

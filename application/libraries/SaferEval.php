@@ -185,7 +185,9 @@ class SaferEval {
             'NULL',
             //Helpers
             'matrix_to_html',
-            'numtoletras'
+            'numtoletras',
+            'tabla_declaracion',
+            'tabla_pension'
         );
         $this->allowedTokens = array(
             'T_AND_EQUAL', // assignment operators
