@@ -139,7 +139,7 @@ class Admseguridad extends MY_BackendController {
     public function exportar($seguridad_id)
     {
 
-        $seguridad = Doctrine::getTable('Accion')->find($seguridad_id);
+        $seguridad = Doctrine::getTable('Seguridad')->find($seguridad_id);
 
         $json = $seguridad->exportComplete();
 

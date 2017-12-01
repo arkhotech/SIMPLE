@@ -114,19 +114,28 @@ class Procesos extends MY_BackendController {
 
         $proceso = Doctrine::getTable('Proceso')->find($proceso_id);
 
+        log_message('debug', '$proceso->estado [' . $proceso->estado . '])');
+
         // Verificar si es draft o un proceso publicado
-        if ($proceso->estado != 'arch') { //no es draft
+        if ($proceso->estado != 'draft') { //no es draft
             //Se crea Draft
             $proceso = $this->crearDraft($proceso);
         } else {
             $root = $proceso_id;
 
+            log_message("INFO", "Editando proceso id ".$proceso_id, FALSE);
+
             if (isset($proceso->root) && strlen($proceso->root) > 0) {
                 $root = $proceso->root;
             }
             $proceso_draft = $proceso->findDraftProceso($root, UsuarioBackendSesion::usuario()->cuenta_id);
-            $proceso_draft->estado = 'arch';
-            $proceso_draft->save();
+
+            log_message("INFO", "Se obtiene draft con id ".$proceso_draft->id, FALSE);
+
+            if(isset($proceso_draft) && $proceso_draft->id > 0){
+                $proceso_draft->estado = 'arch';
+                $proceso_draft->save();
+            }
             $proceso->estado = 'draft';
             $proceso->save();
         }
@@ -146,7 +155,7 @@ class Procesos extends MY_BackendController {
 
         $data['title'] = 'Modelador';
         $data['content'] = 'backend/procesos/editar';
-        $data['iconos'] = $iconos;
+        $data['iconos'] = '';//$iconos;
         
         $this->load->view('backend/template', $data);
     }
@@ -646,6 +655,9 @@ class Procesos extends MY_BackendController {
             log_message('debug', 'post a $proceso->save();');
 
             $this->migrarGrupos($proceso, $cuenta);
+
+            $this->migrarSeguridadAcciones($proceso);
+
         }
 
         log_message("INFO", "Proceso actualizado", FALSE);
@@ -703,6 +715,32 @@ class Procesos extends MY_BackendController {
         }
     }
 
+    private function migrarSeguridadAcciones($proceso) {
+        //asignar grupos de usuario de producción por cada tarea
+        log_message("INFO", "Revisando seguridad para proceso id ".$proceso->id, FALSE);
+        $acciones = $proceso->Acciones;
+        foreach ($acciones as $accion){
+            if($accion->tipo == 'rest' || $accion->tipo == 'soap' || $accion->tipo == 'callback'){
+                if(isset($accion->extra->idSeguridad) && strlen($accion->extra->idSeguridad) > 0 ){
+                    $seguridad = Doctrine::getTable('Seguridad')->find($accion->extra->idSeguridad);
+                    log_message("INFO", "Seguridad recuperada con id ".$seguridad->id, FALSE);
+                    $new_seguridad = new Seguridad();
+                    $new_seguridad->institucion = $seguridad->institucion;
+                    $new_seguridad->servicio = $seguridad->servicio;
+                    $new_seguridad->extra = $seguridad->extra;
+                    $new_seguridad->proceso_id = $proceso->id;
+                    $new_seguridad->save();
+                    log_message("INFO", "Asignando nueva seguridad con id ".$new_seguridad->id, FALSE);
+                    $extra_accion = $accion->extra;
+                    $extra_accion->idSeguridad = $new_seguridad->id;
+                    $accion->extra = $extra_accion;
+                    log_message("INFO", "Guardando accion id ".$accion->id, FALSE);
+                    $accion->save();
+                }
+            }
+        }
+    }
+
     private function crearDraft($proceso){
 
         $proceso_id = $proceso->id;
@@ -737,6 +775,8 @@ class Procesos extends MY_BackendController {
             }
 
             $proceso->save();
+
+            $this->migrarSeguridadAcciones($proceso);
 
         }else{
             log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);

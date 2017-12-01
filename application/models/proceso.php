@@ -204,6 +204,7 @@ class Proceso extends Doctrine_Record {
 
         }
 
+        log_message('info','Se crean acciones de nuevo proceso importado', FALSE);
         //Creamos las acciones
         foreach($json->Acciones as $f){
             $proceso->Acciones[$f->id]=new Accion();
@@ -212,8 +213,8 @@ class Proceso extends Doctrine_Record {
                     $proceso->Acciones[$f->id]->{$keyf}=$f_attr;
                 }
             }
-
         }
+        log_message('info','Acciones creadas', FALSE);
 
         //Completamos el proceso y sus tareas
         foreach($json as $keyp=>$p_attr){
@@ -249,13 +250,14 @@ class Proceso extends Doctrine_Record {
 
                     $proceso->Tareas[$t->id]=$tarea;
                 }
-            }elseif($keyp=='Formularios' || $keyp=='Acciones' || $keyp=='Documentos' || $keyp=='Conexiones'){
+            }elseif($keyp=='Formularios' || $keyp=='Acciones' || $keyp=='Documentos' || $keyp=='Conexiones' || $keyp=='Admseguridad' || $keyp=='Suscriptores'){
 
             }elseif($keyp != 'id' && $keyp != 'cuenta_id'){
                 $proceso->{$keyp} = $p_attr;
             }
         }
 
+        log_message('info','Formularios creados', FALSE);
 
         //Hacemos las conexiones
         foreach($json->Conexiones as $c){
@@ -269,7 +271,31 @@ class Proceso extends Doctrine_Record {
             }
         }
 
-        //print_r($proceso->toArray());
+        log_message('info','Conexiones creadas', FALSE);
+
+        //Creamos las configuraciones de seguridad
+        /*foreach($json->Admseguridad as $f){
+            log_message('info','Admseguridad id: '.$f->id, FALSE);
+            $proceso->Admseguridad[$f->id]=new Seguridad();
+            log_message('info','Completando', FALSE);
+            foreach($f as $keyf => $f_attr){
+                if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso'){
+                    $proceso->Admseguridad[$f->id]->{$keyf}=$f_attr;
+                }
+            }
+        }
+        log_message('info','Seguridad creadas', FALSE);*/
+
+        //Creamos las configuraciones de suscriptores
+        foreach($json->Suscriptores as $f){
+            $proceso->Suscriptores[$f->id]=new Suscriptor();
+            foreach($f as $keyf => $f_attr){
+                if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso'){
+                    $proceso->Suscriptores[$f->id]->{$keyf}=$f_attr;
+                }
+            }
+        }
+        log_message('info','Suscriptores creados', FALSE);
 
         return $proceso;
 

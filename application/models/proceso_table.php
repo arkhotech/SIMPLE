@@ -8,14 +8,18 @@ class ProcesoTable extends Doctrine_Table {
         $cuenta = Doctrine::getTable('Cuenta')->find(Cuenta::cuentaSegunDominio()->id); // UsuarioBackendSesion::usuario()->cuenta_id);
         $estados = "'public'";
         if ($cuenta->ambiente == 'dev') {
-            $estados += ", 'draft'";
+            $estados = $estados.", 'draft'";
         } else {
             log_message('debug', '$cuenta->id: ' . $cuenta->id);
             $cuenta_dev = $cuenta->getAmbienteDev($cuenta->id);
+            log_message('debug', 'cuenta_dev: ' . $cuenta_dev);
+            log_message('debug', 'cuenta_dev: ' . count($cuenta_dev));
             if (count($cuenta_dev) == 0) {
-                $estados += ", 'draft'";
+                $estados = $estados.", 'draft'";
             }
         }
+
+        log_message('debug', 'estados: ' . $estados);
 
         $query = Doctrine_Query::create()
                 ->from('Proceso p, p.Cuenta c, p.Tareas t')
