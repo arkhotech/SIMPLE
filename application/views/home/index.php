@@ -137,6 +137,11 @@
                   <?php foreach ($procesos as $p): ?>
                     <?php if ($p->destacado == 1 || $sidebar == 'categorias'): ?>
                       <div class="col-md-4 item">
+                          <?php if ($p->estado == 'draft') : ?>
+                              <div class="wrap">
+                                  <span class="ribbon6">Draft</span>
+                              </div>
+                          <?php endif ?>
                         <div class="tarjeta">
                           <?php if ($p->icon_ref): ?>
                             <div class="text-left">

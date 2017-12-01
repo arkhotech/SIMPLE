@@ -657,6 +657,7 @@ class Procesos extends MY_BackendController {
             $this->migrarGrupos($proceso, $cuenta);
 
             $this->migrarSeguridadAcciones($proceso);
+            $this->migrarSuscriptores($proceso);
 
         }
 
@@ -741,6 +742,50 @@ class Procesos extends MY_BackendController {
         }
     }
 
+    private function migrarSuscriptores($proceso) {
+        //asignar grupos de usuario de producción por cada tarea
+        log_message("INFO", "Revisando suscriptores para proceso id ".$proceso->id, FALSE);
+        $acciones = $proceso->Acciones;
+        foreach ($acciones as $accion){
+            if($accion->tipo == 'webhook'){
+                if(isset($accion->extra->suscriptorSel) && count($accion->extra->suscriptorSel) > 0 ){
+                    $suscriptores_seleccionados = array();
+                    foreach ($accion->extra->suscriptorSel as $suscriptor){
+                        log_message("INFO", "Reemplazando suscriptor con id ".$suscriptor, FALSE);
+                        $suscriptor = Doctrine::getTable('Suscriptor')->find($suscriptor);
+                        $new_suscriptor = new Suscriptor();
+                        $new_suscriptor->institucion = $suscriptor->institucion;
+                        $extra = $suscriptor->extra;
+
+                        if(isset($extra->idSeguridad) && strlen($extra->idSeguridad) > 0 ) {
+                            $seguridad = Doctrine::getTable('Seguridad')->find($extra->idSeguridad);
+                            log_message("INFO", "Seguridad recuperada con id " . $seguridad->id, FALSE);
+                            $new_seguridad = new Seguridad();
+                            $new_seguridad->institucion = $seguridad->institucion;
+                            $new_seguridad->servicio = $seguridad->servicio;
+                            $new_seguridad->extra = $seguridad->extra;
+                            $new_seguridad->proceso_id = $proceso->id;
+                            $new_seguridad->save();
+                            log_message("INFO", "Asignando nueva seguridad con id " . $new_seguridad->id, FALSE);
+                            $extra->idSeguridad = $new_seguridad->id;
+                            $new_suscriptor->extra = $extra;
+                        }
+
+                        $new_suscriptor->proceso_id = $proceso->id;
+                        $new_suscriptor->save();
+                        $suscriptores_seleccionados[] = $new_suscriptor->id;
+
+                    }
+                    $extra_accion = $accion->extra;
+                    $extra_accion->suscriptorSel = $suscriptores_seleccionados;
+                    $accion->extra = $extra_accion;
+                    log_message("INFO", "Guardando accion id ".$accion->id, FALSE);
+                    $accion->save();
+                }
+            }
+        }
+    }
+
     private function crearDraft($proceso){
 
         $proceso_id = $proceso->id;
@@ -777,6 +822,7 @@ class Procesos extends MY_BackendController {
             $proceso->save();
 
             $this->migrarSeguridadAcciones($proceso);
+            $this->migrarSuscriptores($proceso);
 
         }else{
             log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);

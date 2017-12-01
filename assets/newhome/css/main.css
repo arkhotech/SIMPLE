@@ -1672,6 +1672,12 @@ form.ajaxForm {
   left: -8px;
   overflow: hidden;
 }
+
+.wrap:hover {
+  cursor: pointer;
+}
+
+
 .wrap:before, .wrap:after {
   content: ""; 
   position: absolute;
@@ -1705,5 +1711,6 @@ form.ajaxForm {
   box-shadow:0 0 0 3px #FE6565,  0px 21px 5px -18px rgba(0,0,0,0.6);
   background: #FE6565;
   text-align: center;
+  color: #ccc;
 }
 

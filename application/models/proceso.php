@@ -287,7 +287,7 @@ class Proceso extends Doctrine_Record {
         log_message('info','Seguridad creadas', FALSE);*/
 
         //Creamos las configuraciones de suscriptores
-        foreach($json->Suscriptores as $f){
+        /*foreach($json->Suscriptores as $f){
             $proceso->Suscriptores[$f->id]=new Suscriptor();
             foreach($f as $keyf => $f_attr){
                 if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso'){
@@ -295,7 +295,7 @@ class Proceso extends Doctrine_Record {
                 }
             }
         }
-        log_message('info','Suscriptores creados', FALSE);
+        log_message('info','Suscriptores creados', FALSE);*/
 
         return $proceso;
 
