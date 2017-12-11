@@ -266,7 +266,9 @@ class Proceso extends Doctrine_Record {
                     $proceso->{$keyp} = $p_attr . ' (Importación: ' .  $fecha->format("d-m-Y H:i:s") . ')';
                 } elseif ($keyp == 'root') {
                     $proceso->{$keyp} = null;
-                } else { 
+                } elseif ($keyp == 'version') {
+                    $proceso->{$keyp} = 1;
+                } else {
                     $proceso->{$keyp} = $p_attr;
                 }
             }

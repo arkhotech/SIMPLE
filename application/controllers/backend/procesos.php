@@ -652,6 +652,9 @@ class Procesos extends MY_BackendController {
             $proceso->save();
             log_message('debug', 'post a $proceso->save();');
 
+            $this->migrarSeguridadAcciones($proceso);
+            $this->migrarSuscriptores($proceso);
+
             $this->migrarGrupos($proceso, $cuenta);
 
         }
@@ -802,8 +805,8 @@ class Procesos extends MY_BackendController {
 
             $proceso->save();
 
-            //$this->migrarSeguridadAcciones($proceso);
-            //$this->migrarSuscriptores($proceso);
+            $this->migrarSeguridadAcciones($proceso);
+            $this->migrarSuscriptores($proceso);
 
         }else{
             log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);
