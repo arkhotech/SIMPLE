@@ -165,7 +165,7 @@ class Proceso extends Doctrine_Record {
      * @param $input
      * @return Proceso
      */
-    public static function importComplete($input){
+    public static function importComplete($input, $isImport = FALSE) {
         $json=json_decode($input);
 
         //Creamos el proceso
@@ -173,9 +173,9 @@ class Proceso extends Doctrine_Record {
         $proceso->cuenta_id = UsuarioBackendSesion::usuario()->cuenta_id;
 
         //Creamos los documentos
-        foreach($json->Documentos as $f){
+        foreach($json->Documentos as $f) {
             $proceso->Documentos[$f->id]=new Documento();
-            foreach($f as $keyf => $f_attr){
+            foreach($f as $keyf => $f_attr) {
                 if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso' && $keyf != 'hsm_configuracion_id'){
                     $proceso->Documentos[$f->id]->{$keyf}=$f_attr;
                 }
@@ -205,82 +205,95 @@ class Proceso extends Doctrine_Record {
         }
 
         log_message('info','Se crean acciones de nuevo proceso importado', FALSE);
-        //Creamos las acciones
-        foreach($json->Acciones as $f){
-            $proceso->Acciones[$f->id]=new Accion();
-            foreach($f as $keyf => $f_attr){
-                if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso'){
-                    $proceso->Acciones[$f->id]->{$keyf}=$f_attr;
+        // Creamos las acciones
+        foreach ($json->Acciones as $f) {
+            $proceso->Acciones[$f->id] = new Accion();
+            foreach ($f as $keyf => $f_attr) {
+                if ($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso') {
+                    $proceso->Acciones[$f->id]->{$keyf} = $f_attr;
                 }
             }
         }
         log_message('info','Acciones creadas', FALSE);
 
         //Completamos el proceso y sus tareas
-        foreach($json as $keyp=>$p_attr){
-            if($keyp == 'Tareas'){
-                foreach($p_attr as $t){
-                    $tarea=new Tarea();
-                    foreach($t as $keyt=>$t_attr){
-                        if($keyt == 'Pasos'){
-                            foreach($t_attr as $pa){
+        foreach ($json as $keyp=>$p_attr) {
+            if ($keyp == 'Tareas') {
+                foreach ($p_attr as $t) {
+                    $tarea = new Tarea();
+                    foreach ($t as $keyt=>$t_attr) {
+                        if ($keyt == 'Pasos') {
+                            foreach ($t_attr as $pa) {
                                 $paso = new Paso();
-                                foreach($pa as $keypa => $pa_attr){
-                                    if($keypa != 'id' && $keypa != 'tarea_id' && $keypa != 'Tarea' && $keypa != 'formulario_id')
-                                        $paso->{$keypa}=$pa_attr;
+                                foreach ($pa as $keypa => $pa_attr) {
+                                    if ($keypa != 'id' && $keypa != 'tarea_id' && $keypa != 'Tarea' && $keypa != 'formulario_id')
+                                        $paso->{$keypa} = $pa_attr;
                                 }
-                                $paso->Formulario=$proceso->Formularios[$pa->formulario_id];
-                                $tarea->Pasos[$pa->id]=$paso;
+                                $paso->Formulario = $proceso->Formularios[$pa->formulario_id];
+                                $tarea->Pasos[$pa->id] = $paso;
                             }
-                        }elseif($keyt=='Eventos'){
-                            foreach($t_attr as $ev){
+                        } elseif ($keyt == 'Eventos') {
+                            foreach ($t_attr as $ev) {
                                 $evento = new Evento();
-                                foreach($ev as $keyev => $ev_attr){
-                                    if($keyev != 'id' && $keyev != 'tarea_id' && $keyev != 'Tarea' && $keyev != 'accion_id' && $keyev != 'paso_id')
-                                        $evento->{$keyev}=$ev_attr;
+                                foreach ($ev as $keyev => $ev_attr) {
+                                    if ($keyev != 'id' && $keyev != 'tarea_id' && $keyev != 'Tarea' && $keyev != 'accion_id' && $keyev != 'paso_id')
+                                        $evento->{$keyev} = $ev_attr;
                                 }
-                                $evento->Accion=$proceso->Acciones[$ev->accion_id];
-                                if($ev->paso_id)$evento->Paso=$tarea->Pasos[$ev->paso_id];
-                                $tarea->Eventos[]=$evento;
+                                $evento->Accion = $proceso->Acciones[$ev->accion_id];
+                                if ($ev->paso_id)$evento->Paso = $tarea->Pasos[$ev->paso_id];
+                                $tarea->Eventos[] = $evento;
                             }
-                        }elseif($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso'){// && $keyt != 'grupos_usuarios'){
-                            $tarea->{$keyt}=$t_attr;
+                        } elseif ($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso') { // && $keyt != 'grupos_usuarios'){
+                            $tarea->{$keyt} = $t_attr;
                         }
                     }
 
-                    $proceso->Tareas[$t->id]=$tarea;
+                    $proceso->Tareas[$t->id] = $tarea;
                 }
-            }elseif($keyp=='Formularios' || $keyp=='Acciones' || $keyp=='Documentos' || $keyp=='Conexiones' || $keyp=='Admseguridad' || $keyp=='Suscriptores'){
+            } elseif ($keyp == 'Formularios' || $keyp == 'Acciones' || $keyp == 'Documentos' || $keyp == 'Conexiones' || $keyp == 'Admseguridad' || $keyp == 'Suscriptores') {
+            
+            } elseif ($keyp != 'id' && $keyp != 'cuenta_id' && $isImport == FALSE) {
 
-            }elseif($keyp != 'id' && $keyp != 'cuenta_id'){
+                log_message('debug', '$keyp [' . $keyp . '] $p_attr [' . $p_attr . '] $isImport [' . $isImport . ']');
                 $proceso->{$keyp} = $p_attr;
+
+            } elseif ($keyp != 'id' && $keyp != 'cuenta_id' && $isImport == TRUE) {
+
+                log_message('debug', '$keyp [' . $keyp . '] $p_attr [' . $p_attr . '] $isImport [' . $isImport . ']');
+
+                if ($keyp == 'nombre') {
+                    $fecha = new Datetime();
+                    $proceso->{$keyp} = $p_attr . ' (Importación: ' .  $fecha->format("d-m-Y H:i:s") . ')';
+                } elseif ($keyp == 'root') {
+                    $proceso->{$keyp} = null;
+                } else { 
+                    $proceso->{$keyp} = $p_attr;
+                }
             }
         }
 
-        log_message('info','Formularios creados', FALSE);
-
-        //Hacemos las conexiones
-        foreach($json->Conexiones as $c){
-            $conexion=new Conexion();
-            $proceso->Tareas[$c->tarea_id_origen]->ConexionesOrigen[]=$conexion;
-            if($c->tarea_id_destino) $proceso->Tareas[$c->tarea_id_destino]->ConexionesDestino[]=$conexion;
-            foreach($c as $keyc => $c_attr){
+        // Hacemos las conexiones
+        foreach ($json->Conexiones as $c) {
+            $conexion = new Conexion();
+            $proceso->Tareas[$c->tarea_id_origen]->ConexionesOrigen[] = $conexion;
+            if ($c->tarea_id_destino) $proceso->Tareas[$c->tarea_id_destino]->ConexionesDestino[] = $conexion;
+            foreach ($c as $keyc => $c_attr){
                 if($keyc!='id' && $keyc != 'tarea_id_origen' && $keyc != 'tarea_id_destino'){
                     $conexion->{$keyc} = $c_attr;
                 }
             }
         }
 
-        log_message('info','Conexiones creadas', FALSE);
+        log_message('info', 'Conexiones creadas', FALSE);
 
         //Creamos las configuraciones de seguridad
         foreach($json->Admseguridad as $f){
             log_message('info','Admseguridad id: '.$f->id, FALSE);
-            $proceso->Admseguridad[$f->id]=new Seguridad();
+            $proceso->Admseguridad[$f->id] = new Seguridad();
             log_message('info','Completando', FALSE);
-            foreach($f as $keyf => $f_attr){
-                if($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso'){
-                    $proceso->Admseguridad[$f->id]->{$keyf}=$f_attr;
+            foreach ($f as $keyf => $f_attr) {
+                if ($keyf != 'id' && $keyf != 'proceso_id' && $keyf != 'Proceso') {
+                    $proceso->Admseguridad[$f->id]->{$keyf} = $f_attr;
                 }
             }
         }

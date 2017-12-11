@@ -546,15 +546,13 @@ class Procesos extends MY_BackendController {
 
     }
 
-    public function importar(){
+    public function importar() {
 
-        $file_path=$_FILES['archivo']['tmp_name'];
+        $file_path = $_FILES['archivo']['tmp_name'];
 
-        if($file_path){
-            $input=file_get_contents($_FILES['archivo']['tmp_name']);
-
-            $proceso=Proceso::importComplete($input);
-
+        if ($file_path) {
+            $input = file_get_contents($_FILES['archivo']['tmp_name']);
+            $proceso = Proceso::importComplete($input, TRUE);
             $proceso->save();
 
             $this->migrarSeguridadAcciones($proceso);
@@ -563,8 +561,6 @@ class Procesos extends MY_BackendController {
         }
 
         redirect($_SERVER['HTTP_REFERER']);
-
-
     }
 
     public function publicar($proceso_draft_id){
