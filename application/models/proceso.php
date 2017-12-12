@@ -142,6 +142,7 @@ class Proceso extends Doctrine_Record {
         foreach($proceso->Tareas as $t){
             $t->Pasos;
             $t->Eventos;
+            $t->EventosExternos;
         }
 
         $proceso->Formularios;
@@ -222,6 +223,7 @@ class Proceso extends Doctrine_Record {
                 foreach ($p_attr as $t) {
                     $tarea = new Tarea();
                     foreach ($t as $keyt=>$t_attr) {
+                        log_message("info", "Verificando keyt: ".$keyt, FALSE);
                         if ($keyt == 'Pasos') {
                             foreach ($t_attr as $pa) {
                                 $paso = new Paso();
@@ -243,6 +245,31 @@ class Proceso extends Doctrine_Record {
                                 if ($ev->paso_id)$evento->Paso = $tarea->Pasos[$ev->paso_id];
                                 $tarea->Eventos[] = $evento;
                             }
+                        } elseif ($keyt == 'EventosExternos') {
+                            log_message("info", "Agregando eventos externos", FALSE);
+                            foreach ($tarea->EventosExternos as $key => $val)
+                                unset($tarea->EventosExternos[$key]);
+                            foreach ($t_attr as $ev) {
+                                $evento_externo = new EventoExterno();
+                                foreach ($ev as $keyev => $ev_attr) {
+                                    if ($keyev != 'id' && $keyev != 'tarea_id' && $keyev != 'Tarea') {
+                                        $evento_externo->{$keyev} = $ev_attr;
+                                    }
+                                }
+                                log_message("info", "evento a agregar: ", FALSE);
+                                log_message("info", "Id: ".$evento_externo->id, FALSE);
+                                log_message("info", "nombre: ".$evento_externo->nombre, FALSE);
+                                log_message("info", "metodo: ".$evento_externo->metodo, FALSE);
+                                log_message("info", "url: ".$evento_externo->url, FALSE);
+                                log_message("info", "mensaje: ".$evento_externo->mensaje, FALSE);
+                                log_message("info", "regla: ".$evento_externo->regla, FALSE);
+                                log_message("info", "tarea_id: ".$evento_externo->tarea_id, FALSE);
+                                log_message("info", "opciones: ".$evento_externo->opciones, FALSE);
+                                $tarea->EventosExternos[] = $evento_externo;
+                            }
+
+                            log_message("info", "Eventos externos agregados: ".count($tarea->EventosExternos), FALSE);
+
                         } elseif ($keyt != 'id' && $keyt != 'proceso_id' && $keyt != 'Proceso') { // && $keyt != 'grupos_usuarios'){
                             $tarea->{$keyt} = $t_attr;
                         }
@@ -583,4 +610,14 @@ class Proceso extends Doctrine_Record {
         return $tareas;
 
     }
+
+    static function varDump($data){
+        ob_start();
+        //var_dump($data);
+        print_r($data);
+        $ret_val = ob_get_contents();
+        ob_end_clean();
+        return $ret_val;
+    }
+
 }
