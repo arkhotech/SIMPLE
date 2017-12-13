@@ -555,9 +555,14 @@ class Procesos extends MY_BackendController {
             $proceso = Proceso::importComplete($input, TRUE);
             $proceso->save();
 
+            log_message("INFO", "Migrando configuraciones de seguridad", FALSE);
             $this->migrarSeguridadAcciones($proceso);
+            log_message("INFO", "Migrando configuraciones de suscriptores", FALSE);
             $this->migrarSuscriptores($proceso);
 
+            $this->migrarEventosExternos($proceso);
+
+            log_message("INFO", "Fin migración de proceso", FALSE);
         }
 
         redirect($_SERVER['HTTP_REFERER']);
@@ -654,6 +659,7 @@ class Procesos extends MY_BackendController {
 
             $this->migrarSeguridadAcciones($proceso);
             $this->migrarSuscriptores($proceso);
+            $this->migrarEventosExternos($proceso);
 
             $this->migrarGrupos($proceso, $cuenta);
 
@@ -709,6 +715,19 @@ class Procesos extends MY_BackendController {
                         $tarea->grupos_usuarios = $ids_prod;
                         $tarea->save();
                     }
+                }
+            }
+        }
+    }
+
+    private function migrarEventosExternos($proceso) {
+        log_message("INFO", "Revisando seguridad para proceso id ".$proceso->id, FALSE);
+        $tareas = $proceso->Tareas;
+        foreach ($tareas as $tarea){
+            foreach ($tarea->Eventos as $evento){
+                if(isset($evento->evento_externo_id) && strlen($evento->evento_externo_id) > 0){
+                    $evento->evento_externo_id = $tarea->EventosExternos[$evento->evento_externo_id]->id;
+                    $evento->save();
                 }
             }
         }
@@ -807,6 +826,7 @@ class Procesos extends MY_BackendController {
 
             $this->migrarSeguridadAcciones($proceso);
             $this->migrarSuscriptores($proceso);
+            $this->migrarEventosExternos($proceso);
 
         }else{
             log_message("INFO", "Redirigiendo a edición de Draft con id: ".$draft->id, FALSE);

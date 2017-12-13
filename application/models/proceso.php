@@ -129,10 +129,17 @@ class Proceso extends Doctrine_Record {
     }
 
     public function getConexiones(){
-        return Doctrine_Query::create()
+        /*return Doctrine_Query::create()
             ->select('c.*')
             ->from('Conexion c, c.TareaOrigen.Proceso p1, c.TareaDestino.Proceso p2')
             ->where('(p1.activo=1 AND p2.activo=1) AND (p1.id = ? OR p2.id = ?)',array($this->id,$this->id))
+            ->execute();*/
+
+
+        return Doctrine_Query::create()
+            ->select('c.*')
+            ->from('Conexion c, c.TareaOrigen.Proceso p1')
+            ->where('p1.activo=1 AND p1.id = ?',array($this->id))
             ->execute();
     }
 
@@ -255,17 +262,17 @@ class Proceso extends Doctrine_Record {
                                     if ($keyev != 'id' && $keyev != 'tarea_id' && $keyev != 'Tarea') {
                                         $evento_externo->{$keyev} = $ev_attr;
                                     }
+                                    log_message("info", "evento a agregar: ", FALSE);
+                                    log_message("info", "Id: ".$evento_externo->id, FALSE);
+                                    log_message("info", "nombre: ".$evento_externo->nombre, FALSE);
+                                    log_message("info", "metodo: ".$evento_externo->metodo, FALSE);
+                                    log_message("info", "url: ".$evento_externo->url, FALSE);
+                                    log_message("info", "mensaje: ".$evento_externo->mensaje, FALSE);
+                                    log_message("info", "regla: ".$evento_externo->regla, FALSE);
+                                    log_message("info", "tarea_id: ".$evento_externo->tarea_id, FALSE);
+                                    log_message("info", "opciones: ".$evento_externo->opciones, FALSE);
+                                    $tarea->EventosExternos[$ev->id] = $evento_externo;
                                 }
-                                log_message("info", "evento a agregar: ", FALSE);
-                                log_message("info", "Id: ".$evento_externo->id, FALSE);
-                                log_message("info", "nombre: ".$evento_externo->nombre, FALSE);
-                                log_message("info", "metodo: ".$evento_externo->metodo, FALSE);
-                                log_message("info", "url: ".$evento_externo->url, FALSE);
-                                log_message("info", "mensaje: ".$evento_externo->mensaje, FALSE);
-                                log_message("info", "regla: ".$evento_externo->regla, FALSE);
-                                log_message("info", "tarea_id: ".$evento_externo->tarea_id, FALSE);
-                                log_message("info", "opciones: ".$evento_externo->opciones, FALSE);
-                                $tarea->EventosExternos[] = $evento_externo;
                             }
 
                             log_message("info", "Eventos externos agregados: ".count($tarea->EventosExternos), FALSE);
