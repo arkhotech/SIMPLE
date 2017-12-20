@@ -205,7 +205,9 @@
             <?php if ($num_otros > 0 && $sidebar != 'categorias'): ?>
               <section id="simple-destacados">
                 <div class="section-header">
-                  <h2>Otros trámites</h2>
+                    <?php if (count($categorias) > 0 || $num_destacados > 0){ ?>
+                        <h2>Otros trámites</h2>
+                    <?php }?>
                 </div>
                 <div class="row">
                   <?php foreach ($procesos as $p): ?>

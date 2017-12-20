@@ -110,7 +110,7 @@
                                 <img src="<?= base_url() ?>assets/newhome/images/logo.4583c3bc.png" alt="ClaveÚnica" width="96" height="32"/></a>
                             </p>
                             <div class="form-actions">
-                                <a class="button button--lightgray submit" href="#">Volver</a>
+                                <a class="button button--lightgray" href="<?= base_url() ?>">Volver</a>
                                 <a class="button submit" href="#">Ingresar</a>
                             </div>
                         </fieldset>
