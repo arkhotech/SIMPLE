@@ -54,17 +54,21 @@
         <?php foreach($procesos as $p): ?>
         <tr>
             <td><?=$p->nombre?></td>
-            <td><?=$p->estado == 'public'?'Publicado':'Draft'?></td>
+            <td><?=$p->estado == 'public' ? 'Publicado' : 'Draft'?></td>
             <td><?=$p->version?></td>
             <td>
-                <?php if($editar_proceso){ ?>
+                <?php if ($editar_proceso) { ?>
                     <a class="btn btn-primary" href="<?=site_url('backend/procesos/editar/'.$p->id)?>"><i class="icon-white icon-edit"></i> Editar</a>
                 <?php } ?>
                 <a class="btn btn-default" href="<?=site_url('backend/procesos/exportar/'.$p->id)?>"><i class="icon icon-share"></i> Exportar</a>
                 <a class="btn btn-danger" href="#" onclick="return eliminarProceso(<?=$p->id?>);"><i class="icon-white icon-remove"></i> Eliminar</a>
-                <?php if($p->estado == 'draft'){?>
+                <?php if ($p->estado == 'draft') { ?>
                     <a class="btn btn-primary" href="#" onclick="return publicarProceso(<?=$p->id?>);"><i class="icon-white icon-edit"></i> Publicar</a>
-                <?php }?>
+
+                    <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/versionamiento.html" target="_blank">
+                        <span class="glyphicon glyphicon-info-sign"></span>
+                    </a>
+                <?php } ?>
             </td>
         </tr>
         <?php endforeach; ?>

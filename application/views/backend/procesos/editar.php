@@ -162,6 +162,9 @@
             <option value="<?=$proceso_arch['id']?>" <?=$proceso_arch['id']==$proceso->id?'selected':''?>><?=$proceso_arch['nombre'].'-'.$proceso_arch['version']?></option>
         <?php endforeach ?>
     </select>
+    <a href="/assets/ayuda/simple/backend/modelamiento-del-proceso/versionamiento.html" target="_blank">
+        <span class="glyphicon glyphicon-info-sign"></span>
+    </a>
 </form>
 
 
