@@ -21,17 +21,11 @@ class AccionVariable extends Accion {
     }
 
     public function ejecutar(Etapa $etapa) {
-        log_message("debug", "############# Ejecutando accion variable", FALSE);
-
-        log_message("debug", "############# expresion: ".$this->extra->expresion, FALSE);
-
         $regla=new Regla($this->extra->expresion);
         $filewords = array("file_get_contents", "file_put_contents");
         $matchfound = preg_match_all("/\b(".implode($filewords,"|").")\b/i", $this->extra->expresion, $matches);
         $ev = $matchfound? TRUE : FALSE;
         $valor=$regla->evaluar($etapa->id,$ev);
-
-        log_message("debug", "############# valor: ".$valor, FALSE);
 
         $dato = Doctrine::getTable('DatoSeguimiento')->findOneByNombreAndEtapaId($this->extra->variable,$etapa->id);
         if (!$dato)

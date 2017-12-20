@@ -134,7 +134,7 @@ class Regla {
             $dato = Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($nombre_dato, $etapa_id);
 
             log_message("debug", "############# dato nombre: ".$dato->nombre, FALSE);
-            log_message("debug", "############# dato valor: ".$dato->valor, FALSE);
+            log_message("debug", "############# 1. dato valor: ".$dato->valor, FALSE);
 
             if ($dato) {
                 $dato_almacenado = eval('$x=json_decode(\'' . json_encode($dato->valor, JSON_HEX_APOS) . '\'); return $x' . $accesor . ';');
@@ -200,6 +200,7 @@ class Regla {
                 // Entregamos vacio
                 $valor_dato = '';
             }
+            log_message("debug", "############# 1. dato valor: ".$dato->valor, FALSE);
             return $valor_dato;
         }, $new_regla);
 
@@ -211,6 +212,7 @@ class Regla {
             $dato = Doctrine::getTable('DatoSeguimiento')->findGlobalByNombreAndProceso($nombre_dato, $etapa->Tramite->id);
             $valor_dato = json_encode($dato);
 
+            log_message("debug", "############# 2. dato valor: ".$dato->valor, FALSE);
             return $valor_dato;
         }, $new_regla);
 
