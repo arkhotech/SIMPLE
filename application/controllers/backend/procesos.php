@@ -117,10 +117,11 @@ class Procesos extends MY_BackendController {
         log_message('debug', '$proceso->estado [' . $proceso->estado . '])');
 
         // Verificar si es draft o un proceso publicado
-        if ($proceso->estado != 'draft') { //no es draft
+        if ($proceso->estado == 'public') { //no es draft
             //Se crea Draft
+            log_message("INFO", "Creando Draft para proceso id ".$proceso_id, FALSE);
             $proceso = $this->crearDraft($proceso);
-        } else {
+        } elseif ($proceso->estado == 'arch') {
             $root = $proceso_id;
 
             log_message("INFO", "Editando proceso id ".$proceso_id, FALSE);

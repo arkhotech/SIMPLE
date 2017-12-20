@@ -117,6 +117,7 @@
 <script src="<?= base_url() ?>assets/js/jquery.jsplumb/jquery.jsPlumb-1.3.16-all-min.js" type="text/javascript"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/js/diagrama-procesos.js"></script>
 <script type="text/javascript" src="<?= base_url() ?>assets/js/modelador-procesos.js"></script>
+<script type="text/javascript" src="<?= base_url() ?>assets/js/editar.js"></script>
 <?php endif ?>
 
 <script type="text/javascript">
