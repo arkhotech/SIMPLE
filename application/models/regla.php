@@ -123,14 +123,23 @@ class Regla {
         // print_r( stdClass::__set_state(array( 'region' => 'Antofagasta', 'comuna' => 'San Pedro de Atacama' )));
         // exit;
         $new_regla = $this->regla;
+        log_message("debug", "############# En getExpresionParaOutput", FALSE);
+        log_message("debug", "############# Regla: ".$new_regla, FALSE);
         $new_regla = preg_replace_callback('/@@(\w+)((->\w+|\[\w+\])*)/', function($match) use ($etapa_id, $evaluar) {
             $nombre_dato = $match[1];
+            log_message("debug", "############# nombre_dato: ".$nombre_dato, FALSE);
             $accesor = isset($match[2]) ? $match[2] : '';
+            log_message("debug", "############# accesor: ".$accesor, FALSE);
 
             $dato = Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($nombre_dato, $etapa_id);
 
+            log_message("debug", "############# dato nombre: ".$dato->nombre, FALSE);
+            log_message("debug", "############# dato valor: ".$dato->valor, FALSE);
+
             if ($dato) {
                 $dato_almacenado = eval('$x=json_decode(\'' . json_encode($dato->valor, JSON_HEX_APOS) . '\'); return $x' . $accesor . ';');
+
+                log_message("debug", "############# dato_almacenado: ".$dato_almacenado, FALSE);
 
                 if (!is_string($dato_almacenado)) {
                     $valor_dato = json_encode($dato_almacenado);
