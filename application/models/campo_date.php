@@ -15,13 +15,13 @@ class CampoDate extends Campo{
 
         $display = '<label class="control-label" for="'.$this->id.'">' . $this->etiqueta . (!in_array('required', $this->validacion) ? ' (Opcional)' : '') . '</label>';
         $display .= '<div class="controls">';
-        $display .= '<input id="' . $this->id . '" class="datepicker" ' . ($modo == 'visualizacion' ? 'readonly' : '') . ' type="date" name="' . $this->nombre . '" value="' . ($dato && $dato->valor?date('d-m-Y',strtotime($dato->valor)) : ($valor_default ? date('d-m-Y', strtotime($valor_default)) : $valor_default)) . '" placeholder="dd-mm-aaaa" />';
+        $display .= '<input id="' . $this->id . '" class="datepicker" ' . ($modo == 'visualizacion' ? 'readonly' : '') . ' type="date" name="' . $this->nombre . '" value="' . ($dato && $dato->valor?date('Y-m-d',strtotime($dato->valor)) : ($valor_default ? date('Y-m-d', strtotime($valor_default)) : $valor_default)) . '" placeholder="dd-mm-aaaa" />';
 
         if ($this->ayuda) {
             $display .= '<span class="help-block">' . $this->ayuda . '</span>';
         }
         $display .= '</div>';
-        
+
         return $display;
     }
 
