@@ -23,7 +23,7 @@ class Reportes extends MY_BackendController {
         
         $procesos= Doctrine_Query::create()
             ->from('Proceso p, p.Cuenta c')
-            ->where('c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+            ->where('c.id = ? AND p.estado = "public"',UsuarioBackendSesion::usuario()->cuenta_id)
             ->orderBy('p.nombre asc')
             ->execute();
         
