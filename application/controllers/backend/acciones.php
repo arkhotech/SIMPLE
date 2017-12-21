@@ -24,7 +24,8 @@ class Acciones extends MY_BackendController {
             echo 'Usuario no tiene permisos para listar los formularios de este proceso';
             exit;
         }
-        $data['proceso'] = $proceso;
+        
+	$data['proceso'] = $proceso;
         $data['acciones'] = $data['proceso']->Acciones;
 
         $data['title'] = 'Triggers';
