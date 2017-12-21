@@ -556,14 +556,22 @@ class Proceso extends Doctrine_Record {
 
     public function findIdProcesoActivo($root, $cuenta_id) {
 
-        log_message('info', 'findIdProcesoActivo ($root [ ' . $root . '], $cuenta_id [' . $cuenta_id . '])');
-        
         $procesos = Doctrine_Query::create()
             ->from('Proceso p, p.Cuenta c')
             ->where('(p.root = ? OR p.id = ?) AND p.estado="public" AND c.id = ?', array($root, $root, $cuenta_id))
             ->execute();
 
         return $procesos[0];
+    }
+
+    public function findProcesosByRoot($root, $cuenta_id) {
+
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p, p.Cuenta c')
+            ->where('(p.root = ? OR p.id = ?) AND c.id = ?', array($root, $root, $cuenta_id))
+            ->execute();
+
+        return $procesos;
     }
 
     public function findProcesosArchivados($root){

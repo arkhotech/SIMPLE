@@ -71,9 +71,10 @@ class Reporte extends Doctrine_Record {
 
     	$query = Doctrine_Query::create()
     	->from('Tramite t, t.Proceso p, t.Etapas e, e.DatosSeguimiento d')
-    	->where('p.id = ?', $this->proceso_id);
+    	->where('p.id = ? or p.root = ?', array($this->proceso_id, $this->proceso_id));
 
     	foreach ($params as $p) {
+            log_message('debug', 'Parametro p: ' . $p);
     		$query = $query -> andWhere($p);
     	}
 

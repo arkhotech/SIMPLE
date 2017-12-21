@@ -70,6 +70,7 @@
         <div class="validacion"></div>
         <?php if(!$edit):?>
         <input type="hidden" name="proceso_id" value="<?=$proceso->id?>" />
+            <input type="hidden" name="proceso_root" value="<?=$proceso->root?>" />
         <?php endif; ?>
         <label>Nombre</label>
         <input type="text" name="nombre" value="<?=$edit?$reporte->nombre:''?>" />
