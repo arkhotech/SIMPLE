@@ -54,6 +54,7 @@ $(document).ready(function() {
         if (!$(form).prop("submitting")) {
             $(form).prop("submitting", true);
             $('#login .ajaxLoader').show();
+
             $.ajax({
                 url: $(form).prop("action"),
                 data: $(form).serialize(),
@@ -107,6 +108,7 @@ $(document).ready(function() {
                 left: ($(form).width() / 2 - $(ajaxLoader).width() / 2) + "px", 
                 top: ($(form).height() / 2 - $(ajaxLoader).height() / 2) + "px"
             });
+            $('.ajaxLoader').show();
             $.ajax({
                 url: form.action,
                 data: $(form).serialize(),

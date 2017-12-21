@@ -286,7 +286,6 @@
 
                             $(".reglas").blur(function() {
                                 var input = this;
-                                console.log("$rule: " + $(this).val());
                                 $.ajax({
                                     url: '<?=site_url('backend/configuracion/ajax_get_validacion_reglas')?>',
                                     data: {

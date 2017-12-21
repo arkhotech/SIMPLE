@@ -39,7 +39,6 @@
                 $("#login .submit").click(function() {
 
                     var form = $("#login");
-                    console.log("form.action: " + $(form).action);
                     if (!$(form).prop("submitting")) {
                         $(form).prop("submitting", true);
                         $('#login .ajaxLoader').show();
