@@ -217,7 +217,7 @@ class Configuracion extends MY_BackendController {
 
         $data['procesos'] = Doctrine_Query::create()
                             ->from('Proceso p, p.Cuenta c')
-                            ->where('p.activo=1 AND c.id = ?',UsuarioBackendSesion::usuario()->cuenta_id)
+                            ->where('p.activo=1 AND c.id = ? AND p.estado = "public"',UsuarioBackendSesion::usuario()->cuenta_id)
                             ->orderBy('p.nombre asc')
                             ->execute();
 
