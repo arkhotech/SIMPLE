@@ -737,10 +737,16 @@ form#login {
 
 .handsontable td {
   padding: 14px 4px;
+  font-size: 12px;
+  vertical-align: middle;
 }
 
 .handsontable th {
   background-color: #f9f9f9;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: normal;
+  vertical-align: middle;
 }
 
 .handsontable th:first-child {

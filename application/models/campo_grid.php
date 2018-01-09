@@ -18,7 +18,7 @@ class CampoGrid extends Campo{
 
         $display='<label class="control-label" for="'.$this->id.'">' . $this->etiqueta . (!in_array('required', $this->validacion) ? ' (Opcional)' : '') . '</label>';
         $display.='<div class="controls">';
-        $display.='<div class="grid" data-id="'.$this->id.'" style="width: 590px;"></div>';
+        $display.='<div class="grid" data-id="'.$this->id.'" style="display: block;"></div>';
         $display.='<input type="hidden" name="' . $this->nombre . '" value=\'' . ($dato?json_encode($dato->valor):$valor_default) . '\' />';
         if($this->ayuda)
             $display.='<span class="help-block">'.$this->ayuda.'</span>';
