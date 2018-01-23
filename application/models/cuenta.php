@@ -117,5 +117,16 @@ class Cuenta extends Doctrine_Record {
         return $cuenta_dev;
     }
 
+    public function getProcesosActivos() {
+
+        log_message('debug', 'getProcesosActivos: ' . $this->id);
+
+        $procesos = Doctrine_Query::create()
+            ->from('Proceso p, p.Cuenta c')
+            ->where('p.estado="public" AND p.activo=1 AND c.id = ?', $this->id)
+            ->execute();
+
+        return $procesos;
+    }
 
 }

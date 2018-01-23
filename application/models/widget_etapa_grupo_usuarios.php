@@ -70,7 +70,7 @@ class WidgetEtapaGrupoUsuarios extends Widget {
 
         $procesos = Doctrine_Query::create()
                 ->from('Proceso p, p.Tareas t')
-                ->where('p.activo=1 AND p.cuenta_id = ?', $this->Cuenta->id)
+                ->where('p.activo=1 AND p.estado="public" AND p.cuenta_id = ?', $this->Cuenta->id)
                 ->andWhere('t.acceso_modo = ?', 'grupos_usuarios')
                 ->execute();
 

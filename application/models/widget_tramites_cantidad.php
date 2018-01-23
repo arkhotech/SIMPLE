@@ -18,7 +18,7 @@ class WidgetTramitesCantidad extends Widget {
                 $conteo = Doctrine_Query::create()
                     ->from('Tramite t, t.Etapas e, e.DatosSeguimiento d, t.Proceso p ,p.Cuenta c')
                     ->where('c.id = ?', $this->cuenta_id)
-                    ->andWhere('p.activo=1 AND p.id = ?', $p->id)
+                    ->andWhere('p.activo=1 AND (p.id = ? OR p.root = ?)', array($p->root, $p->root))
                     ->andWhere('t.pendiente=1')
                     ->having('COUNT(d.id) > 0 OR COUNT(e.id) > 1')  //Mostramos solo los que se han avanzado o tienen datos
                     ->groupBy('t.id')
@@ -35,7 +35,7 @@ class WidgetTramitesCantidad extends Widget {
                 $conteo = Doctrine_Query::create()
                     ->from('Tramite t, t.Etapas e, e.DatosSeguimiento d, t.Proceso p ,p.Cuenta c')
                     ->where('c.id = ?', $this->cuenta_id)
-                    ->andWhere('p.activo=1 AND p.id = ?', $p->id)
+                    ->andWhere('p.activo=1 AND (p.id = ? OR p.root = ?)', array($p->root, $p->root))
                     ->andWhere('t.pendiente=0')
                     ->having('COUNT(d.id) > 0 OR COUNT(e.id) > 1')  //Mostramos solo los que se han avanzado o tienen datos
                     ->groupBy('t.id')
@@ -93,7 +93,7 @@ class WidgetTramitesCantidad extends Widget {
     }
 
     public function displayForm() {
-        $procesos = $this->Cuenta->Procesos;
+        $procesos = $this->Cuenta->getProcesosActivos();//Procesos;
         
         $procesos_array=$this->config?$this->config->procesos:array();
         
