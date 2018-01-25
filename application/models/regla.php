@@ -193,7 +193,7 @@ class Regla {
                 // Entregamos vacio
                 $valor_dato = '';
             }
-            log_message("debug", "############# 1. dato valor: ".$dato->valor, FALSE);
+            //log_message("debug", "############# 1. dato valor: ".$dato->valor, FALSE);
             return $valor_dato;
         }, $new_regla);
 

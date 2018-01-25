@@ -407,10 +407,17 @@ class Campo extends Doctrine_Record {
                     }
                 }else if($campo->tipo == 'documento'){
                     $documento = Doctrine::getTable('Documento')->findOneByProcesoId($etapa->Tarea->proceso_id);
-                    $file = $documento->generar($etapa->id);
-                    $data = file_get_contents('uploads/documentos/'.$file->filename);
-                    if(isset($data) && $data != '') {
-                        $return[$key] = base64_encode($data);
+                    //Revisar si variables del documento han sido reemplazadas
+                    $contenido = $documento->contenido;
+
+                    $docCompleto = $this->esDocumentoCompleto($etapa->id, $contenido);
+
+                    if($docCompleto){
+                        $file = $documento->generar($etapa->id);
+                        $data = file_get_contents('uploads/documentos/'.$file->filename);
+                        if(isset($data) && $data != '') {
+                            $return[$key] = base64_encode($data);
+                        }
                     }
                 }else{
                     log_message("INFO", "Obteniendo valor para etapa: ".$etapa->id, FALSE);
@@ -425,6 +432,33 @@ class Campo extends Doctrine_Record {
         log_message("INFO", "Variables a retornar: ".$this->varDump($return), FALSE);
         return $return;
     }
+
+    private function esDocumentoCompleto($etapa_id, $contenido){
+
+        $estaCompleto = true;
+
+        $contenido = preg_replace_callback('/@@(\w+)((->\w+|\[\w+\])*)/', function($match) use ($etapa_id) {
+            $nombre_dato = $match[1];
+
+            $dato = Doctrine::getTable('DatoSeguimiento')->findByNombreHastaEtapa($nombre_dato, $etapa_id);
+            $retorno = '';
+            if (!$dato) {
+                $retorno = 'NO_DATA_FOUND';
+            }
+
+            return $retorno;
+
+        }, $contenido);
+
+        if (strpos($contenido, 'NO_DATA_FOUND') !== false) {
+            $estaCompleto = false;
+        }
+
+        return $estaCompleto;
+
+    }
+
+
     /**
      * Exporta todas las variables creadas por una accion
      * @param type $etapa
